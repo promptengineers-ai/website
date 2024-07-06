@@ -23,7 +23,7 @@ const FooterSection = () => {
   };
 
   return (
-    <footer className="bg-black pb-16 md:py-12 text-gray-300">
+    <footer className="bg-black pb-16 pt-10 md:py-12 text-gray-300">
       <div className="container mx-auto px-6 md:flex md:items-center md:justify-between">
         <div className="mb-6 md:mb-0">
           <h2 className="mb-2 text-center text-xl font-bold md:text-left">

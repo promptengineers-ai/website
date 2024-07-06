@@ -4,7 +4,7 @@ import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 const AboutSection = () => {
   return (
-    <div id="about" className="bg-black py-20">
+    <div id="about" className="bg-black py-10">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
           <div className="relative flex justify-center">
@@ -53,7 +53,7 @@ const AboutSection = () => {
               <p className="text-xs md:text-sm text-gray-700">Founder & Core Developer</p>
             </div>
           </div>
-          <div className="md:mt-20">
+          <div className="mt-10 md:mt-20">
             <h2 className="mb-8 text-5xl font-bold text-white md:text-6xl">
               My Promise...
             </h2>

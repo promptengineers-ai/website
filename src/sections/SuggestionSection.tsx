@@ -15,6 +15,7 @@ const SuggestionSection = () => {
       email,
       feature,
       upvotes: 0,
+      status: "backlog",
     };
     setFeatures([newFeature, ...features]);
     setName("");
@@ -34,8 +35,51 @@ const SuggestionSection = () => {
 
   return (
     <div id="suggestions" className="bg-black py-20">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 md:px-24">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          <div>
+            <h3 className="mb-4 text-4xl font-bold text-white">
+              Feature Requests
+            </h3>
+            <ul>
+              {features
+                .sort((a, b) => b.upvotes - a.upvotes)
+                .map((feature) => (
+                  <li
+                    key={feature.id}
+                    className="mb-4 rounded-lg bg-gray-800 p-4 shadow-lg"
+                  >
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-bold text-gray-300">
+                          {feature.feature}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          by {feature.name}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <div className="flex items-end">
+                          <p className="mr-3 text-gray-300">Status:</p>
+                          <span className="rounded-full bg-indigo-700 px-2 py-1 text-xs font-semibold text-gray-300">
+                            {feature.status}
+                          </span>
+                        </div>
+                        <div className="flex items-end">
+                          <button
+                            onClick={() => handleUpvote(feature.id)}
+                            className="mr-3 text-indigo-400"
+                          >
+                            Upvote
+                          </button>
+                          <p className="text-gray-300">{feature.upvotes}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+            </ul>
+          </div>
           <div className="w-full max-w-lg">
             <h3 className="mb-4 text-4xl font-bold text-white">
               Suggest a Feature
@@ -104,41 +148,6 @@ const SuggestionSection = () => {
                 </button>
               </div>
             </form>
-          </div>
-          <div>
-            <h3 className="mb-4 text-4xl font-bold text-white">
-              Feature Requests
-            </h3>
-            <ul>
-              {features
-                .sort((a, b) => b.upvotes - a.upvotes)
-                .map((feature) => (
-                  <li
-                    key={feature.id}
-                    className="mb-4 rounded-lg bg-gray-800 p-4 shadow-lg"
-                  >
-                    <div className="flex justify-between">
-                      <div>
-                        <p className="font-bold text-gray-300">
-                          {feature.feature}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          by {feature.name}
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        <button
-                          onClick={() => handleUpvote(feature.id)}
-                          className="mr-2 text-indigo-600"
-                        >
-                          Upvote
-                        </button>
-                        <p className="text-gray-300">{feature.upvotes}</p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-            </ul>
           </div>
         </div>
       </div>
