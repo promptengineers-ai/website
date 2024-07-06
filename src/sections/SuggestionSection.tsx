@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { AiTwotoneLike } from "react-icons/ai";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const SuggestionSection = () => {
@@ -13,6 +14,7 @@ const SuggestionSection = () => {
         "Add a dark mode option to the website for better night-time usability.",
       upvotes: 10,
       status: "backlog",
+      enabled: true,
     },
     {
       id: 2,
@@ -22,6 +24,7 @@ const SuggestionSection = () => {
       feature: "Implement a notification system to alert users of new updates.",
       upvotes: 7,
       status: "backlog",
+      enabled: true,
     },
     {
       id: 3,
@@ -32,6 +35,7 @@ const SuggestionSection = () => {
         "Allow users to customize their profiles with pictures and bios.",
       upvotes: 5,
       status: "backlog",
+      enabled: false,
     },
     {
       id: 4,
@@ -41,6 +45,7 @@ const SuggestionSection = () => {
       feature: "Implement two-factor authentication for enhanced security.",
       upvotes: 12,
       status: "backlog",
+      enabled: true,
     },
     {
       id: 5,
@@ -51,35 +56,43 @@ const SuggestionSection = () => {
         "Provide API access to developers for integration with other services.",
       upvotes: 8,
       status: "backlog",
+      enabled: true,
     },
     {
       id: 6,
       name: "Frank Johnson",
       email: "frank@example.com",
       title: "User Management",
-      feature: "Implement user management features for improved user experience.",
+      feature:
+        "Implement user management features for improved user experience.",
       upvotes: 3,
       status: "backlog",
+      enabled: false,
     },
     {
       id: 7,
       name: "Grace Williams",
       email: "grace@example.com",
       title: "User Management",
-      feature: "Implement user management features for improved user experience.",
+      feature:
+        "Implement user management features for improved user experience.",
       upvotes: 3,
       status: "backlog",
+      enabled: false,
     },
     {
       id: 8,
       name: "Henry Johnson",
       email: "henry@example.com",
       title: "User Management",
-      feature: "Implement user management features for improved user experience.",
+      feature:
+        "Implement user management features for improved user experience.",
       upvotes: 3,
       status: "backlog",
+      enabled: true,
     },
   ]);
+  const [upvoteDisabled, setUpvoteDisabled] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [featureTitle, setFeatureTitle] = useState("");
@@ -98,6 +111,7 @@ const SuggestionSection = () => {
       feature,
       upvotes: 0,
       status: "backlog",
+      enabled: true,
     };
     setFeatures([newFeature, ...features]);
     setName("");
@@ -107,6 +121,11 @@ const SuggestionSection = () => {
   };
 
   const handleUpvote = (id: number) => {
+    if (upvoteDisabled) {
+      alert("You can only upvote once every 10 seconds.");
+      return;
+    }
+
     setFeatures(
       features.map((feature: any) =>
         feature.id === id
@@ -114,6 +133,11 @@ const SuggestionSection = () => {
           : feature,
       ),
     );
+
+    setUpvoteDisabled(true);
+    setTimeout(() => {
+      setUpvoteDisabled(false);
+    }, 10000);
   };
 
   const toggleDescription = (id: number) => {
@@ -138,6 +162,7 @@ const SuggestionSection = () => {
             </h3>
             <ul className="max-h-[490px] overflow-y-auto overflow-x-hidden pr-1">
               {features
+                .filter((feature) => feature.enabled)
                 .sort((a, b) => b.upvotes - a.upvotes)
                 .map((feature) => (
                   <li
@@ -171,18 +196,21 @@ const SuggestionSection = () => {
                         </p>
                       </div>
                       <div className="w-2/12 text-right">
-                        <span className="mr-3 rounded-full bg-indigo-700 px-2 py-1 text-xs font-semibold text-gray-300">
+                        <span className="rounded-full bg-indigo-700 px-2 py-1 text-xs font-semibold text-gray-300">
                           {feature.status}
                         </span>
                         <div className="mt-2 flex flex-col items-end">
                           <div className="flex">
-                            <button
-                              onClick={() => handleUpvote(feature.id)}
-                              className="mr-1 text-indigo-400"
-                            >
-                              Upvote:
-                            </button>
                             <p className="text-gray-300">{feature.upvotes}</p>
+                            <button
+                              onClick={() => {
+                                handleUpvote(feature.id);
+                                setTimeout(() => {}, 2000);
+                              }}
+                              className="ml-2 text-indigo-400"
+                            >
+                              <AiTwotoneLike size={20}/>
+                            </button>
                           </div>
                         </div>
                       </div>
