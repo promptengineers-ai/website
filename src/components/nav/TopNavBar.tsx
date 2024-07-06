@@ -46,7 +46,7 @@ const TopNavbar = () => {
     <>
       <nav
         style={showSolidBackground ? solidStyle : {}}
-        className="fixed left-0 top-0 z-10 w-full transition-all duration-300 ease-in-out"
+        className="fixed left-0 top-0 z-50 w-full transition-all duration-300 ease-in-out"
       >
         <div className="px-4">
           <div className="flex items-center justify-between py-3">
@@ -87,7 +87,10 @@ const TopNavbar = () => {
               {/* <a href="/resume.pdf" className="hover:text-green-400">
                 Resume
               </a> */}
-              <a href="/#services" className="hover:text-green-400">
+              <a href="/#about" className="hover:text-green-400">
+                About
+              </a>
+              <a href="/#features" className="hover:text-green-400">
                 Features
               </a>
               <a href="/#projects" className="hover:text-green-400">
@@ -146,7 +149,7 @@ const TopNavbar = () => {
             <FaMedium className="mr-2" fontSize={"20px"} /> Blog
           </a>
           <a
-            href="/#services"
+            href="/#features"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
           >

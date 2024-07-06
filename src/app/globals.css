@@ -88,6 +88,7 @@ body {
 .fade-in {
   opacity: 0; /* Ensure elements are initially hidden */
   animation-fill-mode: forwards; /* Keep the final state after the animation completes */
+  will-change: opacity; /* Optimize for opacity change */
 }
 
 .fade-in-1 {
@@ -95,11 +96,11 @@ body {
 }
 
 .fade-in-2 {
-  animation: fadeIn 0.25s ease-out 0.25s forwards; /* 1s delay for the second item */
+  animation: fadeIn 0.25s ease-out 0.25s forwards; /* 0.25s delay for the second item */
 }
 
 .fade-in-3 {
-  animation: fadeIn 0.25s ease-out 0.5s forwards; /* 2s delay for the third item */
+  animation: fadeIn 0.25s ease-out 0.5s forwards; /* 0.5s delay for the third item */
 }
 
 ::-webkit-scrollbar {
@@ -121,4 +122,13 @@ body {
 
 .hover-shadow-defined:hover {
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Add this CSS to your global styles or component-specific styles */
+.iphone-mock-hover {
+  transition: z-index 0.3s ease, transform 0.3s ease;
+}
+
+.iphone-mock-hover:hover {
+  transform: scale(1.05);
 }

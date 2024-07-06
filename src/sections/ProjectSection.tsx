@@ -20,7 +20,7 @@ const projects = [
     link: "https://github.com/promptengineers-ai",
   },
   {
-    title: "Prompt Engineers AI - SaaS",
+    title: "Prompt Engineers AI - Legacy",
     image:
       "https://github.com/ryaneggz/static/blob/main/promptenigineers-landing.jpg?raw=true",
     description:

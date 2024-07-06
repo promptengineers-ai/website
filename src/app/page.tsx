@@ -1,9 +1,10 @@
 import TopNavBar from "@/components/nav/TopNavBar";
 import HeroSection from "@/sections/HeroSection";
 import ContactSection from "@/sections/ContactSection";
-import ServiceSection from "@/sections/ServiceSection";
 import FooterSection from "@/sections/FooterSection";
 import ProjectSection from "@/sections/ProjectSection";
+import AboutSection from "@/sections/AboutSection";
+import SuggestionSection from "@/sections/SuggestionSection";
 
 export default function Home() {
   return (
@@ -13,7 +14,8 @@ export default function Home() {
 			</header>
 			<main>
 				<HeroSection />
-				<ServiceSection />
+				<AboutSection />
+				<SuggestionSection />
 				<ProjectSection />
 				<ContactSection />
 			</main>
