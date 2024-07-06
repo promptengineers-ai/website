@@ -1,13 +1,15 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
 import { socialIcons } from "@/config/app";
 import { MdVideoCall } from "react-icons/md";
 import { FaMedium } from "react-icons/fa6";
 import { HERO_GIF } from "@/config/static";
-import { ImProfile } from "react-icons/im";
 import IphoneMock from "../components/mocks/IphoneMock"; // Adjust the import path as necessary
 
 const HeroSection = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       className="relative flex min-h-screen flex-col justify-center bg-cover bg-center bg-no-repeat lg:flex-row lg:items-center"
@@ -41,8 +43,12 @@ const HeroSection = () => {
       </div>
 
       {/* Hero Content */}
-      <div className="relative z-10 mx-auto max-w-5xl p-3 sm:text-left lg:flex lg:items-center lg:justify-between">
-        <div className="z-10">
+      <div
+        className={`relative mx-auto max-w-5xl p-3 sm:text-left lg:flex lg:items-center lg:justify-between ${
+          isHovered ? "z-0" : "z-10"
+        }`}
+      >
+        <div className={`z-${isHovered ? "0" : "20"}`}>
           <h1
             className="fade-in fade-in-1 mb-8 text-7xl font-bold text-white md:text-8xl"
             style={{ filter: "drop-shadow(0px 2px 20px rgba(0, 0, 0, 0.8))" }}
@@ -74,10 +80,16 @@ const HeroSection = () => {
 
         {/* IphoneMock Component */}
         <div className="top-50 absolute right-10 hidden lg:block xl:w-1/3 xl:pl-10">
-          <div className="fade-in fade-in-3 opacity-80">
+          <div
+            className={`fade-in fade-in-3 iphone-mock-hover relative ${
+              isHovered ? null : "opacity-80"
+            }`}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             <IphoneMock />
           </div>
-        </div>  
+        </div>
       </div>
     </div>
   );

@@ -123,3 +123,13 @@ body {
 .hover-shadow-defined:hover {
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
 }
+
+/* Add this CSS to your global styles or component-specific styles */
+.iphone-mock-hover {
+  transition: z-index 0.3s ease, transform 0.3s ease;
+}
+
+.iphone-mock-hover:hover {
+  z-index: 30;
+  transform: scale(1.05);
+}
