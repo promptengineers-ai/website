@@ -19,7 +19,7 @@ const HeroSection = () => {
       <div className="absolute bottom-0 left-0 right-0 top-0 bg-black bg-opacity-20"></div>
 
       {/* Social Media Icons - Adjust layout for lg screens and left align on md screens */}
-      <div className="pl-3 z-10 flex items-start justify-start lg:absolute lg:left-2 lg:top-1/2 lg:mt-5 lg:-translate-y-1/2 lg:flex-col lg:items-start lg:justify-start lg:pl-4">
+      <div className="z-10 flex items-start justify-start pl-3 lg:absolute lg:left-2 lg:top-1/2 lg:mt-5 lg:-translate-y-1/2 lg:flex-col lg:items-start lg:justify-start lg:pl-4">
         {socialIcons.map(({ Icon, tooltip, key, link }) => (
           <div
             className="group relative mb-4 mr-3 text-5xl text-white lg:mb-6 lg:mr-0"
@@ -58,7 +58,7 @@ const HeroSection = () => {
             style={{ filter: "drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.8))" }}
           >
             My mission is to help you get it back by providing simple tools for
-            professionals, and best in class API's for builders.
+            professionals, and best in class API&apos;s for builders.
           </p>
           <div className="fade-in fade-in-3 mt-8">
             <Link href="https://calendly.com/adaptivebiz" target="_blank">

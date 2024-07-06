@@ -78,10 +78,10 @@ const ServiceSection = () => {
           My Promise...
         </h2>
         <p className="mb-10 text-center text-base text-gray-300 md:mx-60">
-          To listen to your feedback and bring you the features you want most. 
-          I will be implementing a suggestion form so that you can tell me
-          what you'd like to see an the community will vote on the features 
-          they want to see implemented.
+          To listen to your feedback and bring you the features you want most. I
+          will be implementing a suggestion form so that you can tell me what
+          you&apos;d like to see an the community will vote on the features they
+          want to see implemented.
         </p>
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {services.map((service) => (

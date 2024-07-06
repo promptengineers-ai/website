@@ -30,9 +30,11 @@ const AboutSection = () => {
                 zIndex: 1,
               }}
             />
-            <div className="absolute bottom-[-30px] md:bottom-4 md:right-4 z-20 rounded bg-white p-2 shadow-md">
+            <div className="absolute bottom-[-30px] z-20 rounded bg-white p-2 shadow-md md:bottom-4 md:right-4">
               <div className="flex items-center">
-                <p className="font-bold text-black text-sm md:text-md">Ryan Eggleston</p>
+                <p className="md:text-md text-sm font-bold text-black">
+                  Ryan Eggleston
+                </p>
                 <a
                   href="https://www.linkedin.com/in/ryan-eggleston" // Replace with the actual LinkedIn URL
                   target="_blank"
@@ -50,7 +52,9 @@ const AboutSection = () => {
                   <FaGithub size={20} />
                 </a>
               </div>
-              <p className="text-xs md:text-sm text-gray-700">Founder & Core Developer</p>
+              <p className="text-xs text-gray-700 md:text-sm">
+                Founder & Core Developer
+              </p>
             </div>
           </div>
           <div className="mt-10 md:mt-20">
@@ -60,8 +64,8 @@ const AboutSection = () => {
             <p className="text-xl text-gray-300">
               To listen to your feedback and bring you the features you want
               most. I will be implementing a suggestion form so that you can
-              tell me what you'd like to see and the community will vote on the
-              features they want to see implemented.
+              tell me what you&apos;d like to see and the community will vote on
+              the features they want to see implemented.
             </p>
           </div>
         </div>
