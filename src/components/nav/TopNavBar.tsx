@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { FaMedium } from "react-icons/fa6";
 import {
   MdHome,
   MdWork,
@@ -83,11 +84,11 @@ const TopNavbar = () => {
               <a href="/" className="hover:text-green-400">
                 Home
               </a>
-              <a href="/resume.pdf" className="hover:text-green-400">
+              {/* <a href="/resume.pdf" className="hover:text-green-400">
                 Resume
-              </a>
+              </a> */}
               <a href="/#services" className="hover:text-green-400">
-                Services
+                Features
               </a>
               <a href="/#projects" className="hover:text-green-400">
                 Projects
@@ -130,26 +131,26 @@ const TopNavbar = () => {
           >
             <MdHome className="mr-1" fontSize={"20px"} /> Home
           </a>
-          <a
+          {/* <a
             href="/resume.pdf"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
           >
             <MdDescription className="mr-2" fontSize={"20px"} /> Resume
-          </a>
+          </a> */}
           <a
             href="/blogs"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
           >
-            <MdCreate className="mr-2" fontSize={"20px"} /> Blogs
+            <FaMedium className="mr-2" fontSize={"20px"} /> Blog
           </a>
           <a
             href="/#services"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
           >
-            <MdBuild className="mr-2" fontSize={"20px"} /> Services
+            <MdBuild className="mr-2" fontSize={"20px"} /> Features
           </a>
           <a
             href="/#projects"

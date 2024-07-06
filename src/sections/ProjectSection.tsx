@@ -4,12 +4,12 @@ import { useState } from "react";
 // JSON data for the projects
 const projects = [
   {
-    title: "Prompt Engineers AI - SaaS",
+    title: "Plano Prompt Engineers Meetup",
     image:
-      "https://github.com/ryaneggz/static/blob/main/promptenigineers-landing.jpg?raw=true",
+      "https://secure.meetupstatic.com/photos/event/1/2/3/5/clean_513484661.webp",
     description:
-      "Elevate your workflows with AI-driven chats that turn talk into tasks. Design, automate, and innovate in a chat – where every message moves mountains.",
-    link: "https://promptengineers.ai",
+      "A meetup group (1k+ members) for engineers, developers, and tech enthusiasts in Plano, TX. Join us for tech talks, networking, and more!",
+    link: "https://www.meetup.com/plano-prompt-engineers",
   },
   {
     title: "Prompt Engineers AI - Open Source",
@@ -20,12 +20,12 @@ const projects = [
     link: "https://github.com/promptengineers-ai",
   },
   {
-    title: "Plano Prompt Engineers Meetup",
+    title: "Prompt Engineers AI - SaaS",
     image:
-      "https://secure.meetupstatic.com/photos/event/1/2/3/5/clean_513484661.webp",
+      "https://github.com/ryaneggz/static/blob/main/promptenigineers-landing.jpg?raw=true",
     description:
-      "A meetup group (1k+ members) for engineers, developers, and tech enthusiasts in Plano, TX. Join us for tech talks, networking, and more!",
-    link: "https://www.meetup.com/plano-prompt-engineers",
+      "Elevate your workflows with AI-driven chats that turn talk into tasks. Design, automate, and innovate in a chat – where every message moves mountains.",
+    link: "https://promptengineers.ai",
   },
 ];
 
@@ -41,7 +41,7 @@ const ProjectSection = () => {
   return (
     <section className="bg-black py-12" id="projects">
       <div className="container mx-auto px-4">
-        <h2 className="mb-8 text-3xl font-semibold text-white">Our Work</h2>
+        <h2 className="mb-8 text-3xl font-semibold text-white">Community First</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {currentProjects.map((project, index) => (
             <div
