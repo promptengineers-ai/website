@@ -87,8 +87,8 @@ const TopNavbar = () => {
               {/* <a href="/resume.pdf" className="hover:text-green-400">
                 Resume
               </a> */}
-              <a href="/#services" className="hover:text-green-400">
-                Features
+              <a href="/#about" className="hover:text-green-400">
+                About
               </a>
               <a href="/#projects" className="hover:text-green-400">
                 Projects

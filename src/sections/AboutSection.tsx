@@ -19,14 +19,18 @@ const AboutSection = () => {
               }}
             ></div>
             <img
-              src="/images/ryan_egg.png" // Replace with the actual URL of the founder's picture
+              src="/images/ryan_egg.png"
               alt="Founder"
-              className="relative rounded-[0px_0px_10px_10px] z-10"
+              className="relative z-10 rounded-[0px_0px_10px_10px]"
               style={{
                 filter: "drop-shadow(0px 2px 5px black)",
                 zIndex: 1,
               }}
             />
+            <div className="absolute bottom-4 right-4 z-20 rounded bg-white p-2 shadow-md">
+              <p className="font-bold text-black">Ryan Eggleston</p>
+              <p className="text-sm text-gray-700">Founder & Core Developer</p>
+            </div>
           </div>
           <div>
             <h2 className="mb-8 text-4xl font-bold text-white">
