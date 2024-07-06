@@ -116,12 +116,12 @@ const SuggestionSection = () => {
                           </button>
                         </div>
                         {expandedFeatures.has(feature.id) && (
-                          <p className="mt-2 text-xs text-gray-400">
+                          <p className="mt-2 text-xs text-gray-400 max-w-[255px] md:max-w-full">
                             {feature.feature}
                           </p>
                         )}
                         <p className="mt-2 text-sm text-gray-400">
-                          by {feature.name}
+                          by {feature.email}
                         </p>
                       </div>
                       <div className="w-2/12 text-right">
