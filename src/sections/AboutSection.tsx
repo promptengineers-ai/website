@@ -26,12 +26,13 @@ const AboutSection = () => {
               className="relative z-10 rounded-[0px_0px_10px_10px]"
               style={{
                 filter: "drop-shadow(0px 2px 5px black)",
+                // scale: 0.95,
                 zIndex: 1,
               }}
             />
-            <div className="absolute bottom-4 right-4 z-20 rounded bg-white p-2 shadow-md">
+            <div className="absolute bottom-[-30px] md:bottom-4 md:right-4 z-20 rounded bg-white p-2 shadow-md">
               <div className="flex items-center">
-                <p className="font-bold text-black">Ryan Eggleston</p>
+                <p className="font-bold text-black text-sm md:text-md">Ryan Eggleston</p>
                 <a
                   href="https://www.linkedin.com/in/ryan-eggleston" // Replace with the actual LinkedIn URL
                   target="_blank"
@@ -49,14 +50,14 @@ const AboutSection = () => {
                   <FaGithub size={20} />
                 </a>
               </div>
-              <p className="text-sm text-gray-700">Founder & Core Developer</p>
+              <p className="text-xs md:text-sm text-gray-700">Founder & Core Developer</p>
             </div>
           </div>
-          <div>
-            <h2 className="mb-8 text-4xl font-bold text-white">
+          <div className="md:mt-20">
+            <h2 className="mb-8 text-5xl font-bold text-white md:text-6xl">
               My Promise...
             </h2>
-            <p className="mb-10 text-base text-gray-300">
+            <p className="text-xl text-gray-300">
               To listen to your feedback and bring you the features you want
               most. I will be implementing a suggestion form so that you can
               tell me what you'd like to see and the community will vote on the
