@@ -19,7 +19,7 @@ const HeroSection = () => {
       <div className="absolute bottom-0 left-0 right-0 top-0 bg-black bg-opacity-20"></div>
 
       {/* Social Media Icons - Adjust layout for lg screens and left align on md screens */}
-      <div className="z-10 flex items-start justify-start lg:absolute lg:left-2 lg:top-1/2 lg:mt-5 lg:-translate-y-1/2 lg:flex-col lg:items-start lg:justify-start lg:pl-4">
+      <div className="pl-3 z-10 flex items-start justify-start lg:absolute lg:left-2 lg:top-1/2 lg:mt-5 lg:-translate-y-1/2 lg:flex-col lg:items-start lg:justify-start lg:pl-4">
         {socialIcons.map(({ Icon, tooltip, key, link }) => (
           <div
             className="group relative mb-4 mr-3 text-5xl text-white lg:mb-6 lg:mr-0"
