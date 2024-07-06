@@ -33,6 +33,52 @@ const SuggestionSection = () => {
       upvotes: 5,
       status: "backlog",
     },
+    {
+      id: 4,
+      name: "David Brown",
+      email: "david@example.com",
+      title: "Two-Factor Authentication",
+      feature: "Implement two-factor authentication for enhanced security.",
+      upvotes: 12,
+      status: "backlog",
+    },
+    {
+      id: 5,
+      name: "Eve Davis",
+      email: "eve@example.com",
+      title: "API Access",
+      feature:
+        "Provide API access to developers for integration with other services.",
+      upvotes: 8,
+      status: "backlog",
+    },
+    {
+      id: 6,
+      name: "Frank Johnson",
+      email: "frank@example.com",
+      title: "User Management",
+      feature: "Implement user management features for improved user experience.",
+      upvotes: 3,
+      status: "backlog",
+    },
+    {
+      id: 7,
+      name: "Grace Williams",
+      email: "grace@example.com",
+      title: "User Management",
+      feature: "Implement user management features for improved user experience.",
+      upvotes: 3,
+      status: "backlog",
+    },
+    {
+      id: 8,
+      name: "Henry Johnson",
+      email: "henry@example.com",
+      title: "User Management",
+      feature: "Implement user management features for improved user experience.",
+      upvotes: 3,
+      status: "backlog",
+    },
   ]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -83,14 +129,14 @@ const SuggestionSection = () => {
   };
 
   return (
-    <div id="suggestions" className="bg-black py-20">
+    <div id="features" className="bg-black py-20">
       <div className="container mx-auto px-6 md:px-24">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
           <div>
             <h3 className="mb-4 text-4xl font-bold text-white">
               Feature Requests
             </h3>
-            <ul>
+            <ul className="max-h-[490px] overflow-y-auto overflow-x-hidden pr-1">
               {features
                 .sort((a, b) => b.upvotes - a.upvotes)
                 .map((feature) => (
@@ -116,7 +162,7 @@ const SuggestionSection = () => {
                           </button>
                         </div>
                         {expandedFeatures.has(feature.id) && (
-                          <p className="mt-2 text-xs text-gray-400 max-w-[255px] md:max-w-full">
+                          <p className="mt-2 max-w-[255px] text-xs text-gray-400 md:max-w-full">
                             {feature.feature}
                           </p>
                         )}

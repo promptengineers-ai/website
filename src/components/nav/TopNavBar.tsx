@@ -90,6 +90,9 @@ const TopNavbar = () => {
               <a href="/#about" className="hover:text-green-400">
                 About
               </a>
+              <a href="/#features" className="hover:text-green-400">
+                Features
+              </a>
               <a href="/#projects" className="hover:text-green-400">
                 Projects
               </a>
@@ -146,7 +149,7 @@ const TopNavbar = () => {
             <FaMedium className="mr-2" fontSize={"20px"} /> Blog
           </a>
           <a
-            href="/#services"
+            href="/#features"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
           >
