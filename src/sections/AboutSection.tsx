@@ -1,5 +1,7 @@
 "use client";
 
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+
 const AboutSection = () => {
   return (
     <div id="about" className="bg-black py-20">
@@ -28,7 +30,25 @@ const AboutSection = () => {
               }}
             />
             <div className="absolute bottom-4 right-4 z-20 rounded bg-white p-2 shadow-md">
-              <p className="font-bold text-black">Ryan Eggleston</p>
+              <div className="flex items-center">
+                <p className="font-bold text-black">Ryan Eggleston</p>
+                <a
+                  href="https://www.linkedin.com/in/ryan-eggleston" // Replace with the actual LinkedIn URL
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 text-blue-700"
+                >
+                  <FaLinkedin size={20} />
+                </a>
+                <a
+                  href="https://github.com/ryaneggz" // Replace with the actual GitHub URL
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-1 text-black"
+                >
+                  <FaGithub size={20} />
+                </a>
+              </div>
               <p className="text-sm text-gray-700">Founder & Core Developer</p>
             </div>
           </div>

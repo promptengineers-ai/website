@@ -18,9 +18,9 @@ export const MEDIUM_RSS_URL = "https://medium.com/feed/@ryaneggz";
 export const socialIcons = [
   {
     Icon: FaGithub,
-    tooltip: "ryaneggz",
+    tooltip: "promptengineers-ai",
     key: "github",
-    link: "https://github.com/ryaneggz",
+    link: "https://github.com/promptengineers-ai",
   },
   {
     Icon: FaGitlab,
@@ -36,9 +36,9 @@ export const socialIcons = [
   },
   {
     Icon: FaLinkedin,
-    tooltip: "Ryan Eggleston",
+    tooltip: "Prompt Engineers AI",
     key: "linkedin",
-    link: "https://www.linkedin.com/in/ryan-eggleston/",
+    link: "https://www.linkedin.com/company/promptengineers-ai",
   },
   {
     Icon: FaInstagram,
