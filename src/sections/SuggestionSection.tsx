@@ -191,7 +191,7 @@ const SuggestionSection = () => {
                 ))}
             </ul>
           </div>
-          <div className="w-full max-w-lg">
+          <div>
             <h3 className="mb-4 text-4xl font-bold text-white">
               Suggest a Feature
             </h3>
