@@ -1,4 +1,5 @@
 "use client";
+import { link } from "fs";
 import { useState } from "react";
 import { AiTwotoneLike } from "react-icons/ai";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -15,6 +16,7 @@ const SuggestionSection = () => {
       upvotes: 10,
       status: "backlog",
       enabled: true,
+      link: null,
     },
     {
       id: 2,
@@ -25,6 +27,7 @@ const SuggestionSection = () => {
       upvotes: 7,
       status: "backlog",
       enabled: true,
+      link: null,
     },
     {
       id: 3,
@@ -36,6 +39,7 @@ const SuggestionSection = () => {
       upvotes: 5,
       status: "backlog",
       enabled: false,
+      link: "https://github.com/ryaneggz",
     },
     {
       id: 4,
@@ -46,6 +50,7 @@ const SuggestionSection = () => {
       upvotes: 12,
       status: "backlog",
       enabled: true,
+      link: "https://github.com/ryaneggz",
     },
     {
       id: 5,
@@ -57,6 +62,7 @@ const SuggestionSection = () => {
       upvotes: 8,
       status: "backlog",
       enabled: true,
+      link: "https://github.com/ryaneggz",
     },
     {
       id: 6,
@@ -68,6 +74,7 @@ const SuggestionSection = () => {
       upvotes: 3,
       status: "backlog",
       enabled: false,
+      link: "https://github.com/ryaneggz",
     },
     {
       id: 7,
@@ -79,6 +86,7 @@ const SuggestionSection = () => {
       upvotes: 3,
       status: "backlog",
       enabled: false,
+      link: "https://github.com/ryaneggz",
     },
     {
       id: 8,
@@ -88,8 +96,9 @@ const SuggestionSection = () => {
       feature:
         "Implement user management features for improved user experience.",
       upvotes: 3,
-      status: "backlog",
+      status: "complete",
       enabled: true,
+      link: "https://github.com/ryaneggz",
     },
   ]);
   const [upvoteDisabled, setUpvoteDisabled] = useState(false);
@@ -100,6 +109,7 @@ const SuggestionSection = () => {
   const [expandedFeatures, setExpandedFeatures] = useState<Set<number>>(
     new Set(),
   );
+  const [selectedTab, setSelectedTab] = useState("active");
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -125,7 +135,6 @@ const SuggestionSection = () => {
       alert("You can only upvote once every 10 seconds.");
       return;
     }
-
     setFeatures(
       features.map((feature: any) =>
         feature.id === id
@@ -133,7 +142,6 @@ const SuggestionSection = () => {
           : feature,
       ),
     );
-
     setUpvoteDisabled(true);
     setTimeout(() => {
       setUpvoteDisabled(false);
@@ -152,6 +160,12 @@ const SuggestionSection = () => {
     });
   };
 
+  const filteredFeatures = features.filter((feature) =>
+    selectedTab === "active"
+      ? feature.status !== "complete"
+      : feature.status === "complete",
+  );
+
   return (
     <div id="features" className="bg-black py-20">
       <div className="container mx-auto px-6 md:px-24">
@@ -160,8 +174,22 @@ const SuggestionSection = () => {
             <h3 className="mb-4 text-4xl font-bold text-white">
               Feature Requests
             </h3>
-            <ul className="max-h-[490px] overflow-y-auto overflow-x-hidden pr-1">
-              {features
+            <div className="mb-4 flex space-x-4">
+              <button
+                onClick={() => setSelectedTab("active")}
+                className={`rounded px-2 py-1 ${selectedTab === "active" ? "bg-indigo-500 text-white" : "bg-gray-700 text-gray-300"}`}
+              >
+                Active
+              </button>
+              <button
+                onClick={() => setSelectedTab("complete")}
+                className={`rounded px-2 py-1 ${selectedTab === "complete" ? "bg-green-500 text-white" : "bg-gray-700 text-gray-300"}`}
+              >
+                Complete
+              </button>
+            </div>
+            <ul className="max-h-[445px] overflow-y-auto overflow-x-hidden pr-1">
+              {filteredFeatures
                 .filter((feature) => feature.enabled)
                 .sort((a, b) => b.upvotes - a.upvotes)
                 .map((feature) => (
@@ -172,9 +200,21 @@ const SuggestionSection = () => {
                     <div className="flex items-start justify-between">
                       <div className="w-10/12">
                         <div className="flex items-center">
-                          <p className="font-bold text-gray-300">
-                            {feature.title}
-                          </p>
+                          {feature.link ? (
+                            <a
+                              href={feature.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={feature.link}
+                              className={`font-bold hover:underline ${feature.status === "complete" ? "text-green-400" : "text-indigo-300"}`}
+                            >
+                              {feature.title}
+                            </a>
+                          ) : (
+                            <p className="font-bold text-gray-300">
+                              {feature.title}
+                            </p>
+                          )}
                           <button
                             onClick={() => toggleDescription(feature.id)}
                             className="ml-2 text-gray-400 focus:outline-none"
@@ -196,9 +236,15 @@ const SuggestionSection = () => {
                         </p>
                       </div>
                       <div className="w-2/12 text-right">
-                        <span className="rounded-full bg-indigo-700 px-2 py-1 text-xs font-semibold text-gray-300">
-                          {feature.status}
-                        </span>
+                        {feature.status === "backlog" ? (
+                          <span className="rounded-full bg-indigo-700 px-2 py-1 text-xs font-semibold text-gray-300">
+                            {feature.status}
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-green-500 px-2 py-1 text-xs font-semibold text-gray-300">
+                            {feature.status}
+                          </span>
+                        )}
                         <div className="mt-2 flex flex-col items-end">
                           <div className="flex">
                             <p className="text-gray-300">{feature.upvotes}</p>
@@ -208,8 +254,9 @@ const SuggestionSection = () => {
                                 setTimeout(() => {}, 2000);
                               }}
                               className="ml-2 text-indigo-400"
+                              disabled={upvoteDisabled}
                             >
-                              <AiTwotoneLike size={20}/>
+                              <AiTwotoneLike size={20} />
                             </button>
                           </div>
                         </div>
