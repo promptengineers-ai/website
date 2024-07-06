@@ -130,6 +130,5 @@ body {
 }
 
 .iphone-mock-hover:hover {
-  z-index: 30;
   transform: scale(1.05);
 }

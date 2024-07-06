@@ -46,7 +46,7 @@ const HeroSection = () => {
       <div
         className={`relative mx-auto max-w-5xl p-3 sm:text-left lg:flex lg:items-center lg:justify-between`}
       >
-        <div className={`z-${isHovered ? "0" : "20"}`}>
+        <div className={`z-${isHovered ? "0" : "30"}`}>
           <h1
             className="fade-in fade-in-1 mb-8 text-7xl font-bold text-white md:text-8xl"
             style={{ filter: "drop-shadow(0px 2px 20px rgba(0, 0, 0, 0.8))" }}
@@ -80,7 +80,7 @@ const HeroSection = () => {
         <div className="top-50 absolute right-10 hidden lg:block xl:w-1/3 xl:pl-10">
           <div
             className={`fade-in fade-in-3 iphone-mock-hover relative ${
-              isHovered ? null : "opacity-80"
+              isHovered ? "z-30" : "z-0 opacity-80"
             }`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
