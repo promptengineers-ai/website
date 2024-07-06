@@ -44,9 +44,7 @@ const HeroSection = () => {
 
       {/* Hero Content */}
       <div
-        className={`relative mx-auto max-w-5xl p-3 sm:text-left lg:flex lg:items-center lg:justify-between ${
-          isHovered ? "z-0" : "z-10"
-        }`}
+        className={`relative mx-auto max-w-5xl p-3 sm:text-left lg:flex lg:items-center lg:justify-between`}
       >
         <div className={`z-${isHovered ? "0" : "20"}`}>
           <h1
