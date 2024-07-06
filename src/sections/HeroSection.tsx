@@ -53,7 +53,7 @@ const HeroSection = () => {
             className="fade-in fade-in-2 mt-4 max-w-xl text-2xl text-gray-200"
             style={{ filter: "drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.8))" }}
           >
-            My goal is to help you get it back by providing simple tools for
+            My mission is to help you get it back by providing simple tools for
             professionals, and best in class API's for builders.
           </p>
           <div className="fade-in fade-in-3 mt-8">
