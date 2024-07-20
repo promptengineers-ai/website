@@ -17,17 +17,22 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       animation: {
-        fadeIn: 'fadeIn 1s ease-in-out forwards',
+        fadeIn: "fadeIn 1s ease-in-out forwards",
+        "pulse-grow-shrink": "pulse-grow-shrink 2s infinite",
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: "0" },
-          '100%': { opacity: "1" },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "pulse-grow-shrink": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.1)" },
         },
       },
       transitionDelay: {
-        '500': '500ms',
-        '1000': '1000ms',
+        "500": "500ms",
+        "1000": "1000ms",
       },
     },
   },
