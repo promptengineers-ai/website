@@ -270,6 +270,9 @@ const SuggestionSection = () => {
             <h3 className="mb-4 text-4xl font-bold text-white">
               Suggest a Feature
             </h3>
+            <p className="mb-4 text-gray-300 px-1">
+              This is currently under development and will be available soon!
+            </p>
             <form
               className="mb-4 rounded-lg bg-gray-800 px-8 pb-8 pt-6 shadow-lg"
               onSubmit={handleSubmit}

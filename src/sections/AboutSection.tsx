@@ -70,18 +70,18 @@ const AboutSection = () => {
             </h2>
             <p className="mb-3 text-justify text-base text-gray-200">
               Hi, I&apos;m Ryan! I&apos;m a software engineer that is passionate
-              about automating my life as I can to maximize time with my family
-              and enjoy working on problems that can do the same for others.
+              about automating my life to maximize time with my family.
+              I enjoy working on problems that can do the same for others.
               Over the last few years I spent nearly every waking moment
               obsessing on how AI components should be composed together to
-              maximize my producitivity. I&apos;m taking that obsession and
-              turning it into a platform that can help others do the same.
+              better understand potential use cases. I&apos;m taking that obsession and
+              turning it into a platform that can help other regain ownership of their time.
             </p>
             <p className="text-justify text-base text-gray-200">
-              Currently developing the Enterprise application. Join the waitlist
-              and be one of my first customers and stay up to date on new
-              features! I thrive on feedback and hearing what I can do to
-              improve your experience, which is why I have implemented a feature
+              Currently I am developing the SaaS application. Join the waitlist
+              and be one of my first customers and stay up-to-date on new
+              features! I thrive on your feedback, hearing what I can do to
+              improve your experience motivates me, which is why I have implemented the feature
               request form below in order to get community feedback on what
               they&apos;d like to see prioritized.
             </p>

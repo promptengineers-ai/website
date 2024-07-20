@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { FaQuestion } from "react-icons/fa";
 import { FaMedium } from "react-icons/fa6";
 import {
   MdHome,
@@ -99,6 +100,9 @@ const TopNavbar = () => {
               <a href="/#contact" className="hover:text-green-400">
                 Waitlist
               </a>
+              <a href="/#faq" className="hover:text-green-400">
+                FAQs
+              </a>
             </div>
           </div>
         </div>
@@ -168,6 +172,13 @@ const TopNavbar = () => {
             onClick={closeDrawer}
           >
             <MdEmail className="mr-2" fontSize={"20px"} /> Waitlist
+          </a>
+          <a
+            href="/#faq"
+            className="flex items-center p-2 text-sm hover:bg-gray-700"
+            onClick={closeDrawer}
+          >
+            <FaQuestion className="mr-2" fontSize={"20px"} /> FAQs
           </a>
         </nav>
       </div>
