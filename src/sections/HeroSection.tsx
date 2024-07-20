@@ -80,7 +80,12 @@ const HeroSection = () => {
         </div>
 
         {/* IphoneMock Component */}
-        <div className="top-50 absolute right-10 hidden lg:block xl:w-1/3 xl:pl-10 hover:cursor-pointer" onClick={() => window.location.href = 'https://promptengineersai.netlify.app'}>
+        <div
+          className="top-50 absolute right-10 hidden hover:cursor-pointer lg:block xl:w-1/3 xl:pl-10"
+          onClick={() =>
+            window.open("https://promptengineersai.netlify.app", "_blank")
+          }
+        >
           <div
             className={`fade-in fade-in-3 iphone-mock-hover relative ${
               isHovered ? "z-30" : "z-0 opacity-80"
