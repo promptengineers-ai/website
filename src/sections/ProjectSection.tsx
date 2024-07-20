@@ -41,7 +41,7 @@ const ProjectSection = () => {
   return (
     <section className="bg-black py-12" id="projects">
       <div className="container mx-auto px-4">
-        <h2 className="mb-8 text-3xl font-semibold text-white">Community First</h2>
+        <h2 className="mb-8 text-4xl md:text-5xl font-semibold text-white">Community First</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {currentProjects.map((project, index) => (
             <div
