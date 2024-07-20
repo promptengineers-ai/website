@@ -132,8 +132,8 @@ const ContactSection = () => {
                     <ChevronDownIcon className="size-5 fill-white/60 group-open:rotate-180 group-hover:fill-white/50" />
                   </DisclosureButton>
                   <DisclosurePanel className="mt-2 text-sm/5 text-white/50">
-                    If you're unhappy with your purchase, we'll refund you in
-                    full.
+                    If you&apos;re unhappy with your purchase, we&apos;ll refund
+                    you in full.
                   </DisclosurePanel>
                 </Disclosure>
                 <Disclosure as="div" className="p-6">
