@@ -97,7 +97,7 @@ const TopNavbar = () => {
                 Projects
               </a>
               <a href="/#contact" className="hover:text-green-400">
-                Contact
+                Waitlist
               </a>
             </div>
           </div>
@@ -167,7 +167,7 @@ const TopNavbar = () => {
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
           >
-            <MdEmail className="mr-2" fontSize={"20px"} /> Contact
+            <MdEmail className="mr-2" fontSize={"20px"} /> Waitlist
           </a>
         </nav>
       </div>

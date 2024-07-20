@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 const AboutSection = () => {
+
   return (
     <div id="about" className="bg-black py-10">
       <div className="container mx-auto px-6">
@@ -26,7 +28,6 @@ const AboutSection = () => {
               className="relative z-10 rounded-[0px_0px_10px_10px]"
               style={{
                 filter: "drop-shadow(0px 2px 5px black)",
-                // scale: 0.95,
                 zIndex: 1,
               }}
             />
@@ -36,7 +37,7 @@ const AboutSection = () => {
                   Ryan Eggleston
                 </p>
                 <a
-                  href="https://www.linkedin.com/in/ryan-eggleston" // Replace with the actual LinkedIn URL
+                  href="https://www.linkedin.com/in/ryan-eggleston"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-2 text-blue-700"
@@ -44,7 +45,7 @@ const AboutSection = () => {
                   <FaLinkedin size={20} />
                 </a>
                 <a
-                  href="https://github.com/ryaneggz" // Replace with the actual GitHub URL
+                  href="https://github.com/ryaneggz"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-1 text-black"
@@ -58,14 +59,20 @@ const AboutSection = () => {
             </div>
           </div>
           <div className="mt-10 md:mt-20">
-            <h2 className="mb-8 text-5xl font-bold text-white md:text-6xl">
-              My Promise...
+            <h2 className="mb-8 text-4xl font-bold text-white md:text-6xl">
+              Join the{" "}
+              <a
+                href="/#contact"
+                className="text-indigo-500 hover:text-indigo-700"
+              >
+                Waitlist...
+              </a>
             </h2>
             <p className="text-xl text-gray-300">
-              To listen to your feedback and bring you the features you want
-              most. I will be implementing a suggestion form so that you can
-              tell me what you&apos;d like to see and the community will vote on
-              the features they want to see implemented.
+              Currently developing the Enterprise application. Be one of my
+              first customers and stay up to date on new features! I have
+              implemented a feature request form below in order to get community
+              feedback on what they&apos;d like to see prioritized.
             </p>
           </div>
         </div>

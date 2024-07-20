@@ -36,19 +36,19 @@ const ContactSection = () => {
 
   return (
     <div id="contact" className="bg-black py-20">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-3">
         <h2 className="mb-8 text-center text-4xl font-bold text-white">
-          Get In Touch
+          Join our Waitlist
         </h2>
-        <p className="mb-10 text-center text-base text-gray-300">
-          Whether you have a question about our services or need assistance with
-          your project, our team is here to help you.
+        <p className="mb-5 text-center text-base text-gray-300">
+          Be the first to know when new features are released.
+
         </p>
 
         <div className="flex justify-center">
           <div className="w-full max-w-lg">
             <form
-              className="mb-4 rounded-lg bg-gray-800 px-8 pb-8 pt-6 shadow-lg"
+              className="mb-4 rounded-lg px-8 pb-8 pt-6 shadow-lg"
               onSubmit={handleSubmit}
             >
               <div className="mb-4">
@@ -111,7 +111,7 @@ const ContactSection = () => {
                   placeholder="(480) 555-1234"
                 />
               </div>
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <label
                   className="mb-2 block text-sm font-bold text-gray-300"
                   htmlFor="message"
@@ -130,7 +130,7 @@ const ContactSection = () => {
                   disabled={loading}
                   value={payload.Message}
                 ></textarea>
-              </div>
+              </div> */}
               <div className="flex items-center justify-between">
                 <button
                   className="focus:shadow-outline flex items-center justify-center gap-2 rounded bg-indigo-500 px-4 py-2 font-bold text-white transition-colors duration-150 hover:bg-indigo-700 focus:outline-none"

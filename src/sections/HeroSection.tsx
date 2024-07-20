@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { socialIcons } from "@/config/app";
-import { FaComments, FaMedium } from "react-icons/fa6";
+import { FaMedium } from "react-icons/fa6";
 import { HERO_GIF } from "@/config/static";
 import IphoneMock from "../components/mocks/IphoneMock"; // Adjust the import path as necessary
+import { FaSlack } from "react-icons/fa";
 
 const HeroSection = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -60,14 +61,17 @@ const HeroSection = () => {
             professionals, and best in class API&apos;s for builders.
           </p>
           <div className="fade-in fade-in-3 mt-8">
-            <Link href="https://calendly.com/adaptivebiz" target="_blank">
-              <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full bg-gray-200/20 px-4 py-2 text-white hover:bg-green-500">
-                <span>Let&apos;s Talk</span>
-                <FaComments fontSize="24px" className="ml-1" />
+            <Link
+              href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ"
+              target="_blank"
+            >
+              <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full bg-gray-200/20 px-6 py-3 text-xl text-white hover:bg-green-500">
+                <span>Join Slack</span>
+                <FaSlack fontSize="24px" className="ml-1" />
               </button>
             </Link>
             <Link href="/blogs">
-              <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full bg-gray-200/20 px-4 py-2 text-white hover:bg-green-500">
+              <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full  bg-gray-200/20 px-6 py-3 text-xl text-white hover:bg-green-500">
                 <span>Blog</span>
                 <FaMedium fontSize="20px" className="ml-1" />
               </button>
@@ -76,7 +80,7 @@ const HeroSection = () => {
         </div>
 
         {/* IphoneMock Component */}
-        <div className="top-50 absolute right-10 hidden lg:block xl:w-1/3 xl:pl-10">
+        <div className="top-50 absolute right-10 hidden lg:block xl:w-1/3 xl:pl-10 hover:cursor-pointer" onClick={() => window.location.href = 'https://promptengineersai.netlify.app'}>
           <div
             className={`fade-in fade-in-3 iphone-mock-hover relative ${
               isHovered ? "z-30" : "z-0 opacity-80"
