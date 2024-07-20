@@ -35,14 +35,14 @@ const faqItems = [
     question: "What LLM providers are supported?",
     answer: `<p>The platform will support a variety of models from OpenAI, Anthropic, Ollama, and Groq with plans to support more from
             Google and Hugging Face. Most of the LLMs are currently supported by our 
-            <a class="underline text-indigo-400" href="https://github.com/promptengineers-ai/llm-server">open-source LLM Server</a>. 
+            <a class="underline text-indigo-400" target="_blank" href="https://github.com/promptengineers-ai/llm-server">open-source LLM Server</a>. 
             The models range from Chat, Text-To-Speech, Multi-Modal, Embedding, and more to come!</p>`,
   },
   {
     question: "Who are the Plano Prompt Engineers?",
     answer: `<p>Plano Prompt Engineers is a in-person meetup in Plano, TX &#40where I am located&#41 that meets once a month
             to discuss AI related topics, share ideas, and network with like-minded individuals. We welcome all new members
-            regardless of technical background or experience. If you are interested, check us out at <a class="underline text-indigo-400" href="https://www.meetup.com/plano-prompt-engineers/">Meetup Group</a></p>`,
+            regardless of technical background or experience. If you are interested, check us out at <a class="underline text-indigo-400" target="_blank" href="https://www.meetup.com/plano-prompt-engineers/">Meetup Group</a></p>`,
   },
 ];
 
