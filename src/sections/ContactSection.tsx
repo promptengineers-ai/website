@@ -64,7 +64,7 @@ const ContactSection = () => {
                   className="focus:shadow-outline w-full appearance-none rounded border border-gray-600 bg-gray-700 px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none"
                   id="name"
                   type="text"
-                  placeholder="Enter your full name..."
+                  placeholder="Enter Name..."
                   onChange={(e) =>
                     setPayload((prev) => ({ ...prev, Name: e.target.value }))
                   }
@@ -78,7 +78,7 @@ const ContactSection = () => {
                   className="focus:shadow-outline w-full appearance-none rounded border border-gray-600 bg-gray-700 px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none"
                   id="email"
                   type="email"
-                  placeholder="Enter your email..."
+                  placeholder="Enter Email..."
                   onChange={(e) =>
                     setPayload((prev) => ({ ...prev, Email: e.target.value }))
                   }
@@ -119,14 +119,14 @@ const ContactSection = () => {
               </div>
             </form>
 
-            <div className="mt-8">
-              <h3 className="mb-4 text-center text-5xl font-bold text-white">
+            <div className="mt-12">
+              <h3 className="mb-8 text-center text-5xl font-bold text-white">
                 FAQs
               </h3>
               <div className="mx-auto w-full max-w-4xl divide-y divide-white/5 rounded-xl bg-white/10">
                 <Disclosure as="div" className="p-6" defaultOpen={true}>
                   <DisclosureButton className="group flex w-full items-center justify-between">
-                    <span className="text-sm/6 font-medium text-white group-hover:text-white/80">
+                    <span className="text-lg font-medium text-white group-hover:text-white/80">
                       What is your refund policy?
                     </span>
                     <ChevronDownIcon className="size-5 fill-white/60 group-open:rotate-180 group-hover:fill-white/50" />
@@ -138,7 +138,7 @@ const ContactSection = () => {
                 </Disclosure>
                 <Disclosure as="div" className="p-6">
                   <DisclosureButton className="group flex w-full items-center justify-between">
-                    <span className="text-sm/6 font-medium text-white group-hover:text-white/80">
+                    <span className="text-lg font-medium text-white group-hover:text-white/80">
                       Do you offer technical support?
                     </span>
                     <ChevronDownIcon className="size-5 fill-white/60 group-open:rotate-180 group-hover:fill-white/50" />
