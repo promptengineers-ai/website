@@ -11,6 +11,7 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.5",
     "@headlessui/react": "^2.1.2",
+    "@next/third-parties": "^14.2.5",
     "dompurify": "^3.0.8",
     "html-react-parser": "^5.1.7",
     "isomorphic-dompurify": "^2.3.0",

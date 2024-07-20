@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Head from "next/head";
-import { botScript } from "@/config/bot";
+import InitialLoadActiveUsers from "@/components/users/InitialLoadActiveUsers";
+import { GA_ID, NODE_ENV } from "@/config/app";
+// import { botScript } from "@/config/bot";
 
 const inter = Inter({ subsets: ["latin"] });
 const APP_NAME = "Prompt Engineers AI";
@@ -71,19 +73,13 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
       </Head>
-      <body className={inter.className}>
-        {children}
-        {/* <Script
-          src="https://cdn.promptengineers.ai/embed"
-          strategy="beforeInteractive"
-        />
-        <Script
-          id="bot"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{ __html: botScript }}
-        /> */}
-        {/* Load external scripts if needed */}
-      </body>
+      <body className={inter.className}>{children}</body>
+      {NODE_ENV === "production" && GA_ID && (
+        <>
+          <GoogleAnalytics gaId={GA_ID} />
+          <InitialLoadActiveUsers />
+        </>
+      )}
     </html>
   );
 }

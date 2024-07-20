@@ -5,16 +5,14 @@ import {
   FaLinkedin,
   FaInstagram,
   FaYoutube,
-  FaMedium,
 } from "react-icons/fa";
 
 export const NODE_ENV = process.env.NEXT_PUBLIC_NODE_ENV || "production";
-export const WP_SERVER_URL =
-  NODE_ENV === "development"
-    ? "http://localhost:8000"
-    : "https://wp.adaptive.biz";
+export const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "";
 export const MEDIUM_RSS_URL = "https://medium.com/feed/@ryaneggz";
 
+
+// Social Config
 export const socialIcons = [
   {
     Icon: FaGithub,
