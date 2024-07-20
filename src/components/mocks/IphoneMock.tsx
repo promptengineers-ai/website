@@ -1,4 +1,6 @@
 
+const videoUrl = "https://dmpl4rwnofmx.cloudfront.net/Demo_Video.mp4";
+
 const IphoneMock: React.FC = () => {
     return (
       <div
@@ -15,7 +17,7 @@ const IphoneMock: React.FC = () => {
       >
         <video
           className="absolute"
-          src="https://agent.commit.dev/landing-page-video.352a9d12.mp4#t=0.1"
+          src={videoUrl}
           loop
           playsInline
           preload="auto"

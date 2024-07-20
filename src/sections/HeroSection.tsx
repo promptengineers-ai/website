@@ -2,8 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { socialIcons } from "@/config/app";
-import { MdVideoCall } from "react-icons/md";
-import { FaMedium } from "react-icons/fa6";
+import { FaComments, FaMedium } from "react-icons/fa6";
 import { HERO_GIF } from "@/config/static";
 import IphoneMock from "../components/mocks/IphoneMock"; // Adjust the import path as necessary
 
@@ -63,8 +62,8 @@ const HeroSection = () => {
           <div className="fade-in fade-in-3 mt-8">
             <Link href="https://calendly.com/adaptivebiz" target="_blank">
               <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full bg-gray-200/20 px-4 py-2 text-white hover:bg-green-500">
-                <span>Free Consult</span>
-                <MdVideoCall fontSize="24px" className="ml-1" />
+                <span>Let&apos;s Talk</span>
+                <FaComments fontSize="24px" className="ml-1" />
               </button>
             </Link>
             <Link href="/blogs">
