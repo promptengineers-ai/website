@@ -35,7 +35,7 @@ const faqItems = [
     question: "What LLM providers are supported?",
     answer: `<p>The platform will support a variety of models from OpenAI, Anthropic, Ollama, and Groq with plans to support more from
             Google and Hugging Face. Most of the LLMs are currently supported by our 
-            <a class="underline text-indigo-400" target="_blank" href="https://github.com/promptengineers-ai/llm-server">open-source LLM Server</a>. 
+            <a class="underline text-indigo-400" target="_blank" href="https://promptengineersai.netlify.app">open-source LLM Server</a>. 
             The models range from Chat, Text-To-Speech, Multi-Modal, Embedding, and more to come!</p>`,
   },
   {
