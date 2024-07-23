@@ -9,8 +9,7 @@ class APIClient {
       },
       body: JSON.stringify(body),
     });
-    const data = await response.json();
-    return data;
+    return response;
   }
 
   async subscribeToNewsletter(body: { email: string }): Promise<any> {

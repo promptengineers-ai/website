@@ -10,6 +10,7 @@ import { FaChevronDown as ChevronDownIcon } from "react-icons/fa";
 import FaqList from "@/components/lists/FaqList";
 
 const initState = {
+  buttonText: "I Want To Join The Waitlist!",
   payload: {
     Name: "",
     Email: "",
@@ -20,23 +21,26 @@ const initState = {
 
 const ContactSection = () => {
   // State for the contact form
+  const [buttonText, setButtonText] = useState(initState.buttonText);
   const [payload, setPayload] = useState(initState.payload);
   const [loading, setLoading] = useState(false);
+
+  const successful = buttonText !== initState.buttonText;
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      // Call the API to submit the contact form
-      await apiClient.contactFormSubmit(payload);
-      // Reset the form
-      setPayload(initState.payload);
-      setLoading(false);
-      alert("Message sent successfully!");
-    } catch (error) {
-      console.error(error);
-      alert(error);
-      setLoading(false);
+    // Call the API to submit the contact form
+    const res = await apiClient.contactFormSubmit(payload);
+    // Reset the form
+    const data = await res.json();
+    setLoading(false);
+    if (res.ok) {
+      setButtonText(data.message);
+      alert(data.message);
+    } else {
+      console.error(data.message);
+      alert(data.message);
     }
   };
 
@@ -61,28 +65,28 @@ const ContactSection = () => {
               <div className="mb-6">
                 <input
                   required
-                  className="focus:shadow-outline w-full appearance-none rounded border border-gray-600 bg-gray-700 px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none"
+                  className={`focus:shadow-outline ${!successful ? "bg-gray-700" : "bg-gray-800"} w-full appearance-none rounded border border-gray-600 px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none`}
                   id="name"
                   type="text"
                   placeholder="Enter Name..."
                   onChange={(e) =>
                     setPayload((prev) => ({ ...prev, Name: e.target.value }))
                   }
-                  disabled={loading}
+                  disabled={loading || successful}
                   value={payload.Name}
                 />
               </div>
               <div className="mb-6">
                 <input
                   required
-                  className="focus:shadow-outline w-full appearance-none rounded border border-gray-600 bg-gray-700 px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none"
+                  className={`focus:shadow-outline w-full appearance-none rounded border border-gray-600 ${!successful ? "bg-gray-700" : "bg-gray-800"} px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none`}
                   id="email"
                   type="email"
                   placeholder="Enter Email..."
                   onChange={(e) =>
                     setPayload((prev) => ({ ...prev, Email: e.target.value }))
                   }
-                  disabled={loading}
+                  disabled={loading || successful}
                   value={payload.Email}
                 />
               </div>
@@ -102,7 +106,8 @@ const ContactSection = () => {
               </div> */}
               <div className="flex items-center justify-between">
                 <button
-                  className="focus:shadow-outline flex w-full animate-pulse items-center justify-center gap-2 rounded bg-indigo-500 px-4 py-3 text-xl font-bold text-white transition-all duration-150 hover:animate-none hover:bg-indigo-700 focus:outline-none"
+                  disabled={loading || successful}
+                  className={`focus:shadow-outline flex w-full animate-pulse items-center justify-center gap-2 rounded ${!successful ? "bg-indigo-500" : "bg-green-600"} px-4 py-3 text-xl font-bold text-white transition-all duration-150 hover:animate-none ${!successful ? "hover:bg-indigo-700" : "hover:bg-green-700"} focus:outline-none`}
                   type="submit"
                 >
                   {loading ? (
@@ -113,7 +118,7 @@ const ContactSection = () => {
                       </div>
                     </>
                   ) : (
-                    "I Want To Join The Waitlist!"
+                    buttonText
                   )}
                 </button>
               </div>

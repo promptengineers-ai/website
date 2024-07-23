@@ -4,32 +4,38 @@ import BrevoApi from "../utils/brevo";
 
 export async function POST(request: Request) {
   try {
-    const airtable = new AirtableApi();
-    const brevo = new BrevoApi();
     const body = await request.json();
-    const airRes = await airtable.create(body);
-    const brevoRes = await brevo.subscribe(body);
 
+    const brevo = new BrevoApi();
+    const brevoRes = await brevo.subscribe(body);
+    if (!brevoRes.ok) {
+      const errorData = await brevoRes.json();
+      console.error(errorData);
+      if (brevoRes.status === 400) {
+        return NextResponse.json(errorData, {
+          status: brevoRes.status,
+        });
+      } else {
+        return NextResponse.json(errorData, {
+          status: 500,
+        });
+      }
+    }
+
+    const airtable = new AirtableApi();
+    const airRes = await airtable.create(body);
     if (!airRes.ok) {
-      // Handles Airtable API errors
       const errorData = await airRes.json();
       console.log(errorData);
       return new Response(errorData, {
         status: 500,
       });
     }
-
-    if (!brevoRes.ok) {
-      // Handles Airtable API errors
-      const errorData = await brevoRes.json();
-      console.error(errorData);
-      return new Response(errorData, {
-        status: 500,
-      });
-    }
+    
 
     // Forward the successful response from Airtable to the client
     const data = {
+      'message': `Successfully Subscribed!`,
       ...(await airRes.json()),
       ...(await brevoRes.json()),
     };
