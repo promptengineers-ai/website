@@ -6,6 +6,7 @@ import ProjectSection from "@/sections/ProjectSection";
 import AboutSection from "@/sections/AboutSection";
 import SuggestionSection from "@/sections/SuggestionSection";
 import WaitlistButton from "@/components/buttons/WaitlistButton";
+import VideoSection from "@/sections/VideoSection";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       </header>
       <main>
         <HeroSection />
+        <VideoSection />
         <AboutSection />
         <SuggestionSection />
         <ProjectSection />
