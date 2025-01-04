@@ -9,7 +9,7 @@ const IphoneMock: React.FC = () => {
           width: "350px",
           height: "690px",
           backgroundImage:
-            'url("https://agent.commit.dev/iphone-11.1ef522d0.png")',
+            'url("/images/iphone-mock.png")',
           backgroundPosition: "center",
           backgroundSize: "350px 690px",
           backgroundRepeat: "no-repeat",
