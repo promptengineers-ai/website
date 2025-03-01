@@ -5,7 +5,7 @@ import { socialIcons } from "@/config/app";
 import { FaMedium } from "react-icons/fa6";
 import { HERO_GIF } from "@/config/static";
 import IphoneMock from "../components/mocks/IphoneMock"; // Adjust the import path as necessary
-import { FaDiscord } from "react-icons/fa";
+import { FaSlack } from "react-icons/fa";
 
 const HeroSection = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -62,12 +62,13 @@ const HeroSection = () => {
           </p>
           <div className="fade-in fade-in-3 mt-8">
             <Link
-              href="https://discord.gg/nNYKVTSCRt"
+              // href="https://discord.gg/nNYKVTSCRt"
+              href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ"
               target="_blank"
             >
               <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full bg-gray-200/20 px-6 py-3 text-xl text-white hover:bg-green-500">
-                <span>Join Discord</span>
-                <FaDiscord fontSize="24px" className="ml-1" />
+                <span>Join Slack</span>
+                <FaSlack fontSize="24px" className="ml-1" />
               </button>
             </Link>
             <Link href="/blogs">

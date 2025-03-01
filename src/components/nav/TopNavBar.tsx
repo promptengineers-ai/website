@@ -14,6 +14,7 @@ import {
   MdFolderSpecial,
   MdEmail,
   MdContacts,
+  MdCode,
 } from "react-icons/md";
 
 const TopNavbar = () => {
@@ -145,6 +146,14 @@ const TopNavbar = () => {
           >
             <MdDescription className="mr-2" fontSize={"20px"} /> Resume
           </a> */}
+          <a
+            href="https://demo.promptengineers.ai/chat"
+            target="_blank"
+            className="flex items-center p-2 text-sm hover:bg-gray-700"
+            onClick={closeDrawer}
+          >
+            <MdCode className="mr-2" fontSize={"20px"} /> Demo
+          </a>
           <a
             href="/blogs"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
