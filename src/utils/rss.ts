@@ -18,7 +18,7 @@ export async function rssToJson(
 
                 // Extract all image URLs
                 while ((match = imgRegex.exec(content)) !== null) {
-                imageUrls.push(match[1]);
+                    imageUrls.push(match[1]);
                 }
 
                 // Add the 'images' property to the item object
@@ -29,11 +29,11 @@ export async function rssToJson(
                 const pMatch = pRegex.exec(content);
 
                 if (pMatch && pMatch[1]) {
-                // Create an excerpt of the first 200 characters of the first paragraph
-                item.excerpt = pMatch[1].substr(0, excerptLength);
+                    // Create an excerpt of the first 200 characters of the first paragraph
+                    item.excerpt = pMatch[1].substr(0, excerptLength);
                 } else {
-                // If no paragraph is found, set the excerpt to an empty string
-                item.excerpt = "";
+                    // If no paragraph is found, set the excerpt to an empty string
+                    item.excerpt = "";
                 }
 
                 // Remove HTML tags from the excerpt

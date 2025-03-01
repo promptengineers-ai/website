@@ -88,21 +88,21 @@ const TopNavbar = () => {
               {/* <a href="/resume.pdf" className="hover:text-green-400">
                 Resume
               </a> */}
-              <a href="/#about" className="hover:text-green-400">
+              {/* <a href="/#about" className="hover:text-green-400">
                 About
-              </a>
-              <a href="/#features" className="hover:text-green-400">
+              </a> */}
+              {/* <a href="/#features" className="hover:text-green-400">
                 Features
-              </a>
-              <a href="/#projects" className="hover:text-green-400">
+              </a> */}
+              {/* <a href="/#projects" className="hover:text-green-400">
                 Projects
-              </a>
+              </a> */}
               <a href="/#contact" className="hover:text-green-400">
                 Waitlist
               </a>
-              <a href="/#faq" className="hover:text-green-400">
+              {/* <a href="/#faq" className="hover:text-green-400">
                 FAQs
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
@@ -152,7 +152,7 @@ const TopNavbar = () => {
           >
             <FaMedium className="mr-2" fontSize={"20px"} /> Blog
           </a>
-          <a
+          {/* <a
             href="/#features"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
@@ -165,7 +165,7 @@ const TopNavbar = () => {
             onClick={closeDrawer}
           >
             <MdLayers className="mr-2" fontSize={"20px"} /> Projects
-          </a>
+          </a> */}
           <a
             href="/#contact"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
@@ -173,13 +173,13 @@ const TopNavbar = () => {
           >
             <MdEmail className="mr-2" fontSize={"20px"} /> Waitlist
           </a>
-          <a
+          {/* <a
             href="/#faq"
             className="flex items-center p-2 text-sm hover:bg-gray-700"
             onClick={closeDrawer}
           >
             <FaQuestion className="mr-2" fontSize={"20px"} /> FAQs
-          </a>
+          </a> */}
         </nav>
       </div>
     </>
