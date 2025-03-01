@@ -10,7 +10,7 @@ import { FaChevronDown as ChevronDownIcon } from "react-icons/fa";
 import FaqList from "@/components/lists/FaqList";
 
 const initState = {
-  buttonText: "I Want To Join The Waitlist!",
+  buttonText: "Join Waitlist",
   payload: {
     Name: "",
     Email: "",
@@ -45,15 +45,19 @@ const ContactSection = () => {
   };
 
   return (
-    <div id="contact" className="bg-black py-20">
+    <div id="contact" className="bg-black py-36 h-screen">
       <div className="container mx-auto px-3">
-        <h2 className="mb-8 text-center text-4xl font-bold text-white md:text-8xl">
-          Stay in the Loop!
+        <h2 className="text-center mb-3 text-7xl font-bold text-white">
+              Make Every<br />Moment{" "}
+          <a
+            href="/#contact"
+            className="text-indigo-500 hover:text-indigo-700"
+          >
+            Count
+          </a>
         </h2>
-        <p className="mb-3 text-center text-2xl text-gray-300">
-          Be the first to know when new features are released. <br />
-          Sign up below to stay up-to-date with the latest releases and
-          announcements.
+        <p className="mb-3 text-center text-xl text-gray-300">
+          Register your email to get early access.
         </p>
 
         <div className="flex justify-center">
@@ -62,10 +66,15 @@ const ContactSection = () => {
               className="mb-4 rounded-lg px-8 pb-8 pt-6 shadow-lg"
               onSubmit={handleSubmit}
             >
-              <div className="mb-6">
+              <div className="mb-6 relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
                 <input
                   required
-                  className={`focus:shadow-outline ${!successful ? "bg-gray-700" : "bg-gray-800"} w-full appearance-none rounded border border-gray-600 px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none`}
+                  className={`focus:shadow-outline ${!successful ? "bg-gray-700" : "bg-gray-800"} w-full appearance-none rounded border border-gray-600 px-4 py-3 pl-12 text-lg leading-tight text-gray-300 shadow focus:outline-none`}
                   id="name"
                   type="text"
                   placeholder="Enter Name..."
@@ -76,10 +85,15 @@ const ContactSection = () => {
                   value={payload.Name}
                 />
               </div>
-              <div className="mb-6">
+              <div className="mb-6 relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </span>
                 <input
                   required
-                  className={`focus:shadow-outline w-full appearance-none rounded border border-gray-600 ${!successful ? "bg-gray-700" : "bg-gray-800"} px-4 py-3 text-lg leading-tight text-gray-300 shadow focus:outline-none`}
+                  className={`focus:shadow-outline w-full appearance-none rounded border border-gray-600 ${!successful ? "bg-gray-700" : "bg-gray-800"} px-4 py-3 pl-12 text-lg leading-tight text-gray-300 shadow focus:outline-none`}
                   id="email"
                   type="email"
                   placeholder="Enter Email..."
@@ -124,7 +138,7 @@ const ContactSection = () => {
               </div>
             </form>
 
-            <FaqList />
+            {/* <FaqList /> */}
           </div>
         </div>
       </div>

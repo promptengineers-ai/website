@@ -48,7 +48,7 @@ const HeroSection = () => {
       >
         <div className={`z-${isHovered ? "0" : "30"}`}>
           <h1
-            className="fade-in fade-in-1 mb-8 text-5xl font-bold text-white md:text-8xl"
+            className="fade-in fade-in-1 mb-8 text-7xl font-bold text-white md:text-8xl"
             style={{ filter: "drop-shadow(0px 2px 20px rgba(0, 0, 0, 0.8))" }}
           >
             Time Is Our Most Valuable Resource..
