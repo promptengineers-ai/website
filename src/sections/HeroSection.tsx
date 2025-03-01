@@ -83,7 +83,7 @@ const HeroSection = () => {
         <div
           className="top-50 absolute right-10 hidden hover:cursor-pointer lg:block xl:w-1/3 xl:pl-10"
           onClick={() =>
-            window.open("https://promptengineersai.netlify.app", "_blank")
+            window.open("https://demo.promptengineers.ai/chat", "_blank")
           }
         >
           <div
