@@ -18,6 +18,7 @@ import {
   MdClose,
   MdMenu,
 } from "react-icons/md";
+import Image from "next/image";
 
 const TopNavbar = () => {
   const [showSolidBackground, setShowSolidBackground] = useState(false);
@@ -82,10 +83,12 @@ const TopNavbar = () => {
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <img
+              <Image
                 src="/pe-logo.png"
                 alt="Logo"
-                className="mr-2 h-8 w-8 md:h-9 md:w-9"
+                width={36}
+                height={36}
+                className="mr-2 md:h-9 md:w-9"
               />
               <a
                 href="/"

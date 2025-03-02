@@ -139,7 +139,7 @@ export default function ContactSection() {
                     <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Thank you for joining! We'll be in touch soon.
+                    Thank you for joining! We&apos;ll be in touch soon.
                   </motion.div>
                 )}
               </form>
@@ -153,7 +153,7 @@ export default function ContactSection() {
               className="mt-8 text-center text-gray-400"
             >
               <p>
-                By joining, you'll be the first to know about our latest updates and features.
+                By joining, you&apos;ll be the first to know about our latest updates and features.
               </p>
             </motion.div>
           </motion.div>
