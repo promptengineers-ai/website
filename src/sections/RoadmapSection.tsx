@@ -15,36 +15,28 @@ type Status = 'completed' | 'in-progress' | 'planned';
 
 const roadmapData = [
   { 
-    date: 'Q1 2025', 
-    title: 'Feature A', 
-    description: 'Some details about Feature A.', 
-    status: 'completed' as Status,
-    icon: icons.A,
-    details: 'Extended details about Feature A implementation and benefits.' 
-  },
-  { 
     date: 'Q2 2025', 
-    title: 'Feature B', 
-    description: 'Some details about Feature B.', 
+    title: 'Shareable Agents', 
+    description: 'Users can market their agents to others. Settings are customizable, and private. Best settings win.', 
     status: 'in-progress' as Status,
-    icon: icons.B,
-    details: 'Extended details about how Feature B will improve the platform.' 
+    icon: icons.A,
+    details: 'There will be a review system for users to review agents, a way to see how many people have used an agent, and a way to see how many people have rated an agent.' 
   },
   { 
     date: 'Q3 2025', 
-    title: 'Feature C', 
-    description: 'Some details about Feature C.', 
+    title:  'Agent Marketplace', 
+    description: 'Users should be able to charge for their agents services.', 
     status: 'planned' as Status,
-    icon: icons.C,
-    details: 'Extended details about the planned functionality of Feature C.' 
+    icon: icons.B,
+    details: 'Different payment methods will be available, and users will be able to set their own prices. The marketplace will be open to all users.' 
   },
   { 
     date: 'Q4 2025', 
-    title: 'Feature D', 
-    description: 'Some details about Feature D.', 
+    title: 'Coming Soon...', 
+    description: 'When we know what we are building, we will let you know.', 
     status: 'planned' as Status,
-    icon: icons.D,
-    details: 'Extended details about what Feature D will bring to users.' 
+    icon: icons.C,
+    details: 'More details to come!' 
   },
 ];
 

@@ -59,7 +59,7 @@ const TopNavbar = () => {
   const menuItems = [
     { href: "/", label: "Home", icon: <MdHome className="text-xl" /> },
     { href: "/#roadmap", label: "Roadmap", icon: <MdLayers className="text-xl" /> },
-    { href: "/#contact", label: "Waitlist", icon: <MdEmail className="text-xl" /> },
+    // { href: "/#contact", label: "Waitlist", icon: <MdEmail className="text-xl" /> },
     { href: "https://demo.promptengineers.ai/chat", label: "Demo", icon: <MdCode className="text-xl" />, target: "_blank" },
     { href: "/blogs", label: "Blog", icon: <FaMedium className="text-xl" /> }
   ];
