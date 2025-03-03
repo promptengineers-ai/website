@@ -15,27 +15,36 @@ type Status = 'completed' | 'in-progress' | 'planned';
 
 const roadmapData = [
   { 
+    date: 'Q1 2025', 
+    title: 'Chat Presets', 
+    description: 'System prompts, models, tools are able to be saved and used in chat sessions.', 
+    status: 'completed' as Status,
+    icon: icons.A,
+    details: 'System prompts, models, tools are able to be saved and used in chat sessions.' 
+    + ' Users can also create their own presets. This allows for a more personalized chat experience.'
+  },
+  { 
     date: 'Q2 2025', 
     title: 'Shareable Agents', 
     description: 'Users can market their agents to others. Settings are customizable, and private. Best settings win.', 
     status: 'in-progress' as Status,
-    icon: icons.A,
-    details: 'There will be a review system for users to review agents, a way to see how many people have used an agent, and a way to see how many people have rated an agent.' 
+    icon: icons.B,
+    details: 'There will be a system for users to review agents, a way to see how many people have used an agent, and a way to see how many people have rated an agent.' 
   },
   { 
     date: 'Q3 2025', 
-    title:  'Agent Marketplace', 
-    description: 'Users should be able to charge for their agents services.', 
+    title:  'Agent Insights, and Reviews', 
+    description: 'Creators can see basic usage insights, and users can review agents.', 
     status: 'planned' as Status,
-    icon: icons.B,
-    details: 'Different payment methods will be available, and users will be able to set their own prices. The marketplace will be open to all users.' 
+    icon: icons.C,
+    details: 'Backend dashboard for creators to see basic usage insights, and a system for users to review agents.' 
   },
   { 
-    date: 'Q4 2025', 
+    date: 'Q1 2026', 
     title: 'Coming Soon...', 
     description: 'When we know what we are building, we will let you know.', 
     status: 'planned' as Status,
-    icon: icons.C,
+    icon: icons.D,
     details: 'More details to come!' 
   },
 ];
