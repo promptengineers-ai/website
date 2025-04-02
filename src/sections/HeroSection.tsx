@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { apiClient } from "@/utils/client";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +13,13 @@ const HeroSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Here you would typically send the email to your backend
-    // Simulating API call with timeout
-    setTimeout(() => {
+    try {
+      const response = await apiClient.contactFormSubmit({ 
+        Email: email,
+        // Name: "Newsletter Subscriber", 
+        Message: "Beta invite request" 
+      });
+      
       setIsSubmitting(false);
       setIsSubmitted(true);
       setEmail("");
@@ -23,7 +28,10 @@ const HeroSection = () => {
       setTimeout(() => {
         setIsSubmitted(false);
       }, 3000);
-    }, 1000);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -128,11 +136,11 @@ const HeroSection = () => {
         transition={{ duration: 0.8, delay: 0.9 }}
         className="flex justify-center space-x-6 mt-8 text-sm font-montserrat text-gray-400"
       >
-        <a href="#thesis" className="hover:text-purple-400 transition-colors">Thesis</a>
-        <a href="#social" className="hover:text-purple-400 transition-colors">Social</a>
-        <a href="#community" className="hover:text-purple-400 transition-colors">Community</a>
-        <a href="#support" className="hover:text-purple-400 transition-colors">Support</a>
-        <a href="#github" className="hover:text-purple-400 transition-colors">Github</a>
+        <a href="/about" className="hover:text-purple-400 transition-colors">About</a>
+        <a href="/socials" className="hover:text-purple-400 transition-colors">Follow</a>
+        <a href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ" className="hover:text-purple-400 transition-colors">Community</a>
+        <a href="mailto:ryan.adaptivebiz@gmail.com" className="hover:text-purple-400 transition-colors">Support</a>
+        <a href="https://github.com/enso-labs" className="hover:text-purple-400 transition-colors">Github</a>
       </motion.div>
     </div>
   );

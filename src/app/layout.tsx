@@ -22,8 +22,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 const APP_NAME = "enso";
-const APP_DEFAULT_TITLE = "enso - Be Present";
-const APP_TITLE_TEMPLATE = "%s | enso";
+const APP_DEFAULT_TITLE = "Enso Labs - Be Present";
+const APP_TITLE_TEMPLATE = "%s | Enso Labs";
 const APP_DESCRIPTION =
   "Composable Agents Built on LangGraph Powered by MCP";
 
