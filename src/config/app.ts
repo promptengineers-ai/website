@@ -29,15 +29,15 @@ export const socialIcons = [
   },
   {
     Icon: FaInstagram,
-    tooltip: "@promptengineers.ai",
+    tooltip: "@enso.labs",
     key: "instagram",
-    link: "https://www.instagram.com/promptengineers.ai/",
+    link: "https://www.instagram.com/enso.labs/",
   },
   {
     Icon: FaGithub,
-    tooltip: "promptengineers-ai",
+    tooltip: "enso-labs",
     key: "github",
-    link: "https://github.com/promptengineers-ai",
+    link: "https://github.com/enso-labs",
   },
   // {
   //   Icon: FaGitlab,

@@ -6,21 +6,21 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const brevo = new BrevoApi();
-    const brevoRes = await brevo.subscribe(body);
-    if (!brevoRes.ok) {
-      const errorData = await brevoRes.json();
-      console.error(errorData);
-      if (brevoRes.status === 400) {
-        return NextResponse.json(errorData, {
-          status: brevoRes.status,
-        });
-      } else {
-        return NextResponse.json(errorData, {
-          status: 500,
-        });
-      }
-    }
+    // const brevo = new BrevoApi();
+    // const brevoRes = await brevo.subscribe(body);
+    // if (!brevoRes.ok) {
+    //   const errorData = await brevoRes.json();
+    //   console.error(errorData);
+    //   if (brevoRes.status === 400) {
+    //     return NextResponse.json(errorData, {
+    //       status: brevoRes.status,
+    //     });
+    //   } else {
+    //     return NextResponse.json(errorData, {
+    //       status: 500,
+    //     });
+    //   }
+    // }
 
     const airtable = new AirtableApi();
     const airRes = await airtable.create(body);
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const data = {
       'message': `Successfully Subscribed!`,
       ...(await airRes.json()),
-      ...(await brevoRes.json()),
+      // ...(await brevoRes.json()),
     };
     return NextResponse.json(data, { status: 201 });
   } catch (error) {

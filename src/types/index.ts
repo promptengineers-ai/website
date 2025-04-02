@@ -14,8 +14,8 @@ export type Blog = {
 };
 
 export type Contact = {
-  Name: string;
+  Name?: string;
   Email: string;
-  Phone: string;
-  Message: string;
+  Phone?: string;
+  Message?: string;
 };

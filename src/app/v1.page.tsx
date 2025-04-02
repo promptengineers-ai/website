@@ -15,13 +15,13 @@ export default function Home() {
 
         {/* <ProjectSection /> */}
         {/* <AboutSection /> */}
-        {/* <RoadmapSection /> */}
-        {/* <ContactSection /> */}
+        <RoadmapSection />
+        <ContactSection />
       </main>
       {/* <footer>
 				<FooterSection />
 			</footer> */}
-      {/* <WaitlistButton /> */}
+      <WaitlistButton />
     </>
   );
 }

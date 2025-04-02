@@ -34,6 +34,10 @@ const config: Config = {
         "500": "500ms",
         "1000": "1000ms",
       },
+      fontFamily: {
+        montserrat: ['var(--font-montserrat)', 'sans-serif'],
+        space: ['var(--font-space)', 'sans-serif'],
+      },
     },
   },
   plugins: [],

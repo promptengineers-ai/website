@@ -1,18 +1,31 @@
 import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { Inter } from "next/font/google";
+import { Montserrat, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Head from "next/head";
 import InitialLoadActiveUsers from "@/components/users/InitialLoadActiveUsers";
 import { GA_ID, NODE_ENV } from "@/config/app";
 // import { botScript } from "@/config/bot";
 
-const inter = Inter({ subsets: ["latin"] });
-const APP_NAME = "Prompt Engineers AI";
-const APP_DEFAULT_TITLE = "Prompt Engineers AI";
-const APP_TITLE_TEMPLATE = "%s";
+// Primary font - Montserrat for clean, minimal UI elements
+const montserrat = Montserrat({ 
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-montserrat",
+});
+
+// Futuristic font for "Be Present" headline
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-space",
+});
+
+const APP_NAME = "enso";
+const APP_DEFAULT_TITLE = "Enso Labs - Be Present";
+const APP_TITLE_TEMPLATE = "%s | Enso Labs";
 const APP_DESCRIPTION =
-  "Single Source for All AI Chat Applications.";
+  "Composable Agents Built on LangGraph Powered by MCP";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
@@ -61,7 +74,7 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${montserrat.variable} ${spaceGrotesk.variable}`}>
       <Head>
         <meta
           name="apple-mobile-web-app-status-bar-style"
@@ -73,7 +86,7 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
       </Head>
-      <body className={inter.className}>{children}</body>
+      <body className="font-montserrat">{children}</body>
       {NODE_ENV === "production" && GA_ID && (
         <>
           <GoogleAnalytics gaId={GA_ID} />
