@@ -31,7 +31,7 @@ const AuthorInfo = ({ blog }: { blog: any }) => (
 async function Blogs() {
   const blogs = await rssToJson(MEDIUM_RSS_URL);
   console.log(blogs);
-
+  if (true) return null;
   return (
     <>
       {blogs.map((blog: any) => (
