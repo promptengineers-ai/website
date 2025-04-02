@@ -12,12 +12,12 @@ const projects = [
     link: "https://www.meetup.com/plano-prompt-engineers",
   },
   {
-    title: "Prompt Engineers AI - Open Source",
+    title: "Enso - Open Source",
     image:
       "https://github.com/ryaneggz/static/blob/main/pe-oss-gh-page.png?raw=true",
     description:
       "Open-source AI projects to help you build better chatbots, faster. Get started with our pre-built templates, or dive into the code to customize your own.",
-    link: "https://github.com/promptengineers-ai",
+    link: "https://github.com/enso-labs",
   },
   {
     title: "Prompt Engineers AI - Legacy",
@@ -25,7 +25,7 @@ const projects = [
       "https://github.com/ryaneggz/static/blob/main/promptenigineers-landing.jpg?raw=true",
     description:
       "Elevate your workflows with AI-driven chats that turn talk into tasks. Design, automate, and innovate in a chat – where every message moves mountains.",
-    link: "https://promptengineers.ai",
+    link: "https://enso.sh",
   },
 ];
 

@@ -11,17 +11,17 @@ export default function Home() {
         <TopNavBar />
       </header>
       <main>
-        <HeroSection />
+        {/* <HeroSection /> */}
 
         {/* <ProjectSection /> */}
         {/* <AboutSection /> */}
-        {/* <RoadmapSection /> */}
-        {/* <ContactSection /> */}
+        <RoadmapSection />
+        <ContactSection />
       </main>
       {/* <footer>
 				<FooterSection />
 			</footer> */}
-      {/* <WaitlistButton /> */}
+      <WaitlistButton />
     </>
   );
 }

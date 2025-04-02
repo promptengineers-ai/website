@@ -1,103 +1,139 @@
 "use client";
-import Link from "next/link";
 import { useState } from "react";
-import { socialIcons } from "@/config/app";
-import { FaMedium } from "react-icons/fa6";
-import { HERO_GIF } from "@/config/static";
-import IphoneMock from "../components/mocks/IphoneMock"; // Adjust the import path as necessary
-import { FaSlack } from "react-icons/fa";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 const HeroSection = () => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Here you would typically send the email to your backend
+    // Simulating API call with timeout
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      setEmail("");
+      
+      // Reset success message after delay
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 3000);
+    }, 1000);
+  };
 
   return (
     <div
-      className="relative flex min-h-screen flex-col justify-center bg-cover bg-center bg-no-repeat lg:flex-row lg:items-center"
-      style={{ backgroundImage: `url('${HERO_GIF}')` }}
+      className="relative flex min-h-screen flex-col items-center justify-center bg-black text-white"
     >
-      {/* Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 top-0 bg-black bg-opacity-20"></div>
-
-      {/* Social Media Icons - Adjust layout for lg screens and left align on md screens */}
-      <div className="z-10 flex items-start justify-start pl-3 lg:absolute lg:left-2 lg:top-1/2 lg:mt-5 lg:-translate-y-1/2 lg:flex-col lg:items-start lg:justify-start lg:pl-4">
-        {socialIcons.map(({ Icon, tooltip, key, link }) => (
-          <div
-            className="group relative mb-4 mr-3 text-5xl text-white lg:mb-6 lg:mr-0"
-            key={key}
-          >
-            {/* Tooltip text */}
-            <div className="hover absolute bottom-full mb-3 hidden w-auto rounded-md bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:block group-hover:opacity-100">
-              {tooltip}
-            </div>
-
-            {/* Icon */}
-            <Link href={link} target="_blank">
-              <Icon
-                style={{
-                  filter: "drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.8))",
-                }}
-              />
-            </Link>
-          </div>
-        ))}
-      </div>
-
-      {/* Hero Content */}
-      <div
-        className={`relative mx-auto max-w-5xl p-3 sm:text-left lg:flex lg:items-center lg:justify-between`}
+      {/* Logo */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="w-80 h-80 relative"
       >
-        <div className={`z-${isHovered ? "0" : "30"}`}>
-          <h1
-            className="fade-in fade-in-1 mb-8 text-7xl font-bold text-white md:text-8xl"
-            style={{ filter: "drop-shadow(0px 2px 20px rgba(0, 0, 0, 0.8))" }}
-          >
-            Time Is Our Most Valuable Resource..
-          </h1>
-          <p
-            className="fade-in fade-in-2 mt-4 max-w-xl text-2xl text-gray-200"
-            style={{ filter: "drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.8))" }}
-          >
-            My mission is to help you get it back by providing simple tools for
-            professionals, and best in class API&apos;s for builders.
-          </p>
-          <div className="fade-in fade-in-3 mt-8">
-            <Link
-              // href="https://discord.gg/nNYKVTSCRt"
-              href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ"
-              target="_blank"
-            >
-              <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full bg-gray-200/20 px-6 py-3 text-xl text-white hover:bg-green-500">
-                <span>Join Slack</span>
-                <FaSlack fontSize="24px" className="ml-1" />
-              </button>
-            </Link>
-            <Link href="/blogs">
-              <button className="hover-shadow-defined mr-4 inline-flex items-center rounded-full  bg-gray-200/20 px-6 py-3 text-xl text-white hover:bg-green-500">
-                <span>Blog</span>
-                <FaMedium fontSize="20px" className="ml-1" />
-              </button>
-            </Link>
-          </div>
-        </div>
+        <Image 
+          src="/images/logo-bg.png" 
+          alt="Enso Logo" 
+          fill
+          priority
+          className="object-contain"
+        />
+      </motion.div>
 
-        {/* IphoneMock Component */}
-        <div
-          className="top-50 absolute right-10 hidden hover:cursor-pointer lg:block xl:w-1/3 xl:pl-10"
-          onClick={() =>
-            window.open("https://demo.promptengineers.ai/chat", "_blank")
-          }
-        >
-          <div
-            className={`fade-in fade-in-3 iphone-mock-hover relative ${
-              isHovered ? "z-30" : "z-0 opacity-80"
+      {/* Headline */}
+      <motion.h1
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        className="mb-6 text-5xl md:text-6xl font-cormorant font-light tracking-wide text-center"
+      >
+        
+        
+        Be Present<br />
+        <span className="text-gold-500">with Enso</span>
+        
+      </motion.h1>
+
+      {/* Description */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
+        className="mb-12 max-w-md text-xl font-montserrat font-light tracking-wide text-center text-gray-300"
+      >
+        Composable AI Agents Built on LangGraph Powered by MCP
+      </motion.p>
+
+      {/* Email Form */}
+      <motion.form
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.7 }}
+        onSubmit={handleSubmit}
+        className="w-full max-w-md px-4"
+      >
+        <div className="relative">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter email for beta invite"
+            required
+            className="w-full px-6 py-3 rounded-full bg-gray-900 border border-gray-700 text-white text-sm font-montserrat tracking-wide focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all"
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting || isSubmitted}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 px-5 py-1.5 rounded-full bg-white text-black text-sm font-montserrat tracking-wide font-medium hover:bg-gray-200 transition-all ${
+              isSubmitting ? "opacity-70" : ""
             }`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
           >
-            <IphoneMock />
-          </div>
+            {isSubmitting ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing
+              </span>
+            ) : (
+              "Join Beta"
+            )}
+          </button>
         </div>
-      </div>
+        
+        {/* Success Message */}
+        {isSubmitted && (
+          <motion.p
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-3 text-center text-sm font-montserrat text-green-400"
+          >
+            Thank you! We'll send your invite soon.
+          </motion.p>
+        )}
+      </motion.form>
+
+      {/* Links */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.9 }}
+        className="flex justify-center space-x-6 mt-8 text-sm font-montserrat text-gray-400"
+      >
+        <a href="#thesis" className="hover:text-purple-400 transition-colors">Thesis</a>
+        <a href="#social" className="hover:text-purple-400 transition-colors">Social</a>
+        <a href="#community" className="hover:text-purple-400 transition-colors">Community</a>
+        <a href="#support" className="hover:text-purple-400 transition-colors">Support</a>
+        <a href="#github" className="hover:text-purple-400 transition-colors">Github</a>
+      </motion.div>
     </div>
   );
 };
