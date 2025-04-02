@@ -124,7 +124,7 @@ const HeroSection = () => {
             exit={{ opacity: 0, height: 0 }}
             className="mt-3 text-center text-sm font-montserrat text-green-400"
           >
-            Thank you! We'll send your invite soon.
+            Thank you! We&apos;ll send your invite soon.
           </motion.p>
         )}
       </motion.form>
