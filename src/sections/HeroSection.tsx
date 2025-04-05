@@ -138,7 +138,7 @@ const HeroSection = () => {
       >
         <a href="/about" className="hover:text-purple-400 transition-colors">About</a>
         <a href="/socials" className="hover:text-purple-400 transition-colors">Follow</a>
-        <a href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ" className="hover:text-purple-400 transition-colors">Community</a>
+        <a href="https://discord.gg/QRfjg4YNzU" className="hover:text-purple-400 transition-colors">Community</a>
         <a href="mailto:ryan.adaptivebiz@gmail.com" className="hover:text-purple-400 transition-colors">Support</a>
         <a href="https://github.com/enso-labs" className="hover:text-purple-400 transition-colors">Github</a>
       </motion.div>
