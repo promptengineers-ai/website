@@ -1,31 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { FaArrowLeft } from "react-icons/fa";
-import { FaXTwitter, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa6";
+import { FaArrowLeft, FaGithub } from "react-icons/fa";
+import { FaXTwitter, FaInstagram, FaLinkedin, FaYoutube, FaDiscord, FaGlobe } from "react-icons/fa6";
 import { SiTiktok, SiThreads } from "react-icons/si";
 import { FiExternalLink } from "react-icons/fi";
 
 const SocialPage = () => {
   const socials = [
     {
-      name: "X",
-      handle: "@JohnEggz",
-      icon: <FaXTwitter className="text-xl" />,
-      url: "https://x.com/JohnEggz",
+      name: "Discord",
+      handle: "Enso Labs",
+      icon: <FaDiscord className="text-xl" />,
+      url: "https://discord.gg/QRfjg4YNzU",
     },
-    {
-      name: "Instagram",
-      handle: "@enso-labs",
-      icon: <FaInstagram className="text-xl" />,
-      url: "https://instagram.com/enso-labs",
-    },
-    // {
-    //   name: "TikTok",
-    //   handle: "@10x.app",
-    //   icon: <SiTiktok className="text-xl" />,
-    //   url: "https://tiktok.com/@10x.app",
-    // },
     {
       name: "YouTube",
       handle: "@enso-labs",
@@ -33,11 +21,43 @@ const SocialPage = () => {
       url: "https://www.youtube.com/@enso-labs",
     },
     {
+      name: "Instagram",
+      handle: "@enso.labs",
+      icon: <FaInstagram className="text-xl" />,
+      url: "https://instagram.com/enso.labs",
+    },
+    {
       name: "LinkedIn",
       handle: "Enso Labs",
       icon: <FaLinkedin className="text-xl" />,
       url: "https://www.linkedin.com/company/enso-sh",
     },
+    {
+      name: "X",
+      handle: "@JohnEggz",
+      icon: <FaXTwitter className="text-xl" />,
+      url: "https://x.com/JohnEggz",
+    },
+    {
+      name: "Github",
+      handle: "Enso Labs",
+      icon: <FaGithub className="text-xl" />,
+      url: "https://github.com/enso-labs",
+    },
+    {
+      name: "Website",
+      handle: "Enso Labs",
+      icon: <FaGlobe className="text-xl" />,
+      url: "https://enso.sh",
+    },
+
+    // {
+    //   name: "TikTok",
+    //   handle: "@10x.app",
+    //   icon: <SiTiktok className="text-xl" />,
+    //   url: "https://tiktok.com/@10x.app",
+    // },
+  
     // {
     //   name: "Threads",
     //   handle: "@10x_app",
