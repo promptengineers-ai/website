@@ -75,7 +75,7 @@ const HeroSection = () => {
         transition={{ duration: 0.8, delay: 0.5 }}
         className="mb-12 max-w-md text-xl font-montserrat font-light tracking-wide text-center text-gray-300"
       >
-        Composable AI Agents Built on LangGraph Powered by MCP
+        Composable Agents Built on LangGraph Powered by MCP & A2A
       </motion.p>
 
       {/* Email Form */}
@@ -136,11 +136,13 @@ const HeroSection = () => {
         transition={{ duration: 0.8, delay: 0.9 }}
         className="flex justify-center space-x-6 mt-8 text-sm font-montserrat text-gray-400"
       >
-        <a href="/about" className="hover:text-purple-400 transition-colors">About</a>
-        <a href="/socials" className="hover:text-purple-400 transition-colors">Follow</a>
-        <a href="https://discord.gg/QRfjg4YNzU" className="hover:text-purple-400 transition-colors">Community</a>
-        <a href="mailto:ryan.adaptivebiz@gmail.com" className="hover:text-purple-400 transition-colors">Support</a>
+        <a href="https://demo.enso.sh" className="hover:text-purple-400 transition-colors">Demo</a>
+        <a href="/blogs" className="hover:text-purple-400 transition-colors">Blog</a>
+        <a href="/socials" className="hover:text-purple-400 transition-colors">Social</a>
+        {/* <a href="https://discord.gg/QRfjg4YNzU" className="hover:text-purple-400 transition-colors">Community</a> */}
+        {/* <a href="mailto:ryan.adaptivebiz@gmail.com" className="hover:text-purple-400 transition-colors">Contact</a> */}
         <a href="https://github.com/enso-labs" className="hover:text-purple-400 transition-colors">Github</a>
+        <a href="https://demo.enso.sh/docs/" className="hover:text-purple-400 transition-colors">Docs</a>
       </motion.div>
     </div>
   );

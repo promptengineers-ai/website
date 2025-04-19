@@ -1,4 +1,13 @@
 import { parse } from "rss-to-json";
+import Parser from 'rss-parser';
+import * as htmlparser2 from "htmlparser2";
+
+
+export async function rssParser(url: string) {
+    const parser = new Parser();
+    const feed = await parser.parseURL(url);
+    return feed;
+}
 
 export async function rssToJson(
   url: string,
@@ -25,7 +34,7 @@ export async function rssToJson(
                 item.images = imageUrls;
 
                 // Regular expression to find the first <p> tag and extract its content
-                const pRegex = /<p>(.*?)<\/p>/s;
+                const pRegex = /<p>(.*?)<\/p>/;
                 const pMatch = pRegex.exec(content);
 
                 if (pMatch && pMatch[1]) {
@@ -54,4 +63,24 @@ export async function rssToJson(
     } catch (error) {
         console.error("Error fetching or processing data:", error);
     }
+}
+
+export function extractImagesToJson(htmlString: string) {
+  const images: any[] = [];
+  const parser = new htmlparser2.Parser({
+    onopentag(name, attribs) {
+      if (name === "img") {
+        images.push({
+          src: attribs.src || null,
+          alt: attribs.alt || null,
+          title: attribs.title || null
+        });
+      }
+    }
+  }, { decodeEntities: true });
+
+  parser.write(htmlString);
+  parser.end();
+
+  return images;
 }
