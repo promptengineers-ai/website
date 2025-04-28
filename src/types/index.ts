@@ -18,4 +18,5 @@ export type Contact = {
   Email: string;
   Phone?: string;
   Message?: string;
+  Referrer?: string;
 };
