@@ -17,6 +17,7 @@ const HeroSection = () => {
       const response = await apiClient.contactFormSubmit({ 
         Email: email,
         // Name: "Newsletter Subscriber", 
+        Referrer: "Enso Contact Form",
         Message: "Beta invite request" 
       });
       
