@@ -41,4 +41,6 @@ public/swe-*.js
 public/fallback-*.js
 public/workbox-*.js
 
-.env*
+**/.env*
+**/.worktrees/
+**/.play*

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { apiClient } from "@/utils/client";
+import { FaGithub, FaSlack, FaMeetup } from "react-icons/fa";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
@@ -39,20 +40,16 @@ const HeroSection = () => {
     <div
       className="relative flex min-h-screen flex-col items-center justify-center bg-black text-white"
     >
-      {/* Logo */}
+      {/* Logo/Icon Area */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-80 h-80 relative"
+        className="mb-8 flex items-center justify-center"
       >
-        <Image 
-          src="/images/logo-bg.png" 
-          alt="Enso Logo" 
-          fill
-          priority
-          className="object-contain"
-        />
+        <div className="text-7xl md:text-8xl">
+          🤖
+        </div>
       </motion.div>
 
       {/* Headline */}
@@ -60,13 +57,10 @@ const HeroSection = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="mb-6 text-5xl md:text-6xl font-cormorant font-light tracking-wide text-center"
+        className="mb-6 text-4xl md:text-6xl font-bold tracking-tight text-center"
       >
-        
-        
-        Be Present<br />
-        <span className="text-gold-500">with Enso</span>
-        
+        Prompt Engineers<br />
+        <span className="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">AI Community</span>
       </motion.h1>
 
       {/* Description */}
@@ -74,76 +68,85 @@ const HeroSection = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="mb-12 max-w-md text-xl font-montserrat font-light tracking-wide text-center text-gray-300"
+        className="mb-8 max-w-2xl text-xl font-light text-center text-gray-300"
       >
-        Composable Agents Built on LangGraph Powered by MCP & A2A
+        Join 1,500+ developers and tech enthusiasts in Plano, TX exploring ChatGPT, LLMs, and the future of AI
       </motion.p>
 
-      {/* Email Form */}
-      <motion.form
+      {/* Primary CTA - Survey Button */}
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.7 }}
-        onSubmit={handleSubmit}
-        className="w-full max-w-md px-4"
+        className="mb-12 flex flex-col items-center gap-4"
       >
-        <div className="relative">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter email for beta invite"
-            required
-            className="w-full px-6 py-3 rounded-full bg-gray-900 border border-gray-700 text-white text-sm font-montserrat tracking-wide focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all"
-          />
-          <button
-            type="submit"
-            disabled={isSubmitting || isSubmitted}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 px-5 py-1.5 rounded-full bg-white text-black text-sm font-montserrat tracking-wide font-medium hover:bg-gray-200 transition-all ${
-              isSubmitting ? "opacity-70" : ""
-            }`}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing
-              </span>
-            ) : (
-              "Join Beta"
-            )}
-          </button>
-        </div>
-        
-        {/* Success Message */}
-        {isSubmitted && (
-          <motion.p
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-3 text-center text-sm font-montserrat text-green-400"
-          >
-            Thank you! We&apos;ll send your invite soon.
-          </motion.p>
-        )}
-      </motion.form>
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+        >
+          <span className="relative z-10">Take Our Community Survey</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </a>
+        <p className="text-sm text-gray-400">Help shape the future of our AI community</p>
+      </motion.div>
 
-      {/* Links */}
+      {/* Community Stats */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        className="flex justify-center space-x-6 mt-8 text-sm font-montserrat text-gray-400"
+        className="mb-12 flex flex-wrap justify-center gap-8 text-center"
       >
-        <a href="https://demo.enso.sh" className="hover:text-purple-400 transition-colors">Demo</a>
-        <a href="/blogs" className="hover:text-purple-400 transition-colors">Blog</a>
-        <a href="/socials" className="hover:text-purple-400 transition-colors">Social</a>
-        {/* <a href="https://discord.gg/QRfjg4YNzU" className="hover:text-purple-400 transition-colors">Community</a> */}
-        {/* <a href="mailto:ryan.adaptivebiz@gmail.com" className="hover:text-purple-400 transition-colors">Contact</a> */}
-        <a href="https://github.com/enso-labs" className="hover:text-purple-400 transition-colors">Github</a>
-        <a href="https://demo.enso.sh/docs/" className="hover:text-purple-400 transition-colors">Docs</a>
+        <div>
+          <div className="text-3xl font-bold text-blue-400">1,500+</div>
+          <div className="text-sm text-gray-400">Members</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-purple-400">15+</div>
+          <div className="text-sm text-gray-400">Events Hosted</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-green-400">4.6/5</div>
+          <div className="text-sm text-gray-400">Rating</div>
+        </div>
+      </motion.div>
+
+      {/* Social Links */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1.1 }}
+        className="flex justify-center gap-6"
+      >
+        <a
+          href="https://github.com/promptengineers-ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200 group"
+        >
+          <FaGithub className="text-2xl group-hover:scale-110 transition-transform" />
+          <span className="text-sm">GitHub</span>
+        </a>
+        <a
+          href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200 group"
+        >
+          <FaSlack className="text-2xl group-hover:scale-110 transition-transform" />
+          <span className="text-sm">Slack</span>
+        </a>
+        <a
+          href="https://www.meetup.com/plano-prompt-engineers/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200 group"
+        >
+          <FaMeetup className="text-2xl group-hover:scale-110 transition-transform" />
+          <span className="text-sm">Meetup</span>
+        </a>
       </motion.div>
     </div>
   );
