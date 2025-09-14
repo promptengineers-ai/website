@@ -21,11 +21,11 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space",
 });
 
-const APP_NAME = "enso";
-const APP_DEFAULT_TITLE = "Enso Labs - Be Present";
-const APP_TITLE_TEMPLATE = "%s | Enso Labs";
+const APP_NAME = "Prompt Engineers AI";
+const APP_DEFAULT_TITLE = "Prompt Engineers AI - Dallas Plano AI Community";
+const APP_TITLE_TEMPLATE = "%s | Prompt Engineers AI";
 const APP_DESCRIPTION =
-  "Composable Agents Built on LangGraph Powered by MCP";
+  "Join 1,500+ developers and tech enthusiasts in Plano, TX exploring ChatGPT, LLMs, and the future of AI. Monthly meetups focused on prompt engineering, machine learning, and AI development.";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
@@ -52,14 +52,55 @@ export const metadata: Metadata = {
       template: APP_TITLE_TEMPLATE,
     },
     description: APP_DESCRIPTION,
+    locale: "en_US",
+    url: "https://promptengineers-ai.github.io/website/",
+    images: [
+      {
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Prompt Engineers AI Community - Dallas Plano AI Meetup",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: {
       default: APP_DEFAULT_TITLE,
       template: APP_TITLE_TEMPLATE,
     },
     description: APP_DESCRIPTION,
+    images: ["/images/og-image.png"],
+  },
+  keywords: [
+    "AI",
+    "ChatGPT",
+    "LLM",
+    "Machine Learning",
+    "Prompt Engineering",
+    "Dallas",
+    "Plano",
+    "Texas",
+    "Meetup",
+    "Community",
+    "Software Development",
+    "Technology",
+    "OpenAI",
+    "Langchain"
+  ],
+  authors: [{ name: "Prompt Engineers AI Community" }],
+  creator: "Prompt Engineers AI Community",
+  publisher: "Prompt Engineers AI Community",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 

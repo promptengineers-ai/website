@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdClose, MdMenu } from "react-icons/md";
+import { FaGithub } from "react-icons/fa";
 import Image from "next/image";
 
 const TopNavbar = () => {
@@ -61,27 +62,34 @@ const TopNavbar = () => {
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
-            <motion.div 
-              className="flex items-center" 
+            <motion.div
+              className="flex items-center"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <a href="/" className="flex items-center ml-2">
-                {/* <Image
-                  src="/images/logo-bg.png"
-                  alt="Enso Logo"
-                  width={36}
-                  height={36}
-                  className="mr-2"
-                /> */}
-                <span className="text-xl font-cormorant font-medium tracking-wide text-white hover:text-gray-300 transition-colors duration-200">
-                  enso
+              <a href="/" className="flex items-center ml-2 gap-3">
+                <span className="text-2xl">🤖</span>
+                <span className="text-xl font-bold tracking-tight text-white hover:text-gray-300 transition-colors duration-200">
+                  Prompt Engineers <span className="text-blue-400">AI</span>
                 </span>
               </a>
             </motion.div>
             
+            {/* Right side - GitHub link */}
+            <div className="flex items-center gap-4">
+              <a
+                href="https://github.com/promptengineers-ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors duration-200"
+                aria-label="GitHub"
+              >
+                <FaGithub className="text-xl" />
+              </a>
+            </div>
+
             {/* Mobile menu button */}
-            {/* <motion.button 
+            {/* <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleDrawer} 
