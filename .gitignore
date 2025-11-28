@@ -45,3 +45,8 @@ public/workbox-*.js
 **/.worktrees/
 **/.play*
 **/*.map
+
+# openpsec
+**/openspec/
+**/AGENTS.md
+**/CLAUDE.md
