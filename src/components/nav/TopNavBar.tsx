@@ -4,12 +4,17 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdClose, MdMenu } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
+import { FiUser, FiLogOut } from "react-icons/fi";
+import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 
 const TopNavbar = () => {
+  const { data: session } = useSession();
   const [showSolidBackground, setShowSolidBackground] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,7 +80,7 @@ const TopNavbar = () => {
               </a>
             </motion.div>
             
-            {/* Right side - GitHub link */}
+            {/* Right side - GitHub link and Auth */}
             <div className="flex items-center gap-4">
               <a
                 href="https://github.com/promptengineers-ai"
@@ -86,6 +91,66 @@ const TopNavbar = () => {
               >
                 <FaGithub className="text-xl" />
               </a>
+
+              {session ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-2 rounded-full bg-gray-800/70 px-3 py-2 text-white hover:bg-gray-700/70 transition-colors duration-200"
+                  >
+                    <FiUser className="text-lg" />
+                    <span className="hidden sm:inline text-sm">{session.user.name}</span>
+                  </button>
+
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                      <div className="py-1">
+                        <Link
+                          href="/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          My Profile
+                        </Link>
+                        <Link
+                          href="/profile/edit"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Edit Profile
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setShowUserMenu(false);
+                            signOut({ callbackUrl: '/' });
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          <span className="flex items-center gap-2">
+                            <FiLogOut />
+                            Sign Out
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/login"
+                    className="rounded-full bg-transparent border border-white/30 text-white px-4 py-2 text-sm font-medium hover:bg-white/10 transition-all duration-200"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="rounded-full bg-white text-black px-4 py-2 text-sm font-medium hover:bg-gray-200 transition-all duration-200"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Mobile menu button */}

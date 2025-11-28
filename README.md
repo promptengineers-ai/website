@@ -1,24 +1,65 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Features
+
+- **User Authentication**: Secure signup and login using NextAuth.js with email/password credentials
+- **User Profiles**: Professional profiles with social links (LinkedIn, GitHub, Twitter, Portfolio)
+- **Resume Management**: Upload and manage resumes (PDF, DOC, DOCX) with MongoDB GridFS
+- **Markdown Support**: Professional background with markdown formatting
+- **Career Intentions**: Specify if you're seeking work, hiring, or networking
+
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ installed
+- MongoDB database (local or MongoDB Atlas)
+
+### Environment Variables
+
+Copy `.example.env` to `.env` and fill in the following variables:
+
+```env
+# MongoDB
+MONGO_DB_URI=your_mongodb_connection_string
+
+# NextAuth.js
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+
+# Other services (optional)
+AIRTABLE_API_KEY=your_airtable_key
+BREVO_API_KEY=your_brevo_key
+NEXT_PUBLIC_GA_ID=your_google_analytics_id
+```
+
+To generate a `NEXTAUTH_SECRET`, run:
+```bash
+openssl rand -base64 32
+```
+
+### Installation
+
+```bash
+npm install
+```
+
+### Running the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### User Account Features
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. **Sign Up**: Create a new account at `/signup`
+2. **Sign In**: Log in to your account at `/login`
+3. **Profile**: View your profile at `/profile`
+4. **Edit Profile**: Update your profile at `/profile/edit`
+
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load custom Google Fonts.
 
 ## Learn More
 
