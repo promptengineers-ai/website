@@ -1,0 +1,289 @@
+'use client';
+
+import { FormEvent, useState } from 'react';
+import type { UserProfile } from '@/types';
+import RichTextEditor from './RichTextEditor';
+
+type ProfileFormProps = {
+  profile?: UserProfile;
+  onSubmit: (data: {
+    links: {
+      linkedin?: string;
+      github?: string;
+      twitter?: string;
+      portfolio?: string;
+      other?: string;
+    };
+    background: string;
+    seeking: string[];
+  }) => Promise<void>;
+};
+
+export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
+  const [linkedin, setLinkedin] = useState(profile?.links?.linkedin || '');
+  const [github, setGithub] = useState(profile?.links?.github || '');
+  const [twitter, setTwitter] = useState(profile?.links?.twitter || '');
+  const [portfolio, setPortfolio] = useState(profile?.links?.portfolio || '');
+  const [other, setOther] = useState(profile?.links?.other || '');
+  const [background, setBackground] = useState(profile?.background || '');
+  const [seeking, setSeeking] = useState<string[]>(
+    Array.isArray(profile?.seeking) ? profile.seeking : profile?.seeking ? [profile.seeking] : []
+  );
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSeekingChange = (value: string) => {
+    setSeeking((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
+    );
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      await onSubmit({
+        links: {
+          linkedin: linkedin || undefined,
+          github: github || undefined,
+          twitter: twitter || undefined,
+          portfolio: portfolio || undefined,
+          other: other || undefined,
+        },
+        background,
+        seeking,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="bg-gray-900 border border-gray-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-white">Social Links</h3>
+            <p className="mt-1 text-sm text-gray-400">
+              Add links to your professional profiles
+            </p>
+          </div>
+          <div className="mt-5 md:mt-0 md:col-span-2">
+            <div className="grid grid-cols-6 gap-6">
+              <div className="col-span-6">
+                <label htmlFor="linkedin" className="block text-sm font-medium text-gray-300">
+                  LinkedIn
+                </label>
+                <input
+                  type="url"
+                  name="linkedin"
+                  id="linkedin"
+                  value={linkedin}
+                  onChange={(e) => setLinkedin(e.target.value)}
+                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  placeholder="https://www.linkedin.com/in/yourprofile"
+                />
+              </div>
+
+              <div className="col-span-6">
+                <label htmlFor="github" className="block text-sm font-medium text-gray-300">
+                  GitHub
+                </label>
+                <input
+                  type="url"
+                  name="github"
+                  id="github"
+                  value={github}
+                  onChange={(e) => setGithub(e.target.value)}
+                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  placeholder="https://github.com/yourusername"
+                />
+              </div>
+
+              <div className="col-span-6">
+                <label htmlFor="twitter" className="block text-sm font-medium text-gray-300">
+                  Twitter
+                </label>
+                <input
+                  type="url"
+                  name="twitter"
+                  id="twitter"
+                  value={twitter}
+                  onChange={(e) => setTwitter(e.target.value)}
+                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  placeholder="https://twitter.com/yourusername"
+                />
+              </div>
+
+              <div className="col-span-6">
+                <label htmlFor="portfolio" className="block text-sm font-medium text-gray-300">
+                  Portfolio
+                </label>
+                <input
+                  type="url"
+                  name="portfolio"
+                  id="portfolio"
+                  value={portfolio}
+                  onChange={(e) => setPortfolio(e.target.value)}
+                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  placeholder="https://yourwebsite.com"
+                />
+              </div>
+
+              <div className="col-span-6">
+                <label htmlFor="other" className="block text-sm font-medium text-gray-300">
+                  Other Link
+                </label>
+                <input
+                  type="url"
+                  name="other"
+                  id="other"
+                  value={other}
+                  onChange={(e) => setOther(e.target.value)}
+                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  placeholder="https://example.com"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gray-900 border border-gray-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-white">Professional Background</h3>
+            <p className="mt-1 text-sm text-gray-400">
+              Tell us about yourself
+            </p>
+          </div>
+          <div className="mt-5 md:mt-0 md:col-span-2">
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="background" className="block text-sm font-medium text-gray-300 mb-2">
+                  Background
+                </label>
+                <RichTextEditor
+                  value={background}
+                  onChange={setBackground}
+                  placeholder="Tell us about your experience, skills, and what you're passionate about..."
+                  maxLength={5000}
+                />
+                <p className="mt-2 text-sm text-gray-400">
+                  {background.replace(/<[^>]*>/g, '').length} / 5000 characters
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gray-900 border border-gray-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-white">Career Intentions</h3>
+            <p className="mt-1 text-sm text-gray-400">What brings you to our community? (Select all that apply)</p>
+          </div>
+          <div className="mt-5 md:mt-0 md:col-span-2">
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="seeking-work"
+                    name="seeking-work"
+                    type="checkbox"
+                    checked={seeking.includes('work')}
+                    onChange={() => handleSeekingChange('work')}
+                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="seeking-work" className="font-medium text-gray-300">
+                    Seeking Work
+                  </label>
+                  <p className="text-gray-400">Looking for job opportunities</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="seeking-hiring"
+                    name="seeking-hiring"
+                    type="checkbox"
+                    checked={seeking.includes('hiring')}
+                    onChange={() => handleSeekingChange('hiring')}
+                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="seeking-hiring" className="font-medium text-gray-300">
+                    Hiring
+                  </label>
+                  <p className="text-gray-400">Looking to hire talent</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="seeking-networking"
+                    name="seeking-networking"
+                    type="checkbox"
+                    checked={seeking.includes('networking')}
+                    onChange={() => handleSeekingChange('networking')}
+                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="seeking-networking" className="font-medium text-gray-300">
+                    Networking
+                  </label>
+                  <p className="text-gray-400">Building professional connections</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="seeking-other"
+                    name="seeking-other"
+                    type="checkbox"
+                    checked={seeking.includes('other')}
+                    onChange={() => handleSeekingChange('other')}
+                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="seeking-other" className="font-medium text-gray-300">
+                    Other
+                  </label>
+                  <p className="text-gray-400">Other reasons</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {error && (
+        <div className="rounded-md bg-red-900/50 border border-red-700 p-4">
+          <div className="text-sm text-red-200">{error}</div>
+        </div>
+      )}
+
+      <div className="flex justify-end space-x-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Saving...' : 'Save Profile'}
+        </button>
+      </div>
+    </form>
+  );
+}
