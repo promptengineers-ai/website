@@ -82,7 +82,7 @@ const TopNavbar = () => {
             
             {/* Right side - GitHub link and Auth */}
             <div className="flex items-center gap-4">
-              <a
+              {/* <a
                 href="https://github.com/promptengineers-ai"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -90,7 +90,7 @@ const TopNavbar = () => {
                 aria-label="GitHub"
               >
                 <FaGithub className="text-xl" />
-              </a>
+              </a> */}
 
               {session ? (
                 <div className="relative">
