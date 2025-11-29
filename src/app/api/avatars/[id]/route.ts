@@ -40,7 +40,7 @@ export async function GET(
 
     return new NextResponse(readableStream, {
       headers: {
-        "Content-Type": file.contentType || "image/jpeg",
+        "Content-Type": (file.metadata?.contentType as string) || "image/jpeg",
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
