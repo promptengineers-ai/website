@@ -149,15 +149,6 @@ const HeroSection = () => {
           <FaLinkedin className="text-2xl transition-transform group-hover:scale-110" />
           <span>LinkedIn</span>
         </a>
-        <a
-          href="https://github.com/promptengineers-ai"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
-        >
-          <FaGithub className="text-2xl transition-transform group-hover:scale-110" />
-          <span>GitHub</span>
-        </a>
       </motion.div>
     </div>
   );
