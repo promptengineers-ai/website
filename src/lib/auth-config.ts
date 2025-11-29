@@ -15,27 +15,32 @@ export const authConfig: NextAuthConfig = {
           throw new Error('Email and password are required');
         }
 
-        // Dynamic import to avoid loading MongoDB in middleware
-        const { getUserByEmail } = await import('@/lib/models/User');
-        const { verifyPassword } = await import('@/lib/auth');
+        try {
+          // Dynamic import to avoid loading MongoDB in middleware
+          const { getUserByEmail } = await import('@/lib/models/User');
+          const { verifyPassword } = await import('@/lib/auth');
 
-        const user = await getUserByEmail(credentials.email as string);
+          const user = await getUserByEmail(credentials.email as string);
 
-        if (!user) {
-          throw new Error('Invalid credentials');
+          if (!user) {
+            throw new Error('Invalid credentials');
+          }
+
+          const isValid = await verifyPassword(credentials.password as string, user.passwordHash);
+
+          if (!isValid) {
+            throw new Error('Invalid credentials');
+          }
+
+          return {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          throw new Error('Authentication failed');
         }
-
-        const isValid = await verifyPassword(credentials.password as string, user.passwordHash);
-
-        if (!isValid) {
-          throw new Error('Invalid credentials');
-        }
-
-        return {
-          id: user._id,
-          email: user.email,
-          name: user.name,
-        };
       },
     }),
   ],
@@ -81,6 +86,20 @@ export const authConfig: NextAuthConfig = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
+  debug: process.env.NODE_ENV === 'development',
+  logger: {
+    error(code, metadata) {
+      console.error('NextAuth Error:', code, metadata);
+    },
+    warn(code) {
+      console.warn('NextAuth Warning:', code);
+    },
+    debug(code, metadata) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('NextAuth Debug:', code, metadata);
+      }
+    },
+  },
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);

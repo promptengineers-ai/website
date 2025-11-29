@@ -5,7 +5,16 @@ if (!process.env.MONGO_DB_URI) {
 }
 
 const uri = process.env.MONGO_DB_URI;
-const options = {};
+const options = {
+  serverSelectionTimeoutMS: 5000, // 5 seconds timeout for serverless
+  socketTimeoutMS: 45000, // 45 seconds socket timeout
+  maxPoolSize: 10, // Maintain up to 10 socket connections
+  serverApi: {
+    version: '1' as const,
+    strict: true,
+    deprecationErrors: true,
+  },
+};
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
