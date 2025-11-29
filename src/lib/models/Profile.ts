@@ -1,8 +1,8 @@
-import { ObjectId } from 'mongodb';
-import { getDb } from '../mongodb';
-import type { UserProfile } from '@/types';
+import { ObjectId } from "mongodb";
+import { getDb } from "../mongodb";
+import type { UserProfile } from "@/types";
 
-export const PROFILES_COLLECTION = 'profiles';
+export const PROFILES_COLLECTION = "profiles";
 
 export async function createProfileIndexes() {
   const db = await getDb();
@@ -18,10 +18,11 @@ export async function createProfile(data: {
     github?: string;
     twitter?: string;
     portfolio?: string;
+    meetup?: string;
     other?: string;
   };
   background?: string;
-  seeking?: 'work' | 'hiring' | 'networking' | 'other';
+  seeking?: "work" | "hiring" | "networking" | "other";
 }): Promise<UserProfile> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
@@ -30,8 +31,8 @@ export async function createProfile(data: {
   const profile = {
     userId: new ObjectId(data.userId),
     links: data.links || {},
-    background: data.background || '',
-    seeking: data.seeking || 'networking',
+    background: data.background || "",
+    seeking: data.seeking || "networking",
     createdAt: now,
     updatedAt: now,
   };
@@ -49,7 +50,9 @@ export async function createProfile(data: {
   };
 }
 
-export async function getProfileByUserId(userId: string): Promise<UserProfile | null> {
+export async function getProfileByUserId(
+  userId: string,
+): Promise<UserProfile | null> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
 
@@ -61,8 +64,8 @@ export async function getProfileByUserId(userId: string): Promise<UserProfile | 
     _id: profile._id.toString(),
     userId: profile.userId.toString(),
     links: profile.links || {},
-    background: profile.background || '',
-    seeking: profile.seeking || 'networking',
+    background: profile.background || "",
+    seeking: profile.seeking || "networking",
     resumeId: profile.resumeId?.toString(),
     createdAt: new Date(profile.createdAt),
     updatedAt: new Date(profile.updatedAt),
@@ -77,12 +80,13 @@ export async function updateProfile(
       github?: string;
       twitter?: string;
       portfolio?: string;
+      meetup?: string;
       other?: string;
     };
     background?: string;
-    seeking?: 'work' | 'hiring' | 'networking' | 'other';
+    seeking?: "work" | "hiring" | "networking" | "other";
     resumeId?: string;
-  }
+  },
 ): Promise<UserProfile | null> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
@@ -101,7 +105,7 @@ export async function updateProfile(
   const result = await collection.findOneAndUpdate(
     { userId: new ObjectId(userId) },
     { $set: updateData },
-    { returnDocument: 'after' }
+    { returnDocument: "after" },
   );
 
   if (!result) return null;
@@ -110,8 +114,8 @@ export async function updateProfile(
     _id: result._id.toString(),
     userId: result.userId.toString(),
     links: result.links || {},
-    background: result.background || '',
-    seeking: result.seeking || 'networking',
+    background: result.background || "",
+    seeking: result.seeking || "networking",
     resumeId: result.resumeId?.toString(),
     createdAt: new Date(result.createdAt),
     updatedAt: new Date(result.updatedAt),

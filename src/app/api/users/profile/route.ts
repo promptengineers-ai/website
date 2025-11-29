@@ -1,24 +1,27 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 import {
   getProfileByUserId,
   createProfile,
   updateProfile,
-} from '@/lib/models/Profile';
-import { validateUrl } from '@/lib/auth';
+} from "@/lib/models/Profile";
+import { validateUrl } from "@/lib/auth";
 import {
   clearAuthCookie,
   getAuthFromCookies,
   refreshAuthToken,
   setAuthCookie,
   shouldRefreshToken,
-} from '@/lib/jwt';
+} from "@/lib/jwt";
 
 export async function GET() {
   try {
     const auth = getAuthFromCookies();
 
     if (!auth?.user?.id) {
-      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const response = NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
       clearAuthCookie(response);
       return response;
     }
@@ -26,7 +29,7 @@ export async function GET() {
     const profile = await getProfileByUserId(auth.user.id);
 
     if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
     const response = NextResponse.json({ profile }, { status: 200 });
@@ -38,8 +41,11 @@ export async function GET() {
 
     return response;
   } catch (error) {
-    console.error('Get profile error:', error);
-    return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
+    console.error("Get profile error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch profile" },
+      { status: 500 },
+    );
   }
 }
 
@@ -48,7 +54,10 @@ export async function POST(request: Request) {
     const auth = getAuthFromCookies();
 
     if (!auth?.user?.id) {
-      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const response = NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
       clearAuthCookie(response);
       return response;
     }
@@ -58,12 +67,19 @@ export async function POST(request: Request) {
 
     // Validate URLs if provided
     if (links) {
-      const urlFields = ['linkedin', 'github', 'twitter', 'portfolio', 'other'];
+      const urlFields = [
+        "linkedin",
+        "github",
+        "twitter",
+        "portfolio",
+        "meetup",
+        "other",
+      ];
       for (const field of urlFields) {
         if (links[field] && !validateUrl(links[field])) {
           return NextResponse.json(
             { error: `Invalid URL format for ${field}` },
-            { status: 400 }
+            { status: 400 },
           );
         }
       }
@@ -72,22 +88,22 @@ export async function POST(request: Request) {
     // Validate background length
     if (background && background.length > 5000) {
       return NextResponse.json(
-        { error: 'Background text must not exceed 5000 characters' },
-        { status: 400 }
+        { error: "Background text must not exceed 5000 characters" },
+        { status: 400 },
       );
     }
 
     // Validate seeking value(s)
-    const validSeekingValues = ['work', 'hiring', 'networking', 'other'];
+    const validSeekingValues = ["work", "hiring", "networking", "other"];
     if (seeking) {
       const seekingArray = Array.isArray(seeking) ? seeking : [seeking];
       const allValid = seekingArray.every((value: string) =>
-        validSeekingValues.includes(value)
+        validSeekingValues.includes(value),
       );
       if (!allValid) {
         return NextResponse.json(
-          { error: 'Invalid seeking value' },
-          { status: 400 }
+          { error: "Invalid seeking value" },
+          { status: 400 },
         );
       }
     }
@@ -114,8 +130,8 @@ export async function POST(request: Request) {
     }
 
     const response = NextResponse.json(
-      { message: 'Profile saved successfully', profile },
-      { status: 200 }
+      { message: "Profile saved successfully", profile },
+      { status: 200 },
     );
 
     if (shouldRefreshToken(auth.payload)) {
@@ -125,7 +141,10 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    console.error('Save profile error:', error);
-    return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
+    console.error("Save profile error:", error);
+    return NextResponse.json(
+      { error: "Failed to save profile" },
+      { status: 500 },
+    );
   }
 }

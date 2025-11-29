@@ -46,6 +46,7 @@ export type UserProfile = {
     github?: string;
     twitter?: string;
     portfolio?: string;
+    meetup?: string;
     other?: string;
   };
   background: string;

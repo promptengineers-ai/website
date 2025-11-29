@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { FormEvent, useState } from 'react';
-import type { UserProfile } from '@/types';
-import RichTextEditor from './RichTextEditor';
+import { FormEvent, useState } from "react";
+import type { UserProfile } from "@/types";
+import RichTextEditor from "./RichTextEditor";
 
 type ProfileFormProps = {
   profile?: UserProfile;
@@ -12,6 +12,7 @@ type ProfileFormProps = {
       github?: string;
       twitter?: string;
       portfolio?: string;
+      meetup?: string;
       other?: string;
     };
     background: string;
@@ -20,29 +21,34 @@ type ProfileFormProps = {
 };
 
 export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
-  const [linkedin, setLinkedin] = useState(profile?.links?.linkedin || '');
-  const [github, setGithub] = useState(profile?.links?.github || '');
-  const [twitter, setTwitter] = useState(profile?.links?.twitter || '');
-  const [portfolio, setPortfolio] = useState(profile?.links?.portfolio || '');
-  const [other, setOther] = useState(profile?.links?.other || '');
-  const [background, setBackground] = useState(profile?.background || '');
+  const [linkedin, setLinkedin] = useState(profile?.links?.linkedin || "");
+  const [github, setGithub] = useState(profile?.links?.github || "");
+  const [twitter, setTwitter] = useState(profile?.links?.twitter || "");
+  const [portfolio, setPortfolio] = useState(profile?.links?.portfolio || "");
+  const [meetup, setMeetup] = useState(profile?.links?.meetup || "");
+  const [other, setOther] = useState(profile?.links?.other || "");
+  const [background, setBackground] = useState(profile?.background || "");
   const [seeking, setSeeking] = useState<string[]>(
-    Array.isArray(profile?.seeking) ? profile.seeking : profile?.seeking ? [profile.seeking] : []
+    Array.isArray(profile?.seeking)
+      ? profile.seeking
+      : profile?.seeking
+        ? [profile.seeking]
+        : [],
   );
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSeekingChange = (value: string) => {
     setSeeking((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
-        : [...prev, value]
+        : [...prev, value],
     );
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
@@ -52,13 +58,14 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
           github: github || undefined,
           twitter: twitter || undefined,
           portfolio: portfolio || undefined,
+          meetup: meetup || undefined,
           other: other || undefined,
         },
         background,
         seeking,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save profile');
+      setError(err instanceof Error ? err.message : "Failed to save profile");
     } finally {
       setLoading(false);
     }
@@ -66,18 +73,23 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-gray-900 border border-gray-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+      <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-white">Social Links</h3>
+            <h3 className="text-lg font-medium leading-6 text-white">
+              Social Links
+            </h3>
             <p className="mt-1 text-sm text-gray-400">
               Add links to your professional profiles
             </p>
           </div>
-          <div className="mt-5 md:mt-0 md:col-span-2">
+          <div className="mt-5 md:col-span-2 md:mt-0">
             <div className="grid grid-cols-6 gap-6">
               <div className="col-span-6">
-                <label htmlFor="linkedin" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="linkedin"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   LinkedIn
                 </label>
                 <input
@@ -86,13 +98,16 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
                   id="linkedin"
                   value={linkedin}
                   onChange={(e) => setLinkedin(e.target.value)}
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   placeholder="https://www.linkedin.com/in/yourprofile"
                 />
               </div>
 
               <div className="col-span-6">
-                <label htmlFor="github" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="github"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   GitHub
                 </label>
                 <input
@@ -101,13 +116,16 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
                   id="github"
                   value={github}
                   onChange={(e) => setGithub(e.target.value)}
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   placeholder="https://github.com/yourusername"
                 />
               </div>
 
               <div className="col-span-6">
-                <label htmlFor="twitter" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="twitter"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Twitter
                 </label>
                 <input
@@ -116,13 +134,16 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
                   id="twitter"
                   value={twitter}
                   onChange={(e) => setTwitter(e.target.value)}
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   placeholder="https://twitter.com/yourusername"
                 />
               </div>
 
               <div className="col-span-6">
-                <label htmlFor="portfolio" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="portfolio"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Portfolio
                 </label>
                 <input
@@ -131,13 +152,34 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
                   id="portfolio"
                   value={portfolio}
                   onChange={(e) => setPortfolio(e.target.value)}
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   placeholder="https://yourwebsite.com"
                 />
               </div>
 
               <div className="col-span-6">
-                <label htmlFor="other" className="block text-sm font-medium text-gray-300">
+                <label
+                  htmlFor="meetup"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Meetup
+                </label>
+                <input
+                  type="url"
+                  name="meetup"
+                  id="meetup"
+                  value={meetup}
+                  onChange={(e) => setMeetup(e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  placeholder="https://www.meetup.com/members/1234567890"
+                />
+              </div>
+
+              <div className="col-span-6">
+                <label
+                  htmlFor="other"
+                  className="block text-sm font-medium text-gray-300"
+                >
                   Other Link
                 </label>
                 <input
@@ -146,7 +188,7 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
                   id="other"
                   value={other}
                   onChange={(e) => setOther(e.target.value)}
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 bg-gray-800 text-white rounded-md px-3 py-2 border"
+                  className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   placeholder="https://example.com"
                 />
               </div>
@@ -155,18 +197,21 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
         </div>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+      <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-white">Professional Background</h3>
-            <p className="mt-1 text-sm text-gray-400">
-              Tell us about yourself
-            </p>
+            <h3 className="text-lg font-medium leading-6 text-white">
+              Professional Background
+            </h3>
+            <p className="mt-1 text-sm text-gray-400">Tell us about yourself</p>
           </div>
-          <div className="mt-5 md:mt-0 md:col-span-2">
+          <div className="mt-5 md:col-span-2 md:mt-0">
             <div className="space-y-4">
               <div>
-                <label htmlFor="background" className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  htmlFor="background"
+                  className="mb-2 block text-sm font-medium text-gray-300"
+                >
                   Background
                 </label>
                 <RichTextEditor
@@ -176,7 +221,7 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
                   maxLength={5000}
                 />
                 <p className="mt-2 text-sm text-gray-400">
-                  {background.replace(/<[^>]*>/g, '').length} / 5000 characters
+                  {background.replace(/<[^>]*>/g, "").length} / 5000 characters
                 </p>
               </div>
             </div>
@@ -184,81 +229,99 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
         </div>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+      <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-white">Career Intentions</h3>
-            <p className="mt-1 text-sm text-gray-400">What brings you to our community? (Select all that apply)</p>
+            <h3 className="text-lg font-medium leading-6 text-white">
+              Career Intentions
+            </h3>
+            <p className="mt-1 text-sm text-gray-400">
+              What brings you to our community? (Select all that apply)
+            </p>
           </div>
-          <div className="mt-5 md:mt-0 md:col-span-2">
+          <div className="mt-5 md:col-span-2 md:mt-0">
             <div className="space-y-4">
               <div className="flex items-start">
-                <div className="flex items-center h-5">
+                <div className="flex h-5 items-center">
                   <input
                     id="seeking-work"
                     name="seeking-work"
                     type="checkbox"
-                    checked={seeking.includes('work')}
-                    onChange={() => handleSeekingChange('work')}
-                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                    checked={seeking.includes("work")}
+                    onChange={() => handleSeekingChange("work")}
+                    className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="seeking-work" className="font-medium text-gray-300">
+                  <label
+                    htmlFor="seeking-work"
+                    className="font-medium text-gray-300"
+                  >
                     Seeking Work
                   </label>
                   <p className="text-gray-400">Looking for job opportunities</p>
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="flex items-center h-5">
+                <div className="flex h-5 items-center">
                   <input
                     id="seeking-hiring"
                     name="seeking-hiring"
                     type="checkbox"
-                    checked={seeking.includes('hiring')}
-                    onChange={() => handleSeekingChange('hiring')}
-                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                    checked={seeking.includes("hiring")}
+                    onChange={() => handleSeekingChange("hiring")}
+                    className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="seeking-hiring" className="font-medium text-gray-300">
+                  <label
+                    htmlFor="seeking-hiring"
+                    className="font-medium text-gray-300"
+                  >
                     Hiring
                   </label>
                   <p className="text-gray-400">Looking to hire talent</p>
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="flex items-center h-5">
+                <div className="flex h-5 items-center">
                   <input
                     id="seeking-networking"
                     name="seeking-networking"
                     type="checkbox"
-                    checked={seeking.includes('networking')}
-                    onChange={() => handleSeekingChange('networking')}
-                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                    checked={seeking.includes("networking")}
+                    onChange={() => handleSeekingChange("networking")}
+                    className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="seeking-networking" className="font-medium text-gray-300">
+                  <label
+                    htmlFor="seeking-networking"
+                    className="font-medium text-gray-300"
+                  >
                     Networking
                   </label>
-                  <p className="text-gray-400">Building professional connections</p>
+                  <p className="text-gray-400">
+                    Building professional connections
+                  </p>
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="flex items-center h-5">
+                <div className="flex h-5 items-center">
                   <input
                     id="seeking-other"
                     name="seeking-other"
                     type="checkbox"
-                    checked={seeking.includes('other')}
-                    onChange={() => handleSeekingChange('other')}
-                    className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-700 bg-gray-800 rounded"
+                    checked={seeking.includes("other")}
+                    onChange={() => handleSeekingChange("other")}
+                    className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="seeking-other" className="font-medium text-gray-300">
+                  <label
+                    htmlFor="seeking-other"
+                    className="font-medium text-gray-300"
+                  >
                     Other
                   </label>
                   <p className="text-gray-400">Other reasons</p>
@@ -270,7 +333,7 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
       </div>
 
       {error && (
-        <div className="rounded-md bg-red-900/50 border border-red-700 p-4">
+        <div className="rounded-md border border-red-700 bg-red-900/50 p-4">
           <div className="text-sm text-red-200">{error}</div>
         </div>
       )}
@@ -279,9 +342,9 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? 'Saving...' : 'Save Profile'}
+          {loading ? "Saving..." : "Save Profile"}
         </button>
       </div>
     </form>
