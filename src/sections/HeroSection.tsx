@@ -43,9 +43,9 @@ const HeroSection = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="mb-8 flex items-center justify-center"
+        className="mb-5 flex items-center justify-center"
       >
-        <div className="text-9xl">🤖</div>
+        <div className="text-7xl">🤖</div>
       </motion.div>
 
       {/* Headline */}
@@ -128,7 +128,7 @@ const HeroSection = () => {
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
         >
-          <FaSlack className="text-4xl transition-transform group-hover:scale-110" />
+          <FaSlack className="text-2xl transition-transform group-hover:scale-110" />
           <span>Slack</span>
         </a>
         <a
@@ -137,7 +137,7 @@ const HeroSection = () => {
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
         >
-          <FaMeetup className="text-4xl transition-transform group-hover:scale-110" />
+          <FaMeetup className="text-2xl transition-transform group-hover:scale-110" />
           <span>Meetup</span>
         </a>
         <a
@@ -146,7 +146,7 @@ const HeroSection = () => {
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
         >
-          <FaGithub className="text-4xl transition-transform group-hover:scale-110" />
+          <FaGithub className="text-2xl transition-transform group-hover:scale-110" />
           <span>GitHub</span>
         </a>
       </motion.div>
