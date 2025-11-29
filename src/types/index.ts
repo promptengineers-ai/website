@@ -52,6 +52,8 @@ export type UserProfile = {
   background: string;
   seeking: string[] | string; // Array for multi-select, string for backward compatibility
   resumeId?: string;
+  isPublic?: boolean;
+  avatarUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 };

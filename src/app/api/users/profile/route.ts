@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { links, background, seeking } = body;
+    const { links, background, seeking, isPublic, avatarUrl } = body;
 
     // Validate URLs if provided
     if (links) {
@@ -118,6 +118,8 @@ export async function POST(request: Request) {
         links,
         background,
         seeking,
+        isPublic,
+        avatarUrl,
       });
     } else {
       // Create new profile
@@ -126,6 +128,8 @@ export async function POST(request: Request) {
         links,
         background,
         seeking,
+        isPublic,
+        avatarUrl,
       });
     }
 

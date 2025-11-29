@@ -23,6 +23,8 @@ export async function createProfile(data: {
   };
   background?: string;
   seeking?: "work" | "hiring" | "networking" | "other";
+  isPublic?: boolean;
+  avatarUrl?: string;
 }): Promise<UserProfile> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
@@ -33,6 +35,8 @@ export async function createProfile(data: {
     links: data.links || {},
     background: data.background || "",
     seeking: data.seeking || "networking",
+    isPublic: data.isPublic || false,
+    avatarUrl: data.avatarUrl || "",
     createdAt: now,
     updatedAt: now,
   };
@@ -45,6 +49,8 @@ export async function createProfile(data: {
     links: profile.links,
     background: profile.background,
     seeking: profile.seeking,
+    isPublic: profile.isPublic,
+    avatarUrl: profile.avatarUrl,
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
   };
@@ -67,6 +73,8 @@ export async function getProfileByUserId(
     background: profile.background || "",
     seeking: profile.seeking || "networking",
     resumeId: profile.resumeId?.toString(),
+    isPublic: profile.isPublic || false,
+    avatarUrl: profile.avatarUrl || "",
     createdAt: new Date(profile.createdAt),
     updatedAt: new Date(profile.updatedAt),
   };
@@ -86,6 +94,8 @@ export async function updateProfile(
     background?: string;
     seeking?: "work" | "hiring" | "networking" | "other";
     resumeId?: string;
+    isPublic?: boolean;
+    avatarUrl?: string;
   },
 ): Promise<UserProfile | null> {
   const db = await getDb();
@@ -98,6 +108,8 @@ export async function updateProfile(
   if (data.links !== undefined) updateData.links = data.links;
   if (data.background !== undefined) updateData.background = data.background;
   if (data.seeking !== undefined) updateData.seeking = data.seeking;
+  if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
+  if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
   if (data.resumeId !== undefined) {
     updateData.resumeId = data.resumeId ? new ObjectId(data.resumeId) : null;
   }
@@ -117,6 +129,8 @@ export async function updateProfile(
     background: result.background || "",
     seeking: result.seeking || "networking",
     resumeId: result.resumeId?.toString(),
+    isPublic: result.isPublic || false,
+    avatarUrl: result.avatarUrl || "",
     createdAt: new Date(result.createdAt),
     updatedAt: new Date(result.updatedAt),
   };

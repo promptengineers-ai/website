@@ -66,20 +66,42 @@ export default function EditProfilePage() {
     };
     background: string;
     seeking: string[];
+    isPublic: boolean;
+    avatarFile: File | null;
   }) => {
+    // Extract avatarFile to handle separately
+    const { avatarFile, ...profileData } = data;
+
     // Save profile data
     const response = await fetch("/api/users/profile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(profileData),
     });
 
     const result = await response.json();
 
     if (!response.ok) {
       throw new Error(result.error || "Failed to save profile");
+    }
+
+    // Upload avatar if file selected
+    if (avatarFile) {
+      const formData = new FormData();
+      formData.append("file", avatarFile);
+
+      const uploadResponse = await fetch("/api/avatars/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploadResult = await uploadResponse.json();
+
+      if (!uploadResponse.ok) {
+        throw new Error(uploadResult.error || "Failed to upload avatar");
+      }
     }
 
     // Upload resume if file selected

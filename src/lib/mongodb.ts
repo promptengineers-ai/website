@@ -18,13 +18,12 @@ const options = {
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
-let gridFSBucket: GridFSBucket | null = null;
 
 declare global {
   // eslint-disable-next-line no-var
   var _mongoClientPromise: Promise<MongoClient> | undefined;
   // eslint-disable-next-line no-var
-  var _gridFSBucket: GridFSBucket | undefined;
+  var _gridFSBuckets: Map<string, GridFSBucket> | undefined;
 }
 
 if (process.env.NODE_ENV === 'development') {
@@ -43,17 +42,23 @@ export async function getDb(): Promise<Db> {
   return client.db();
 }
 
-export async function getGridFSBucket(): Promise<GridFSBucket> {
-  if (global._gridFSBucket) {
-    return global._gridFSBucket;
+export async function getGridFSBucket(bucketName: string = 'resumes'): Promise<GridFSBucket> {
+  if (!global._gridFSBuckets) {
+    global._gridFSBuckets = new Map();
+  }
+
+  if (global._gridFSBuckets.has(bucketName)) {
+    return global._gridFSBuckets.get(bucketName)!;
   }
 
   const db = await getDb();
-  global._gridFSBucket = new GridFSBucket(db, {
-    bucketName: 'resumes',
+  const bucket = new GridFSBucket(db, {
+    bucketName: bucketName,
   });
 
-  return global._gridFSBucket;
+  global._gridFSBuckets.set(bucketName, bucket);
+
+  return bucket;
 }
 
 export default clientPromise;

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import type { UserProfile } from "@/types";
 import RichTextEditor from "./RichTextEditor";
+import AvatarUpload from "./AvatarUpload";
 
 type ProfileFormProps = {
   profile?: UserProfile;
@@ -17,6 +18,8 @@ type ProfileFormProps = {
     };
     background: string;
     seeking: string[];
+    isPublic: boolean;
+    avatarFile: File | null;
   }) => Promise<void>;
 };
 
@@ -35,6 +38,8 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
         ? [profile.seeking]
         : [],
   );
+  const [isPublic, setIsPublic] = useState(profile?.isPublic || false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -63,6 +68,8 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
         },
         background,
         seeking,
+        isPublic,
+        avatarFile,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save profile");
@@ -73,6 +80,49 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-white">
+              Public Profile
+            </h3>
+            <p className="mt-1 text-sm text-gray-400">
+              Manage your profile visibility and avatar
+            </p>
+          </div>
+          <div className="mt-5 md:col-span-2 md:mt-0 space-y-6">
+            <div className="flex items-start">
+              <div className="flex h-5 items-center">
+                <input
+                  id="isPublic"
+                  name="isPublic"
+                  type="checkbox"
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label
+                  htmlFor="isPublic"
+                  className="font-medium text-gray-300"
+                >
+                  Make Profile Public
+                </label>
+                <p className="text-gray-400">
+                  Allow other members to see your profile in the directory.
+                </p>
+              </div>
+            </div>
+
+            <AvatarUpload
+              avatarUrl={profile?.avatarUrl}
+              onFileSelect={setAvatarFile}
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">

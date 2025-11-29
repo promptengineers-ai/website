@@ -132,6 +132,13 @@ const TopNavbar = () => {
                         >
                           Edit Profile
                         </Link>
+                        <Link
+                          href="/members"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Members
+                        </Link>
                         <button
                           onClick={handleSignOut}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
