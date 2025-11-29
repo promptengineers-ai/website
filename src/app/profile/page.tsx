@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaLinkedin, FaGithub, FaTwitter, FaGlobe, FaLink, FaFileAlt, FaBriefcase, FaUserFriends, FaUsers } from 'react-icons/fa';
+import { FaLinkedin, FaGithub, FaTwitter, FaGlobe, FaLink, FaFileAlt, FaBriefcase, FaUserFriends, FaUsers, FaHome } from 'react-icons/fa';
 import type { UserProfile } from '@/types';
 
 export default function ProfilePage() {
@@ -100,7 +100,18 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto space-y-6">
+          {/* Navigation */}
+          <div className="flex items-center">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              <FaHome className="w-4 h-4" />
+              Back to Home
+            </Link>
+          </div>
+
           <div className="bg-gray-900 border border-gray-800 shadow sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg leading-6 font-medium text-white">
@@ -127,6 +138,17 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Navigation */}
+        <div className="flex items-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            <FaHome className="w-4 h-4" />
+            Back to Home
+          </Link>
+        </div>
+
         {/* Header Card */}
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-xl overflow-hidden">
           <div className="px-6 py-8">

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { FaHome } from 'react-icons/fa';
 import ProfileForm from '@/components/profile/ProfileForm';
 import ResumeUpload from '@/components/profile/ResumeUpload';
 import type { UserProfile } from '@/types';
@@ -132,17 +133,29 @@ export default function EditProfilePage() {
   return (
     <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        {/* Navigation */}
+        <div className="mb-6 flex items-center gap-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            <FaHome className="w-4 h-4" />
+            Home
+          </Link>
+          <span className="text-gray-600">|</span>
+          <Link
+            href="/profile"
+            className="text-sm text-blue-400 hover:text-blue-300"
+          >
+            ← Back to Profile
+          </Link>
+        </div>
+
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white">
               {profile ? 'Edit Profile' : 'Create Profile'}
             </h2>
-            <Link
-              href="/profile"
-              className="text-sm text-blue-400 hover:text-blue-300"
-            >
-              ← Back to Profile
-            </Link>
           </div>
           <p className="mt-1 text-sm text-gray-400">
             Update your professional information and links
