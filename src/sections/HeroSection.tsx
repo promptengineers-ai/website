@@ -45,7 +45,7 @@ const HeroSection = () => {
         transition={{ duration: 0.8 }}
         className="mb-8 flex items-center justify-center"
       >
-        <div className="text-7xl md:text-8xl">🤖</div>
+        <div className="text-9xl">🤖</div>
       </motion.div>
 
       {/* Headline */}
@@ -69,7 +69,7 @@ const HeroSection = () => {
         transition={{ duration: 0.8, delay: 0.5 }}
         className="mb-8 max-w-2xl text-center text-xl font-light text-gray-300"
       >
-        Join 1,500+ developers and tech enthusiasts in Plano, TX exploring
+        Join 1,700+ developers and tech enthusiasts in Plano, TX exploring
         ChatGPT, LLMs, and the future of AI
       </motion.p>
 
@@ -102,7 +102,7 @@ const HeroSection = () => {
         className="mb-12 flex flex-wrap justify-center gap-8 text-center"
       >
         <div>
-          <div className="text-3xl font-bold text-blue-400">1,500+</div>
+          <div className="text-3xl font-bold text-blue-400">1,700+</div>
           <div className="text-sm text-gray-400">Members</div>
         </div>
         <div>
@@ -123,22 +123,13 @@ const HeroSection = () => {
         className="flex justify-center gap-6"
       >
         <a
-          href="https://github.com/promptengineers-ai"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
-        >
-          <FaGithub className="text-2xl transition-transform group-hover:scale-110" />
-          <span className="text-sm">GitHub</span>
-        </a>
-        <a
           href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
         >
-          <FaSlack className="text-2xl transition-transform group-hover:scale-110" />
-          <span className="text-sm">Slack</span>
+          <FaSlack className="text-4xl transition-transform group-hover:scale-110" />
+          <span>Slack</span>
         </a>
         <a
           href="https://www.meetup.com/plano-prompt-engineers/"
@@ -146,8 +137,17 @@ const HeroSection = () => {
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
         >
-          <FaMeetup className="text-2xl transition-transform group-hover:scale-110" />
-          <span className="text-sm">Meetup</span>
+          <FaMeetup className="text-4xl transition-transform group-hover:scale-110" />
+          <span>Meetup</span>
+        </a>
+        <a
+          href="https://github.com/promptengineers-ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
+        >
+          <FaGithub className="text-4xl transition-transform group-hover:scale-110" />
+          <span>GitHub</span>
         </a>
       </motion.div>
     </div>

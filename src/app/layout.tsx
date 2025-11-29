@@ -26,7 +26,7 @@ const APP_NAME = "Prompt Engineers AI";
 const APP_DEFAULT_TITLE = "Prompt Engineers AI - Dallas Plano AI Community";
 const APP_TITLE_TEMPLATE = "%s | Prompt Engineers AI";
 const APP_DESCRIPTION =
-  "Join 1,500+ developers and tech enthusiasts in Plano, TX exploring ChatGPT, LLMs, and the future of AI. Monthly meetups focused on prompt engineering, machine learning, and AI development.";
+  "Join 1,700+ developers and tech enthusiasts in Plano, TX exploring ChatGPT, LLMs, and the future of AI. Monthly meetups focused on prompt engineering, machine learning, and AI development.";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
