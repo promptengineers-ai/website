@@ -113,9 +113,13 @@ export default function MembersPage() {
                   id="location"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g. San Francisco, Remote"
-                  className="block w-full rounded-md border border-gray-700 bg-gray-800 py-3 pl-10 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  placeholder="Under development..."
+                  disabled
+                  className="block w-full rounded-md border border-gray-700 bg-gray-800 py-3 pl-10 text-gray-500 placeholder-gray-600 opacity-60 cursor-not-allowed sm:text-sm"
                 />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-yellow-500 font-medium">
+                  Coming Soon
+                </span>
               </div>
             </div>
 
@@ -147,7 +151,8 @@ export default function MembersPage() {
 
             <button
               type="submit"
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+              disabled
+              className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm opacity-50 cursor-not-allowed"
             >
               Search
             </button>
