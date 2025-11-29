@@ -86,8 +86,7 @@ const TopNavbar = () => {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <a href="/" className="flex items-center ml-2 gap-3">
-                <span className="text-2xl">🤖</span>
-                <span className="text-xl font-bold tracking-tight text-white hover:text-gray-300 transition-colors duration-200">
+                <span className="text-lg font-bold tracking-tight text-white hover:text-gray-300 transition-colors duration-200">
                   Prompt Engineers <span className="text-blue-400">AI</span>
                 </span>
               </a>
@@ -158,13 +157,13 @@ const TopNavbar = () => {
                     href="/login"
                     className="rounded-full bg-transparent border border-white/30 text-white px-4 py-2 text-sm font-medium hover:bg-white/10 transition-all duration-200"
                   >
-                    Sign In
+                    Login
                   </Link>
                   <Link
                     href="/signup"
                     className="rounded-full bg-white text-black px-4 py-2 text-sm font-medium hover:bg-gray-200 transition-all duration-200"
                   >
-                    Sign Up
+                    Register
                   </Link>
                 </div>
               )}

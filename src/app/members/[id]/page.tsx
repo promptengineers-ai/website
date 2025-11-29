@@ -125,7 +125,7 @@ export default async function MemberProfilePage({
                     I'll hide email for now unless explicitly public. 
                     The mock doesn't show email.
                 */}
-                
+
                 {/* Career Intentions Badges */}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {(Array.isArray(profile.seeking)
@@ -257,7 +257,7 @@ export default async function MemberProfilePage({
           <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
             <h2 className="mb-4 text-xl font-semibold text-white">About Me</h2>
             <div
-              className="prose prose-sm prose-invert max-w-none text-gray-300"
+              className="prose prose-sm prose-invert max-w-none text-gray-300 [&_a]:text-blue-400 [&_a]:underline hover:[&_a]:text-blue-300"
               dangerouslySetInnerHTML={{ __html: profile.background }}
             />
           </div>
@@ -284,4 +284,3 @@ export default async function MemberProfilePage({
     </div>
   );
 }
-

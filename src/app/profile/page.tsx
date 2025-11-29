@@ -219,8 +219,8 @@ export default function ProfilePage() {
         {/* Header Card */}
         <div className="overflow-hidden rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 shadow-xl">
           <div className="px-6 py-8">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
                 {profile.avatarUrl && (
                   <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full border-4 border-white/20">
                     <Image
@@ -231,9 +231,13 @@ export default function ProfilePage() {
                     />
                   </div>
                 )}
-                <div>
-                  <h1 className="text-3xl font-bold text-white">{user?.name}</h1>
-                  <p className="mt-2 text-blue-100">{user?.email}</p>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-2xl font-bold text-white sm:text-3xl">
+                    {user?.name}
+                  </h1>
+                  <p className="mt-2 truncate text-sm text-blue-100 sm:text-base">
+                    {user?.email}
+                  </p>
                   {/* Career Intentions Badges */}
                   <div className="mt-4 flex flex-wrap gap-2">
                     {(Array.isArray(profile.seeking)
@@ -253,7 +257,7 @@ export default function ProfilePage() {
               </div>
               <Link
                 href="/profile/edit"
-                className="inline-flex items-center rounded-md border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-white/20"
+                className="inline-flex items-center justify-center rounded-md border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-white/20 sm:flex-shrink-0"
               >
                 Edit Profile
               </Link>
@@ -263,12 +267,12 @@ export default function ProfilePage() {
 
         {/* Public Profile & QR Code */}
         {profile.isPublic && (
-          <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
+          <div className="rounded-lg border border-gray-800 bg-gray-900 p-4 shadow-lg sm:p-6">
             <h2 className="mb-4 text-xl font-semibold text-white">
               Public Profile
             </h2>
             <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-              <div className="rounded-lg bg-white p-4 w-full max-w-[320px] sm:max-w-[200px] flex justify-center">
+              <div className="flex w-full max-w-[320px] justify-center rounded-lg bg-white p-4 sm:max-w-[200px]">
                 <div className="w-full max-w-[280px] sm:max-w-[128px]">
                   <QRCode
                     value={publicUrl}
@@ -278,26 +282,27 @@ export default function ProfilePage() {
                   />
                 </div>
               </div>
-              <div className="space-y-4 flex-1">
-                <p className="text-gray-300">
-                  Your profile is public! Share this QR code or link with others.
+              <div className="w-full min-w-0 flex-1 space-y-4">
+                <p className="break-words text-gray-300">
+                  Your profile is public! Share this QR code or link with
+                  others.
                 </p>
-                <div>
+                <div className="w-full min-w-0">
                   <label className="mb-2 block text-sm font-medium text-gray-300">
                     Public Link
                   </label>
-                  <div className="flex items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3">
+                  <div className="flex w-full min-w-0 items-center gap-2 rounded-lg border border-gray-700 bg-gray-800 p-3">
                     <a
                       href={publicUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 min-w-0 text-sm text-blue-400 hover:text-blue-300 truncate"
+                      className="min-w-0 flex-1 truncate text-sm text-blue-400 hover:text-blue-300"
                     >
                       {publicUrl.replace(/^https?:\/\//, "")}
                     </a>
                     <button
                       onClick={handleCopyLink}
-                      className="flex-shrink-0 rounded-md bg-gray-700 p-2 text-gray-300 hover:bg-gray-600 hover:text-white transition-colors"
+                      className="flex-shrink-0 rounded-md bg-gray-700 p-2 text-gray-300 transition-colors hover:bg-gray-600 hover:text-white"
                       title="Copy link"
                     >
                       {copied ? (
@@ -424,7 +429,7 @@ export default function ProfilePage() {
           <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
             <h2 className="mb-4 text-xl font-semibold text-white">About Me</h2>
             <div
-              className="prose prose-sm prose-invert max-w-none text-gray-300"
+              className="prose prose-sm prose-invert max-w-none text-gray-300 [&_a]:text-blue-400 [&_a]:underline hover:[&_a]:text-blue-300"
               dangerouslySetInnerHTML={{ __html: profile.background }}
             />
           </div>
