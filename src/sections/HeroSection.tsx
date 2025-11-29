@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { apiClient } from "@/utils/client";
-import { FaGithub, FaSlack, FaMeetup } from "react-icons/fa";
+import { FaGithub, FaSlack, FaMeetup, FaLinkedin } from "react-icons/fa";
 
 const HeroSection = () => {
   const [email, setEmail] = useState("");
@@ -139,6 +139,15 @@ const HeroSection = () => {
         >
           <FaMeetup className="text-2xl transition-transform group-hover:scale-110" />
           <span>Meetup</span>
+        </a>
+        <a
+          href="https://www.linkedin.com/company/prompt-engineers-ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
+        >
+          <FaLinkedin className="text-2xl transition-transform group-hover:scale-110" />
+          <span>LinkedIn</span>
         </a>
         <a
           href="https://github.com/promptengineers-ai"
