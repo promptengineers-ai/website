@@ -132,3 +132,19 @@ body {
 .iphone-mock-hover:hover {
   transform: scale(1.05);
 }
+
+/* Style links in prose content (About Me section) */
+.prose-invert a {
+  color: #818cf8; /* Indigo-400 for good contrast on dark background */
+  text-decoration: underline;
+  text-decoration-color: rgba(129, 140, 248, 0.4); /* Semi-transparent underline */
+  text-underline-offset: 3px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.prose-invert a:hover {
+  color: #a5b4fc; /* Indigo-300 for hover state */
+  text-decoration-color: #a5b4fc; /* Solid underline on hover */
+  text-shadow: 0 0 8px rgba(129, 140, 248, 0.3); /* Subtle glow on hover */
+}
