@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Features
 
-- **User Authentication**: Secure signup and login using NextAuth.js with email/password credentials
+- **User Authentication**: Secure signup and login using JWTs with HTTP-only cookies
 - **User Profiles**: Professional profiles with social links (LinkedIn, GitHub, Twitter, Portfolio)
 - **Resume Management**: Upload and manage resumes (PDF, DOC, DOCX) with MongoDB GridFS
 - **Markdown Support**: Professional background with markdown formatting
@@ -23,9 +23,8 @@ Copy `.example.env` to `.env` and fill in the following variables:
 # MongoDB
 MONGO_DB_URI=your_mongodb_connection_string
 
-# NextAuth.js
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
+# Auth
+NEXTAUTH_SECRET=your_jwt_secret
 
 # Other services (optional)
 AIRTABLE_API_KEY=your_airtable_key

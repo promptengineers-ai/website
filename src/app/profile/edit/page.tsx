@@ -1,34 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ProfileForm from '@/components/profile/ProfileForm';
 import ResumeUpload from '@/components/profile/ResumeUpload';
 import type { UserProfile } from '@/types';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function EditProfilePage() {
-  const { data: session, status } = useSession();
+  const { status } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    if (status === 'loading') return;
-
-    if (!session) {
-      router.push('/login');
-      return;
-    }
-
-    fetchProfile();
-  }, [session, status, router]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const response = await fetch('/api/users/profile');
+
+      if (response.status === 401) {
+        router.push('/login');
+        return;
+      }
 
       if (response.status === 404) {
         setProfile(null);
@@ -47,7 +41,18 @@ export default function EditProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+
+    fetchProfile();
+  }, [status, router, fetchProfile]);
 
   const handleSubmit = async (data: {
     links: {
@@ -137,12 +142,20 @@ export default function EditProfilePage() {
             <h2 className="text-2xl font-bold text-white">
               {profile ? 'Edit Profile' : 'Create Profile'}
             </h2>
-            <Link
-              href="/profile"
-              className="text-sm text-blue-400 hover:text-blue-300"
-            >
-              ← Back to Profile
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="text-sm text-blue-400 hover:text-blue-300"
+              >
+                ← Back to Home
+              </Link>
+              <Link
+                href="/profile"
+                className="text-sm text-blue-400 hover:text-blue-300"
+              >
+                Back to Profile
+              </Link>
+            </div>
           </div>
           <p className="mt-1 text-sm text-gray-400">
             Update your professional information and links

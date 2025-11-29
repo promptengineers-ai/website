@@ -2,27 +2,16 @@
 
 import { useRouter } from 'next/navigation';
 import AuthForm from '@/components/auth/AuthForm';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { register } = useAuth();
 
   const handleSignup = async (data: { email: string; password: string; name?: string }) => {
-    const response = await fetch('/api/users/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || 'Signup failed');
-    }
-
-    // Redirect to login page after successful signup
-    router.push('/login?registered=true');
+    await register({ email: data.email, password: data.password, name: data.name || '' });
+    router.push('/profile');
+    router.refresh();
   };
 
   return <AuthForm type="signup" onSubmit={handleSignup} />;

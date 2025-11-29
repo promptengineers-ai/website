@@ -71,7 +71,7 @@ const SocialPage = () => {
       <div className="w-full max-w-lg">
         <Link href="/" className="flex items-center text-gray-400 hover:text-white mb-8">
           <FaArrowLeft className="mr-2" />
-          Back
+          Go Home
         </Link>
 
         <div className="space-y-4">

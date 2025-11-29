@@ -1,25 +1,32 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth-config';
 import { ObjectId } from 'mongodb';
-import { Readable } from 'stream';
 import { getGridFSBucket } from '@/lib/mongodb';
 import { getProfileByUserId, updateProfile } from '@/lib/models/Profile';
+import {
+  clearAuthCookie,
+  getAuthFromCookies,
+  refreshAuthToken,
+  setAuthCookie,
+  shouldRefreshToken,
+} from '@/lib/jwt';
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
+    const auth = getAuthFromCookies();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth?.user?.id) {
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      clearAuthCookie(response);
+      return response;
     }
 
     const { id } = params;
 
     // Verify the resume belongs to the user
-    const profile = await getProfileByUserId(session.user.id);
+    const profile = await getProfileByUserId(auth.user.id);
     if (!profile || profile.resumeId !== id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -45,13 +52,20 @@ export async function GET(
     const buffer = Buffer.concat(chunks);
 
     // Return file as response
-    return new Response(buffer, {
+    const response = new NextResponse(buffer, {
       headers: {
         'Content-Type': (file.metadata as any)?.contentType || 'application/octet-stream',
         'Content-Disposition': `inline; filename="${file.filename}"`,
         'Content-Length': file.length.toString(),
       },
     });
+
+    if (shouldRefreshToken(auth.payload)) {
+      const refreshed = refreshAuthToken(auth.payload);
+      setAuthCookie(response, refreshed);
+    }
+
+    return response;
   } catch (error) {
     console.error('Download error:', error);
     return NextResponse.json({ error: 'Failed to download resume' }, { status: 500 });
@@ -63,16 +77,18 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
+    const auth = getAuthFromCookies();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth?.user?.id) {
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      clearAuthCookie(response);
+      return response;
     }
 
     const { id } = params;
 
     // Verify the resume belongs to the user
-    const profile = await getProfileByUserId(session.user.id);
+    const profile = await getProfileByUserId(auth.user.id);
     if (!profile || profile.resumeId !== id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -83,14 +99,21 @@ export async function DELETE(
     await bucket.delete(new ObjectId(id));
 
     // Remove resume reference from profile
-    await updateProfile(session.user.id, {
+    await updateProfile(auth.user.id, {
       resumeId: undefined,
     });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: 'Resume deleted successfully' },
       { status: 200 }
     );
+
+    if (shouldRefreshToken(auth.payload)) {
+      const refreshed = refreshAuthToken(auth.payload);
+      setAuthCookie(response, refreshed);
+    }
+
+    return response;
   } catch (error) {
     console.error('Delete error:', error);
     return NextResponse.json({ error: 'Failed to delete resume' }, { status: 500 });

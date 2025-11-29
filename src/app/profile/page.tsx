@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaLinkedin, FaGithub, FaTwitter, FaGlobe, FaLink, FaFileAlt, FaBriefcase, FaUserFriends, FaUsers } from 'react-icons/fa';
 import type { UserProfile } from '@/types';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { user, status } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,20 +55,14 @@ export default function ProfilePage() {
     }
   };
 
-  useEffect(() => {
-    if (status === 'loading') return;
-
-    if (!session) {
-      router.push('/login');
-      return;
-    }
-
-    fetchProfile();
-  }, [session, status, router]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const response = await fetch('/api/users/profile');
+
+      if (response.status === 401) {
+        router.push('/login');
+        return;
+      }
 
       if (response.status === 404) {
         setProfile(null);
@@ -87,12 +81,44 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+
+    fetchProfile();
+  }, [status, router, fetchProfile]);
 
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        <div className="max-w-lg w-full bg-gray-900 border border-gray-800 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-white mb-2">Unable to load profile</h2>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <button
+            onClick={() => {
+              setLoading(true);
+              setError('');
+              fetchProfile();
+            }}
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-black"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -127,13 +153,23 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Navigation */}
+        <div className="mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            ← Back to Home
+          </Link>
+        </div>
+
         {/* Header Card */}
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-xl overflow-hidden">
           <div className="px-6 py-8">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-3xl font-bold text-white">{session?.user?.name}</h1>
-                <p className="mt-2 text-blue-100">{session?.user?.email}</p>
+                <h1 className="text-3xl font-bold text-white">{user?.name}</h1>
+                <p className="mt-2 text-blue-100">{user?.email}</p>
                 {/* Career Intentions Badges */}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {(Array.isArray(profile.seeking) ? profile.seeking : [profile.seeking]).map((s) => (

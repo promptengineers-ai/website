@@ -4,7 +4,7 @@ import { Montserrat, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Head from "next/head";
 import InitialLoadActiveUsers from "@/components/users/InitialLoadActiveUsers";
-import SessionProvider from "@/components/auth/SessionProvider";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import { GA_ID, NODE_ENV } from "@/config/app";
 // import { botScript } from "@/config/bot";
 
@@ -129,7 +129,7 @@ export default function RootLayout({
         />
       </Head>
       <body className="font-montserrat">
-        <SessionProvider>{children}</SessionProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
       {NODE_ENV === "production" && GA_ID && (
         <>

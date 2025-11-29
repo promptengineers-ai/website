@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth-config';
 import { ObjectId } from 'mongodb';
 import { Readable } from 'stream';
 import { getGridFSBucket } from '@/lib/mongodb';
 import { getProfileByUserId, updateProfile } from '@/lib/models/Profile';
+import {
+  clearAuthCookie,
+  getAuthFromCookies,
+  refreshAuthToken,
+  setAuthCookie,
+  shouldRefreshToken,
+} from '@/lib/jwt';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = [
@@ -14,10 +20,12 @@ const ALLOWED_TYPES = [
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const auth = getAuthFromCookies();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth?.user?.id) {
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      clearAuthCookie(response);
+      return response;
     }
 
     const formData = await request.formData();
@@ -47,7 +55,7 @@ export async function POST(request: Request) {
     const bucket = await getGridFSBucket();
 
     // Delete old resume if exists
-    const profile = await getProfileByUserId(session.user.id);
+    const profile = await getProfileByUserId(auth.user.id);
     if (profile?.resumeId) {
       try {
         await bucket.delete(new ObjectId(profile.resumeId));
@@ -63,7 +71,7 @@ export async function POST(request: Request) {
     // Create upload stream
     const uploadStream = bucket.openUploadStream(file.name, {
       metadata: {
-        userId: session.user.id,
+        userId: auth.user.id,
         uploadDate: new Date(),
         contentType: file.type,
       },
@@ -80,11 +88,11 @@ export async function POST(request: Request) {
     });
 
     // Update profile with new resume ID
-    await updateProfile(session.user.id, {
+    await updateProfile(auth.user.id, {
       resumeId: uploadStream.id.toString(),
     });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: 'Resume uploaded successfully',
         resumeId: uploadStream.id.toString(),
@@ -93,6 +101,13 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
+
+    if (shouldRefreshToken(auth.payload)) {
+      const refreshed = refreshAuthToken(auth.payload);
+      setAuthCookie(response, refreshed);
+    }
+
+    return response;
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json({ error: 'Failed to upload resume' }, { status: 500 });

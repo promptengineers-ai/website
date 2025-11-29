@@ -1,27 +1,42 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth-config';
 import {
   getProfileByUserId,
   createProfile,
   updateProfile,
 } from '@/lib/models/Profile';
 import { validateUrl } from '@/lib/auth';
+import {
+  clearAuthCookie,
+  getAuthFromCookies,
+  refreshAuthToken,
+  setAuthCookie,
+  shouldRefreshToken,
+} from '@/lib/jwt';
 
 export async function GET() {
   try {
-    const session = await auth();
+    const auth = getAuthFromCookies();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth?.user?.id) {
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      clearAuthCookie(response);
+      return response;
     }
 
-    const profile = await getProfileByUserId(session.user.id);
+    const profile = await getProfileByUserId(auth.user.id);
 
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ profile }, { status: 200 });
+    const response = NextResponse.json({ profile }, { status: 200 });
+
+    if (shouldRefreshToken(auth.payload)) {
+      const refreshed = refreshAuthToken(auth.payload);
+      setAuthCookie(response, refreshed);
+    }
+
+    return response;
   } catch (error) {
     console.error('Get profile error:', error);
     return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
@@ -30,10 +45,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const auth = getAuthFromCookies();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth?.user?.id) {
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      clearAuthCookie(response);
+      return response;
     }
 
     const body = await request.json();
@@ -76,12 +93,12 @@ export async function POST(request: Request) {
     }
 
     // Check if profile exists
-    const existingProfile = await getProfileByUserId(session.user.id);
+    const existingProfile = await getProfileByUserId(auth.user.id);
 
     let profile;
     if (existingProfile) {
       // Update existing profile
-      profile = await updateProfile(session.user.id, {
+      profile = await updateProfile(auth.user.id, {
         links,
         background,
         seeking,
@@ -89,17 +106,24 @@ export async function POST(request: Request) {
     } else {
       // Create new profile
       profile = await createProfile({
-        userId: session.user.id,
+        userId: auth.user.id,
         links,
         background,
         seeking,
       });
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: 'Profile saved successfully', profile },
       { status: 200 }
     );
+
+    if (shouldRefreshToken(auth.payload)) {
+      const refreshed = refreshAuthToken(auth.payload);
+      setAuthCookie(response, refreshed);
+    }
+
+    return response;
   } catch (error) {
     console.error('Save profile error:', error);
     return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });

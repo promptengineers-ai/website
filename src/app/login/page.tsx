@@ -1,35 +1,21 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import AuthForm from '@/components/auth/AuthForm';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get('registered');
+  const { login } = useAuth();
 
   const handleLogin = async (data: { email: string; password: string }) => {
     try {
-      const result = await signIn('credentials', {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
-
-      console.log('Login result:', result);
-
-      if (result?.error) {
-        throw new Error('Invalid email or password');
-      }
-
-      if (result?.ok) {
-        // Wait a bit for the session to be established
-        await new Promise(resolve => setTimeout(resolve, 100));
-        router.push('/profile');
-        router.refresh();
-      }
+      await login({ email: data.email, password: data.password });
+      router.push('/profile');
+      router.refresh();
     } catch (error) {
       console.error('Login error:', error);
       throw error;

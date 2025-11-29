@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 
 type AuthFormProps = {
   type: 'login' | 'signup';
@@ -43,6 +43,16 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        <div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            <FiArrowLeft className="h-4 w-4" />
+            Go Home
+          </Link>
+        </div>
+
         {/* Logo */}
         <div className="flex justify-center">
           <div className="text-6xl">🤖</div>

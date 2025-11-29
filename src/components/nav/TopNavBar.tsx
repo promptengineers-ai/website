@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MdClose, MdMenu } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
 import { FiUser, FiLogOut } from "react-icons/fi";
-import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const TopNavbar = () => {
-  const { data: session } = useSession();
+  const { user, logout, status } = useAuth();
+  const router = useRouter();
   const [showSolidBackground, setShowSolidBackground] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -44,6 +46,17 @@ const TopNavbar = () => {
 
   const closeDrawer = () => {
     setIsDrawerOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      setShowUserMenu(false);
+      router.push('/');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   // Define menu items in one place for consistency
@@ -92,14 +105,14 @@ const TopNavbar = () => {
                 <FaGithub className="text-xl" />
               </a> */}
 
-              {session ? (
+              {user ? (
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="flex items-center gap-2 rounded-full bg-gray-800/70 px-3 py-2 text-white hover:bg-gray-700/70 transition-colors duration-200"
                   >
                     <FiUser className="text-lg" />
-                    <span className="hidden sm:inline text-sm">{session.user.name}</span>
+                    <span className="hidden sm:inline text-sm">{user.name}</span>
                   </button>
 
                   {showUserMenu && (
@@ -120,10 +133,7 @@ const TopNavbar = () => {
                           Edit Profile
                         </Link>
                         <button
-                          onClick={() => {
-                            setShowUserMenu(false);
-                            signOut({ callbackUrl: '/' });
-                          }}
+                          onClick={handleSignOut}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           <span className="flex items-center gap-2">

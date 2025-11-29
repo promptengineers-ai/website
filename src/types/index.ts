@@ -32,6 +32,12 @@ export type User = {
   emailVerified: boolean;
 };
 
+export type AuthUser = {
+  id: string;
+  email: string;
+  name?: string;
+};
+
 export type UserProfile = {
   _id: string;
   userId: string;
