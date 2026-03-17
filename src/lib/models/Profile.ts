@@ -25,6 +25,9 @@ export async function createProfile(data: {
   seeking?: "work" | "hiring" | "networking" | "other";
   isPublic?: boolean;
   avatarUrl?: string;
+  badges?: string[];
+  skillBackground?: string;
+  aiExperience?: string;
 }): Promise<UserProfile> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
@@ -37,6 +40,9 @@ export async function createProfile(data: {
     seeking: data.seeking || "networking",
     isPublic: data.isPublic || false,
     avatarUrl: data.avatarUrl || "",
+    badges: data.badges || [],
+    skillBackground: data.skillBackground || "",
+    aiExperience: data.aiExperience || "",
     createdAt: now,
     updatedAt: now,
   };
@@ -51,6 +57,9 @@ export async function createProfile(data: {
     seeking: profile.seeking,
     isPublic: profile.isPublic,
     avatarUrl: profile.avatarUrl,
+    badges: profile.badges,
+    skillBackground: profile.skillBackground,
+    aiExperience: profile.aiExperience,
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
   };
@@ -75,6 +84,9 @@ export async function getProfileByUserId(
     resumeId: profile.resumeId?.toString(),
     isPublic: profile.isPublic || false,
     avatarUrl: profile.avatarUrl || "",
+    badges: profile.badges || [],
+    skillBackground: profile.skillBackground || "",
+    aiExperience: profile.aiExperience || "",
     createdAt: new Date(profile.createdAt),
     updatedAt: new Date(profile.updatedAt),
   };
@@ -96,6 +108,9 @@ export async function updateProfile(
     resumeId?: string;
     isPublic?: boolean;
     avatarUrl?: string;
+    badges?: string[];
+    skillBackground?: string;
+    aiExperience?: string;
   },
 ): Promise<UserProfile | null> {
   const db = await getDb();
@@ -110,6 +125,9 @@ export async function updateProfile(
   if (data.seeking !== undefined) updateData.seeking = data.seeking;
   if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
   if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
+  if (data.badges !== undefined) updateData.badges = data.badges;
+  if (data.skillBackground !== undefined) updateData.skillBackground = data.skillBackground;
+  if (data.aiExperience !== undefined) updateData.aiExperience = data.aiExperience;
   if (data.resumeId !== undefined) {
     updateData.resumeId = data.resumeId ? new ObjectId(data.resumeId) : null;
   }
@@ -131,6 +149,9 @@ export async function updateProfile(
     resumeId: result.resumeId?.toString(),
     isPublic: result.isPublic || false,
     avatarUrl: result.avatarUrl || "",
+    badges: result.badges || [],
+    skillBackground: result.skillBackground || "",
+    aiExperience: result.aiExperience || "",
     createdAt: new Date(result.createdAt),
     updatedAt: new Date(result.updatedAt),
   };

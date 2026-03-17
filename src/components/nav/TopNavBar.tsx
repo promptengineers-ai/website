@@ -7,12 +7,13 @@ import { FaGithub } from "react-icons/fa";
 import { FiUser, FiLogOut } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 const TopNavbar = () => {
   const { user, logout, status } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [showSolidBackground, setShowSolidBackground] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -138,6 +139,13 @@ const TopNavbar = () => {
                         >
                           Members
                         </Link>
+                        <Link
+                          href="/hackathon"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          Hackathon
+                        </Link>
                         <button
                           onClick={handleSignOut}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -154,13 +162,13 @@ const TopNavbar = () => {
               ) : (
                 <div className="flex items-center gap-2">
                   <Link
-                    href="/login"
+                    href={`/login?from=${encodeURIComponent(pathname)}`}
                     className="rounded-full bg-transparent border border-white/30 text-white px-4 py-2 text-sm font-medium hover:bg-white/10 transition-all duration-200"
                   >
                     Login
                   </Link>
                   <Link
-                    href="/signup"
+                    href={`/signup?from=${encodeURIComponent(pathname)}`}
                     className="rounded-full bg-white text-black px-4 py-2 text-sm font-medium hover:bg-gray-200 transition-all duration-200"
                   >
                     Register

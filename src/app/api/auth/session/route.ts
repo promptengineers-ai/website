@@ -6,6 +6,7 @@ import {
   setAuthCookie,
   shouldRefreshToken,
 } from '@/lib/jwt';
+import { getUserById } from '@/lib/models/User';
 
 export async function GET() {
   const auth = getAuthFromCookies();
@@ -16,8 +17,15 @@ export async function GET() {
     return response;
   }
 
+  // Include isAdmin flag
+  const dbUser = await getUserById(auth.user.id);
+  const userWithAdmin = {
+    ...auth.user,
+    isAdmin: dbUser?.isAdmin || false,
+  };
+
   const response = NextResponse.json(
-    { user: auth.user },
+    { user: userWithAdmin },
     { status: 200 }
   );
 

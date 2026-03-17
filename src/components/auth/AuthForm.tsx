@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 
 type AuthFormProps = {
@@ -10,6 +11,9 @@ type AuthFormProps = {
 };
 
 export default function AuthForm({ type, onSubmit }: AuthFormProps) {
+  const searchParams = useSearchParams();
+  const fromParam = searchParams.get('from');
+  const fromQuery = fromParam ? `?from=${encodeURIComponent(fromParam)}` : '';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -66,14 +70,14 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
             {type === 'login' ? (
               <>
                 Or{' '}
-                <Link href="/signup" className="font-medium text-blue-400 hover:text-blue-300">
+                <Link href={`/signup${fromQuery}`} className="font-medium text-blue-400 hover:text-blue-300">
                   create a new account
                 </Link>
               </>
             ) : (
               <>
                 Already have an account?{' '}
-                <Link href="/login" className="font-medium text-blue-400 hover:text-blue-300">
+                <Link href={`/login${fromQuery}`} className="font-medium text-blue-400 hover:text-blue-300">
                   Sign in
                 </Link>
               </>

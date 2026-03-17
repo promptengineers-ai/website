@@ -14,7 +14,8 @@ function LoginContent() {
   const handleLogin = async (data: { email: string; password: string }) => {
     try {
       await login({ email: data.email, password: data.password });
-      router.push('/profile');
+      const redirectTo = searchParams.get('from') || '/profile';
+      router.push(redirectTo);
       router.refresh();
     } catch (error) {
       console.error('Login error:', error);

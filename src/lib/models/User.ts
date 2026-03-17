@@ -24,6 +24,7 @@ export async function createUser(data: {
     email: data.email,
     passwordHash: data.passwordHash,
     name: data.name,
+    isAdmin: false,
     emailVerified: false,
     createdAt: now,
     updatedAt: now,
@@ -34,7 +35,7 @@ export async function createUser(data: {
   return {
     _id: result.insertedId.toString(),
     ...user,
-  };
+  } as User;
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
@@ -50,6 +51,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     email: user.email,
     passwordHash: user.passwordHash,
     name: user.name,
+    isAdmin: user.isAdmin || false,
     emailVerified: user.emailVerified || false,
     createdAt: new Date(user.createdAt),
     updatedAt: new Date(user.updatedAt),
@@ -69,6 +71,7 @@ export async function getUserById(id: string): Promise<User | null> {
     email: user.email,
     passwordHash: user.passwordHash,
     name: user.name,
+    isAdmin: user.isAdmin || false,
     emailVerified: user.emailVerified || false,
     createdAt: new Date(user.createdAt),
     updatedAt: new Date(user.updatedAt),
