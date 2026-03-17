@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createUser, getUserByEmail } from '@/lib/models/User';
+import { createProfile } from '@/lib/models/Profile';
 import { hashPassword, validateEmail, validatePassword } from '@/lib/auth';
 import { initializeDatabase } from '@/lib/initDb';
 import { setAuthCookie, signAuthToken } from '@/lib/jwt';
@@ -52,6 +53,9 @@ export async function POST(request: Request) {
       passwordHash,
       name,
     });
+
+    // Create default profile
+    await createProfile({ userId: user._id });
 
     const token = signAuthToken({
       id: user._id,

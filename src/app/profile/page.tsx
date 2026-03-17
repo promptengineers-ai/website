@@ -252,6 +252,21 @@ export default function ProfilePage() {
                         {getSeekingLabel(s)}
                       </span>
                     ))}
+                    {profile.skillBackground && (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-purple-500/20 px-3 py-1 text-sm font-medium text-purple-200 backdrop-blur-sm">
+                        {profile.skillBackground}
+                      </span>
+                    )}
+                    {profile.aiExperience && (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-green-500/20 px-3 py-1 text-sm font-medium text-green-200 backdrop-blur-sm">
+                        {profile.aiExperience}
+                      </span>
+                    )}
+                    {profile.badges?.includes("hackathon") && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-medium text-yellow-200 backdrop-blur-sm">
+                        &#9889; Hackathon
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

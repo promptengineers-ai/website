@@ -67,13 +67,8 @@ export async function POST(
       );
     }
 
-    // Verify role is valid for this hackathon
-    if (!hackathon.roles.includes(role as HackathonRole)) {
-      return NextResponse.json(
-        { error: `Role "${role}" is not valid for this hackathon` },
-        { status: 400 },
-      );
-    }
+    // Verify role exists as a slot on the target team (supports custom roles)
+    // (checked below when looking for open slot)
 
     // Verify team exists and belongs to this hackathon
     const team = await getTeamById(params.teamId);
