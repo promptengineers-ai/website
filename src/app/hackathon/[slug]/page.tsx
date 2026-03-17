@@ -35,9 +35,10 @@ export default function HackathonLandingPage() {
 
   const fetchData = async () => {
     try {
+      const t = Date.now();
       const [hackRes, teamsRes] = await Promise.all([
-        fetch(`/api/hackathons/${slug}`),
-        fetch(`/api/hackathons/${slug}/teams`),
+        fetch(`/api/hackathons/${slug}?_t=${t}`, { cache: "no-store" }),
+        fetch(`/api/hackathons/${slug}/teams?_t=${t}`, { cache: "no-store" }),
       ]);
 
       if (!hackRes.ok) {

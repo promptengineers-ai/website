@@ -73,18 +73,30 @@ export async function POST(
       rolePreference: rolePreference as HackathonRole | undefined,
     });
 
-    // Update profile with hackathon fields and badge
+    // Update profile with hackathon fields, badge, and make public
     const profile = await getProfileByUserId(auth.user.id);
     const currentBadges = profile?.badges || [];
     const updatedBadges = currentBadges.includes("hackathon")
       ? currentBadges
       : [...currentBadges, "hackathon"];
 
-    await updateProfile(auth.user.id, {
-      badges: updatedBadges,
-      ...(skillBackground ? { skillBackground } : {}),
-      ...(aiExperience ? { aiExperience } : {}),
-    });
+    if (profile) {
+      await updateProfile(auth.user.id, {
+        badges: updatedBadges,
+        isPublic: true,
+        ...(skillBackground ? { skillBackground } : {}),
+        ...(aiExperience ? { aiExperience } : {}),
+      });
+    } else {
+      const { createProfile } = await import("@/lib/models/Profile");
+      await createProfile({
+        userId: auth.user.id,
+        badges: updatedBadges,
+        isPublic: true,
+        ...(skillBackground ? { skillBackground } : {}),
+        ...(aiExperience ? { aiExperience } : {}),
+      });
+    }
 
     return NextResponse.json({ registration }, { status: 201 });
   } catch (error) {

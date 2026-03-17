@@ -36,9 +36,11 @@ export default function TeamCardGrid({
   const [leavingTeam, setLeavingTeam] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("");
 
-  const currentTeam = teams.find((t) =>
-    t.slots.some((s) => s.userId === currentUserId),
-  );
+  const currentTeam = currentUserId
+    ? teams.find((t) =>
+        t.slots.some((s) => s.userId && s.userId === currentUserId),
+      )
+    : undefined;
 
   const filteredTeams = filter
     ? teams.filter((t) =>
@@ -138,14 +140,18 @@ export default function TeamCardGrid({
           return (
             <div
               key={team._id}
-              className={`rounded-xl border p-6 transition-all ${
+              className={`relative rounded-xl border p-6 transition-all ${
                 isMyTeam
-                  ? "border-blue-500 bg-blue-500/5"
+                  ? "border-emerald-500/40 bg-gradient-to-br from-blue-900/30 to-purple-900/30"
                   : "border-gray-700 bg-gray-900 hover:border-gray-600"
               }`}
             >
+              {/* Glow border for user's team */}
+              {isMyTeam && (
+                <span className="pointer-events-none absolute -inset-[2px] rounded-xl shadow-[0_0_25px_6px_rgba(16,185,129,0.25),0_0_50px_12px_rgba(16,185,129,0.1)] animate-pulse" />
+              )}
               {/* Header */}
-              <div className="mb-4 flex items-start justify-between">
+              <div className="relative mb-4 flex items-start justify-between">
                 <div>
                   <h3 className="text-lg font-bold">{team.name}</h3>
                   {team.description && (
@@ -166,9 +172,9 @@ export default function TeamCardGrid({
               </div>
 
               {/* Slots */}
-              <div className="space-y-2">
+              <div className="relative space-y-2">
                 {team.slots.map((slot, idx) => {
-                  const isMe = slot.userId === currentUserId;
+                  const isMe = !!(currentUserId && slot.userId && slot.userId === currentUserId);
                   const isOpen = !slot.userId;
                   const isRequired = slot.required;
                   const isJoining =
@@ -247,7 +253,8 @@ export default function TeamCardGrid({
 
               {/* My team indicator */}
               {isMyTeam && (
-                <div className="mt-4 text-center text-xs font-medium text-blue-400">
+                <div className="relative mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Your Team
                 </div>
               )}

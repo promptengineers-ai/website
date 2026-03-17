@@ -10,7 +10,7 @@ export async function POST(
   { params }: { params: { slug: string } },
 ) {
   try {
-    const auth = getAuthFromRequest(request);
+    const auth = await getAuthFromRequest(request);
     if (!auth) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

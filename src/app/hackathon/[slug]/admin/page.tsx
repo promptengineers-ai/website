@@ -8,6 +8,7 @@ import Loading from "@/components/loaders/Loading";
 import AdminKanbanBoard from "@/components/hackathon/AdminKanbanBoard";
 import CreateTeamModal from "@/components/hackathon/CreateTeamModal";
 import HackathonSettingsPanel from "@/components/hackathon/HackathonSettingsPanel";
+import EditParticipantModal from "@/components/hackathon/EditParticipantModal";
 import type { Hackathon, HackathonTeam, HackathonTeamSlot } from "@/types";
 
 type EnrichedSlot = HackathonTeamSlot & { userName?: string | null };
@@ -37,16 +38,25 @@ export default function HackathonAdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showCreateTeam, setShowCreateTeam] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState<"kanban" | "participants">(
-    "kanban",
-  );
+  const [activeTab, setActiveTabState] = useState<"kanban" | "participants">(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#participants") {
+      return "participants";
+    }
+    return "kanban";
+  });
+  const setActiveTab = (tab: "kanban" | "participants") => {
+    setActiveTabState(tab);
+    window.location.hash = tab === "kanban" ? "" : tab;
+  };
+  const [editingParticipant, setEditingParticipant] = useState<Participant | null>(null);
 
   const fetchData = async () => {
     try {
+      const t = Date.now();
       const [hackRes, teamsRes, participantsRes] = await Promise.all([
-        fetch(`/api/hackathons/${slug}`),
-        fetch(`/api/hackathons/${slug}/teams`),
-        fetch(`/api/hackathons/${slug}/participants`),
+        fetch(`/api/hackathons/${slug}?_t=${t}`, { cache: "no-store" }),
+        fetch(`/api/hackathons/${slug}/teams?_t=${t}`, { cache: "no-store" }),
+        fetch(`/api/hackathons/${slug}/participants?_t=${t}`, { cache: "no-store" }),
       ]);
 
       if (!hackRes.ok) {
@@ -207,7 +217,7 @@ export default function HackathonAdminPage() {
           )}
 
           {activeTab === "participants" && (
-            <div className="rounded-lg border border-gray-700">
+            <div className="overflow-x-auto rounded-lg border border-gray-700">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-gray-700 bg-gray-900">
                   <tr>
@@ -227,14 +237,28 @@ export default function HackathonAdminPage() {
                       Role Pref
                     </th>
                     <th className="px-4 py-3 font-medium text-gray-300">
+                      Involvement
+                    </th>
+                    <th className="px-4 py-3 font-medium text-gray-300">
                       Status
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-800">
                   {participants.map((p) => (
-                    <tr key={p.userId} className="hover:bg-gray-900/50">
-                      <td className="max-w-[200px] truncate px-4 py-3 font-medium" title={p.name}>{p.name}</td>
+                    <tr
+                      key={p.userId}
+                      className="cursor-pointer hover:bg-gray-800/50 transition-colors"
+                      onClick={() => setEditingParticipant(p)}
+                    >
+                      <td className="max-w-[200px] truncate px-4 py-3 font-medium" title={p.name}>
+                        <span className="flex items-center gap-2">
+                          {p.name}
+                          <svg className="h-3 w-3 flex-shrink-0 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </span>
+                      </td>
                       <td className="px-4 py-3 text-gray-400">{p.email}</td>
                       <td className="px-4 py-3 text-gray-400">
                         {p.skillBackground || "—"}
@@ -244,6 +268,17 @@ export default function HackathonAdminPage() {
                       </td>
                       <td className="px-4 py-3 text-gray-400">
                         {p.rolePreference || "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-full px-2 py-0.5 text-xs capitalize ${
+                          p.involvement === "mentor"
+                            ? "bg-purple-600/20 text-purple-400"
+                            : p.involvement === "volunteer"
+                              ? "bg-blue-600/20 text-blue-400"
+                              : "bg-gray-600/20 text-gray-400"
+                        }`}>
+                          {p.involvement}
+                        </span>
                       </td>
                       <td className="px-4 py-3">
                         {assignedUserIds.has(p.userId) ? (
@@ -290,6 +325,19 @@ export default function HackathonAdminPage() {
           onClose={() => setShowSettings(false)}
           onUpdated={() => {
             setShowSettings(false);
+            fetchData();
+          }}
+        />
+      )}
+
+      {editingParticipant && hackathon && (
+        <EditParticipantModal
+          participant={editingParticipant}
+          hackathonId={hackathon._id}
+          slug={slug}
+          onClose={() => setEditingParticipant(null)}
+          onUpdated={() => {
+            setEditingParticipant(null);
             fetchData();
           }}
         />

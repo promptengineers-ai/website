@@ -55,43 +55,83 @@ function DraggableCard({
   isOverlay,
   sourceTeamId,
   sourceRole,
+  compact,
 }: {
   id: string;
   participant: Participant;
   isOverlay?: boolean;
   sourceTeamId?: string;
   sourceRole?: string;
+  compact?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
     data: { type: "participant", participant, sourceTeamId, sourceRole },
   });
 
+  if (compact) {
+    return (
+      <div
+        ref={isOverlay ? undefined : setNodeRef}
+        {...(isOverlay ? {} : { ...listeners, ...attributes })}
+        style={isDragging && !isOverlay ? { opacity: 0.3 } : undefined}
+        className="cursor-grab truncate text-xs font-medium text-gray-200"
+        title={participant.name}
+      >
+        {participant.name}
+      </div>
+    );
+  }
+
+  const prefAbbrev = participant.rolePreference
+    ? ROLE_ABBREV[participant.rolePreference] || participant.rolePreference.slice(0, 2).toUpperCase()
+    : null;
+
   return (
     <div
       ref={isOverlay ? undefined : setNodeRef}
       {...(isOverlay ? {} : { ...listeners, ...attributes })}
       style={isDragging && !isOverlay ? { opacity: 0.3 } : undefined}
-      className={`cursor-grab rounded-lg border border-gray-600 bg-gray-800 p-2.5 transition-colors hover:border-gray-500 ${
-        isOverlay ? "rotate-2 scale-105 shadow-xl shadow-blue-500/20" : ""
+      className={`flex cursor-grab items-center gap-2 rounded-lg border px-2.5 py-2 transition-colors ${
+        isOverlay
+          ? "rotate-2 scale-105 border-blue-500/50 bg-blue-500/10 shadow-xl shadow-blue-500/20"
+          : "border-blue-500/30 bg-blue-500/5 hover:border-blue-500/50"
       }`}
     >
-      <div className="truncate text-sm font-medium" title={participant.name}>
-        {participant.name}
-      </div>
-      {participant.skillBackground && (
-        <div className="mt-0.5 truncate text-xs text-gray-400">
-          {participant.skillBackground}
-        </div>
-      )}
-      {participant.rolePreference && (
-        <span className="mt-1 inline-block rounded bg-blue-600/20 px-1.5 py-0.5 text-xs text-blue-400">
-          Wants: {participant.rolePreference}
+      {prefAbbrev ? (
+        <span
+          className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-[9px] font-bold text-blue-400"
+          title={`Wants: ${participant.rolePreference}`}
+        >
+          {prefAbbrev}
+        </span>
+      ) : (
+        <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-500 text-[9px] text-gray-500">
+          ?
         </span>
       )}
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs font-medium text-gray-200" title={participant.name}>
+          {participant.name}
+        </div>
+        {participant.skillBackground && (
+          <div className="truncate text-[10px] text-gray-400">
+            {participant.skillBackground}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
+const ROLE_ABBREV: Record<string, string> = {
+  "Product Manager": "PM",
+  "UI/UX Designer": "UX",
+  "Prompt/AI Engineer": "AI",
+  "Backend Engineer": "BE",
+  "Frontend Developer": "FE",
+  "Flex": "FX",
+};
 
 // Droppable slot inside a team column
 function DroppableSlot({
@@ -118,49 +158,43 @@ function DroppableSlot({
     const assignedParticipant = participants.find(
       (p) => p.userId === slot.userId,
     );
+    const abbrev = ROLE_ABBREV[slot.role] || slot.role.slice(0, 2).toUpperCase();
+    const displayName = assignedParticipant?.name || slot.userName || "Unknown";
 
     return (
-      <div className="group relative">
-        <div className="flex items-center gap-1">
-          <span className="flex-shrink-0 text-xs text-gray-500">
-            {slot.role}
+      <div className="group">
+        <div
+          ref={undefined}
+          className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/5 px-2 py-1.5 cursor-grab"
+        >
+          <span
+            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-500/20 text-[9px] font-bold text-green-400"
+            title={slot.role}
+          >
+            {abbrev}
           </span>
-          <div className="min-w-0 flex-1">
-            {assignedParticipant ? (
+          {assignedParticipant ? (
+            <div className="min-w-0 flex-1">
               <DraggableCard
                 id={`assigned-${teamId}-${slot.userId}-${index}`}
                 participant={assignedParticipant}
                 sourceTeamId={teamId}
                 sourceRole={slot.role}
+                compact
               />
-            ) : (
-              <div className="rounded-lg border border-gray-700 bg-gray-800 p-2.5">
-                <div
-                  className="truncate text-sm"
-                  title={slot.userName || "Unknown"}
-                >
-                  {slot.userName || "Unknown"}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <span className="min-w-0 flex-1 truncate text-xs text-gray-300" title={displayName}>
+              {displayName}
+            </span>
+          )}
           <button
             onClick={() => onRemove(teamId, slot.userId!)}
-            className="flex-shrink-0 rounded p-1 text-gray-600 opacity-0 transition-all hover:bg-red-600/20 hover:text-red-400 group-hover:opacity-100"
+            className="flex-shrink-0 rounded p-0.5 text-gray-600 opacity-0 transition-all hover:bg-red-600/20 hover:text-red-400 group-hover:opacity-100"
             title="Remove from team"
           >
-            <svg
-              className="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -577,39 +611,65 @@ export default function AdminKanbanBoard({
     }
 
     if (!targetTeamId || !targetRole) return;
-    if (sourceTeamId === targetTeamId) return;
+
+    // Same team, same role — no-op
+    if (sourceTeamId === targetTeamId && dragData.sourceRole === targetRole) return;
 
     setProcessing(true);
     try {
-      // Remove from source team
-      if (sourceTeamId) {
-        const sourceTeam = teams.find((t) => t._id === sourceTeamId);
-        if (sourceTeam) {
-          const sourceSlots = sourceTeam.slots.map((s) =>
-            s.userId === participant.userId
-              ? { ...s, userId: undefined, userName: null }
-              : s,
-          );
-          await updateTeamSlots(sourceTeamId, sourceSlots);
+      if (sourceTeamId === targetTeamId) {
+        // Moving within the same team (role swap)
+        const team = teams.find((t) => t._id === sourceTeamId);
+        if (team) {
+          let removed = false;
+          let assigned = false;
+          const newSlots = team.slots.map((s) => {
+            // Remove from old slot
+            if (s.userId === participant.userId && !removed) {
+              removed = true;
+              return { ...s, userId: undefined, userName: null };
+            }
+            // Assign to new slot
+            if (s.role === targetRole && !s.userId && !assigned) {
+              assigned = true;
+              return { ...s, userId: participant.userId, userName: participant.name };
+            }
+            return s;
+          });
+          await updateTeamSlots(sourceTeamId, newSlots);
         }
-      }
-
-      // Assign to target team
-      const targetTeam = teams.find((t) => t._id === targetTeamId);
-      if (targetTeam) {
-        let filled = false;
-        const targetSlots = targetTeam.slots.map((s) => {
-          if (s.role === targetRole && !s.userId && !filled) {
-            filled = true;
-            return {
-              ...s,
-              userId: participant.userId,
-              userName: participant.name,
-            };
+      } else {
+        // Moving between teams
+        // Remove from source team
+        if (sourceTeamId) {
+          const sourceTeam = teams.find((t) => t._id === sourceTeamId);
+          if (sourceTeam) {
+            const sourceSlots = sourceTeam.slots.map((s) =>
+              s.userId === participant.userId
+                ? { ...s, userId: undefined, userName: null }
+                : s,
+            );
+            await updateTeamSlots(sourceTeamId, sourceSlots);
           }
-          return s;
-        });
-        await updateTeamSlots(targetTeamId, targetSlots);
+        }
+
+        // Assign to target team
+        const targetTeam = teams.find((t) => t._id === targetTeamId);
+        if (targetTeam) {
+          let filled = false;
+          const targetSlots = targetTeam.slots.map((s) => {
+            if (s.role === targetRole && !s.userId && !filled) {
+              filled = true;
+              return {
+                ...s,
+                userId: participant.userId,
+                userName: participant.name,
+              };
+            }
+            return s;
+          });
+          await updateTeamSlots(targetTeamId, targetSlots);
+        }
       }
 
       onRefresh();
@@ -653,12 +713,52 @@ export default function AdminKanbanBoard({
               : "border-gray-700 bg-gray-900"
           }`}
         >
-          <h3 className="mb-3 text-sm font-bold">
-            Unassigned{" "}
-            <span className="font-normal text-gray-400">
-              ({unassignedParticipants.length})
-            </span>
-          </h3>
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-bold">
+              Unassigned{" "}
+              <span className="font-normal text-gray-400">
+                ({unassignedParticipants.length})
+              </span>
+            </h3>
+            {unassignedParticipants.length > 0 && (
+              <button
+                onClick={async () => {
+                  if (processing) return;
+                  if (
+                    !confirm(
+                      `Auto-assign ${unassignedParticipants.length} participants to teams based on their role preferences?`,
+                    )
+                  )
+                    return;
+                  setProcessing(true);
+                  try {
+                    const res = await fetch(
+                      `/api/hackathons/${slug}/teams/auto-assign`,
+                      { method: "POST" },
+                    );
+                    const data = await res.json();
+                    if (res.ok) {
+                      alert(
+                        `${data.assigned} assigned${data.teamsCreated ? `, ${data.teamsCreated} new team(s) created` : ""}`,
+                      );
+                      onRefresh();
+                    } else {
+                      alert(data.error || "Auto-assign failed");
+                    }
+                  } catch {
+                    alert("Something went wrong");
+                  } finally {
+                    setProcessing(false);
+                  }
+                }}
+                disabled={processing}
+                className="rounded bg-green-600 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-green-700 disabled:opacity-50"
+                title="Auto-assign all unassigned participants to teams based on their role preferences"
+              >
+                &#9889; Auto
+              </button>
+            )}
+          </div>
           {isOverUnassigned && activeDragData?.sourceTeamId && (
             <div className="mb-2 rounded-lg border border-dashed border-yellow-500 bg-yellow-500/10 px-3 py-2 text-center text-xs text-yellow-400">
               Drop to unassign
