@@ -69,7 +69,7 @@ const HeroSection = () => {
         transition={{ duration: 0.8, delay: 0.5 }}
         className="mb-8 max-w-2xl text-center text-xl font-light text-gray-300"
       >
-        Join 1,700+ developers and tech enthusiasts in Plano, TX exploring
+        Join 2,450+ developers and tech enthusiasts in Plano, TX exploring
         ChatGPT, LLMs, and the future of AI
       </motion.p>
 
@@ -102,15 +102,15 @@ const HeroSection = () => {
         className="mb-12 flex flex-wrap justify-center gap-8 text-center"
       >
         <div>
-          <div className="text-3xl font-bold text-blue-400">1,700+</div>
+          <div className="text-3xl font-bold text-blue-400">2,450+</div>
           <div className="text-sm text-gray-400">Members</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-purple-400">15+</div>
+          <div className="text-3xl font-bold text-purple-400">19+</div>
           <div className="text-sm text-gray-400">Events Hosted</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-green-400">4.6/5</div>
+          <div className="text-3xl font-bold text-green-400">4.7/5</div>
           <div className="text-sm text-gray-400">Rating</div>
         </div>
       </motion.div>
