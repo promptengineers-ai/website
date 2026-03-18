@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/jwt";
+import { parseJsonBody } from "@/lib/validation";
 import { getHackathonBySlug } from "@/lib/models/Hackathon";
 import {
   createRegistration,
   getRegistration,
   deleteRegistration,
 } from "@/lib/models/HackathonRegistration";
-import { updateProfile } from "@/lib/models/Profile";
-import { getProfileByUserId } from "@/lib/models/Profile";
+import {
+  updateProfile,
+  getProfileByUserId,
+  createProfile,
+} from "@/lib/models/Profile";
 import type { HackathonInvolvement, HackathonRole } from "@/types";
 
 // POST /api/hackathons/[slug]/register - Register for hackathon
@@ -29,19 +33,19 @@ export async function POST(
       );
     }
 
-    if (hackathon.status !== "registration" && hackathon.status !== "active") {
-      return NextResponse.json(
-        { error: "Registration is not open for this hackathon" },
-        { status: 400 },
-      );
-    }
-
     if (
       hackathon.registrationDeadline &&
       new Date() > hackathon.registrationDeadline
     ) {
       return NextResponse.json(
         { error: "Registration deadline has passed" },
+        { status: 400 },
+      );
+    }
+
+    if (hackathon.status !== "registration" && hackathon.status !== "active") {
+      return NextResponse.json(
+        { error: "Registration is not open for this hackathon" },
         { status: 400 },
       );
     }
@@ -55,8 +59,16 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
-    const { involvement, rolePreference, skillBackground, aiExperience } = body;
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
+    const { involvement, rolePreference, skillBackground, aiExperience } =
+      body as {
+        involvement?: string;
+        rolePreference?: string;
+        skillBackground?: string;
+        aiExperience?: string;
+      };
 
     if (!involvement) {
       return NextResponse.json(
@@ -88,7 +100,6 @@ export async function POST(
         ...(aiExperience ? { aiExperience } : {}),
       });
     } else {
-      const { createProfile } = await import("@/lib/models/Profile");
       await createProfile({
         userId: auth.user.id,
         badges: updatedBadges,
@@ -107,10 +118,7 @@ export async function POST(
         { status: 409 },
       );
     }
-    return NextResponse.json(
-      { error: "Failed to register" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to register" }, { status: 500 });
   }
 }
 

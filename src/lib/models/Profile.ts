@@ -92,6 +92,38 @@ export async function getProfileByUserId(
   };
 }
 
+export async function getProfilesByUserIds(
+  userIds: string[],
+): Promise<Map<string, UserProfile>> {
+  if (userIds.length === 0) return new Map();
+  const db = await getDb();
+  const collection = db.collection(PROFILES_COLLECTION);
+
+  const objectIds = userIds.map((id) => new ObjectId(id));
+  const docs = await collection.find({ userId: { $in: objectIds } }).toArray();
+
+  const map = new Map<string, UserProfile>();
+  for (const doc of docs) {
+    const userId = doc.userId.toString();
+    map.set(userId, {
+      _id: doc._id.toString(),
+      userId,
+      links: doc.links || {},
+      background: doc.background || "",
+      seeking: doc.seeking || "networking",
+      resumeId: doc.resumeId?.toString(),
+      isPublic: doc.isPublic || false,
+      avatarUrl: doc.avatarUrl || "",
+      badges: doc.badges || [],
+      skillBackground: doc.skillBackground || "",
+      aiExperience: doc.aiExperience || "",
+      createdAt: new Date(doc.createdAt),
+      updatedAt: new Date(doc.updatedAt),
+    });
+  }
+  return map;
+}
+
 export async function updateProfile(
   userId: string,
   data: {
@@ -126,8 +158,10 @@ export async function updateProfile(
   if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
   if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
   if (data.badges !== undefined) updateData.badges = data.badges;
-  if (data.skillBackground !== undefined) updateData.skillBackground = data.skillBackground;
-  if (data.aiExperience !== undefined) updateData.aiExperience = data.aiExperience;
+  if (data.skillBackground !== undefined)
+    updateData.skillBackground = data.skillBackground;
+  if (data.aiExperience !== undefined)
+    updateData.aiExperience = data.aiExperience;
   if (data.resumeId !== undefined) {
     updateData.resumeId = data.resumeId ? new ObjectId(data.resumeId) : null;
   }

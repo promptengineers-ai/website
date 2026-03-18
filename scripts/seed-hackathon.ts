@@ -6,7 +6,8 @@
 
 import { MongoClient, ObjectId } from "mongodb";
 
-const MONGO_URI = process.env.MONGO_DB_URI || "mongodb://localhost:27017/promptengineers";
+const MONGO_URI =
+  process.env.MONGO_DB_URI || "mongodb://localhost:27017/promptengineers";
 
 async function main() {
   const client = new MongoClient(MONGO_URI);
@@ -41,8 +42,6 @@ async function main() {
       "Prompt/AI Engineer",
       "Backend Engineer",
       "Frontend Developer",
-      "DevOps/Deployment",
-      "Data Engineer",
       "Flex",
     ];
     const requiredRoles = [

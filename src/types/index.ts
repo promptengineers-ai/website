@@ -85,8 +85,7 @@ export const ROLE_DESCRIPTIONS: Record<string, string> = {
     "Builds the server, APIs, and database layer — handles data flow, auth, and business logic behind the scenes.",
   "Frontend Developer":
     "Brings the UI to life in the browser — implements designs, handles user interactions, and connects to backend APIs.",
-  "Flex":
-    "Versatile team player who fills gaps wherever needed — can assist with any role depending on team needs.",
+  Flex: "Versatile team player who fills gaps wherever needed — can assist with any role depending on team needs.",
 };
 
 export const SKILL_BACKGROUNDS = [
@@ -110,7 +109,13 @@ export const AI_EXPERIENCE_LEVELS = [
 export type AiExperience = (typeof AI_EXPERIENCE_LEVELS)[number];
 
 export type HackathonStatus = "draft" | "registration" | "active" | "completed";
-export type HackathonInvolvement = "participant" | "volunteer" | "mentor";
+
+export const INVOLVEMENT_TYPES = [
+  "participant",
+  "volunteer",
+  "mentor",
+] as const;
+export type HackathonInvolvement = (typeof INVOLVEMENT_TYPES)[number];
 
 export type Hackathon = {
   _id: string;

@@ -12,11 +12,10 @@ export async function createHackathonRegistrationIndexes() {
   const db = await getDb();
   const collection = db.collection(HACKATHON_REGISTRATIONS_COLLECTION);
 
-  await collection.createIndex(
-    { hackathonId: 1, userId: 1 },
-    { unique: true },
-  );
+  await collection.createIndex({ hackathonId: 1, userId: 1 }, { unique: true });
   await collection.createIndex({ hackathonId: 1 });
+  await collection.createIndex({ userId: 1 });
+  await collection.createIndex({ hackathonId: 1, involvement: 1 });
 }
 
 function docToRegistration(

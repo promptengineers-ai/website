@@ -5,11 +5,12 @@ import "./globals.css";
 import Head from "next/head";
 import InitialLoadActiveUsers from "@/components/users/InitialLoadActiveUsers";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 import { GA_ID, NODE_ENV } from "@/config/app";
 // import { botScript } from "@/config/bot";
 
 // Primary font - Montserrat for clean, minimal UI elements
-const montserrat = Montserrat({ 
+const montserrat = Montserrat({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-montserrat",
@@ -87,7 +88,7 @@ export const metadata: Metadata = {
     "Software Development",
     "Technology",
     "OpenAI",
-    "Langchain"
+    "Langchain",
   ],
   authors: [{ name: "Prompt Engineers AI Community" }],
   creator: "Prompt Engineers AI Community",
@@ -98,9 +99,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
@@ -114,9 +115,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
-    <html lang="en" className={`${montserrat.variable} ${spaceGrotesk.variable}`}>
+    <html
+      lang="en"
+      className={`${montserrat.variable} ${spaceGrotesk.variable}`}
+    >
       <Head>
         <meta
           name="apple-mobile-web-app-status-bar-style"
@@ -129,7 +132,9 @@ export default function RootLayout({
         />
       </Head>
       <body className="font-montserrat">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
       </body>
       {NODE_ENV === "production" && GA_ID && (
         <>

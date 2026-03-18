@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromRequest } from "@/lib/jwt";
-import { getUserById } from "@/lib/models/User";
+import { requireAdmin } from "@/lib/auth-helpers";
+import { parseJsonBody } from "@/lib/validation";
+import { getUsersByIds } from "@/lib/models/User";
 import { getHackathonBySlug } from "@/lib/models/Hackathon";
 import {
   getTeamById,
   updateHackathonTeam,
   deleteHackathonTeam,
 } from "@/lib/models/HackathonTeam";
+import type { HackathonTeamSlot } from "@/types";
 
 // GET /api/hackathons/[slug]/teams/[teamId] - Get team details
 export async function GET(
@@ -24,28 +26,26 @@ export async function GET(
 
     const team = await getTeamById(params.teamId);
     if (!team || team.hackathonId !== hackathon._id) {
-      return NextResponse.json(
-        { error: "Team not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
 
-    // Enrich slots with user names
-    const slotsWithNames = await Promise.all(
-      team.slots.map(async (slot) => {
-        if (!slot.userId) return { ...slot, userName: null };
-        const user = await getUserById(slot.userId);
-        return { ...slot, userName: user?.name || "Unknown" };
-      }),
-    );
+    // Batch-fetch user names
+    const slotUserIds = team.slots
+      .filter((s) => s.userId)
+      .map((s) => s.userId!);
+    const userMap = await getUsersByIds(slotUserIds);
+
+    const slotsWithNames = team.slots.map((slot) => ({
+      ...slot,
+      userName: slot.userId
+        ? userMap.get(slot.userId)?.name || "Unknown"
+        : null,
+    }));
 
     return NextResponse.json({ team: { ...team, slots: slotsWithNames } });
   } catch (error) {
     console.error("Get team error:", error);
-    return NextResponse.json(
-      { error: "Failed to get team" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to get team" }, { status: 500 });
   }
 }
 
@@ -55,15 +55,8 @@ export async function PATCH(
   { params }: { params: { slug: string; teamId: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {
@@ -75,13 +68,16 @@ export async function PATCH(
 
     const team = await getTeamById(params.teamId);
     if (!team || team.hackathonId !== hackathon._id) {
-      return NextResponse.json(
-        { error: "Team not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
 
-    const body = await request.json();
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data as Partial<{
+      name: string;
+      description: string;
+      slots: HackathonTeamSlot[];
+    }>;
 
     const updated = await updateHackathonTeam(params.teamId, body);
 
@@ -101,15 +97,8 @@ export async function DELETE(
   { params }: { params: { slug: string; teamId: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {
@@ -121,10 +110,7 @@ export async function DELETE(
 
     const team = await getTeamById(params.teamId);
     if (!team || team.hackathonId !== hackathon._id) {
-      return NextResponse.json(
-        { error: "Team not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
 
     await deleteHackathonTeam(params.teamId);

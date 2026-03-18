@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -21,11 +21,9 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type {
-  Hackathon,
-  HackathonTeam,
-  HackathonTeamSlot,
-} from "@/types";
+import type { Hackathon, HackathonTeam, HackathonTeamSlot } from "@/types";
+import { useToast } from "@/components/ui/Toast";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 type EnrichedSlot = HackathonTeamSlot & { userName?: string | null };
 type EnrichedTeam = Omit<HackathonTeam, "slots"> & { slots: EnrichedSlot[] };
@@ -84,7 +82,8 @@ function DraggableCard({
   }
 
   const prefAbbrev = participant.rolePreference
-    ? ROLE_ABBREV[participant.rolePreference] || participant.rolePreference.slice(0, 2).toUpperCase()
+    ? ROLE_ABBREV[participant.rolePreference] ||
+      participant.rolePreference.slice(0, 2).toUpperCase()
     : null;
 
   return (
@@ -111,7 +110,10 @@ function DraggableCard({
         </span>
       )}
       <div className="min-w-0 flex-1">
-        <div className="truncate text-xs font-medium text-gray-200" title={participant.name}>
+        <div
+          className="truncate text-xs font-medium text-gray-200"
+          title={participant.name}
+        >
           {participant.name}
         </div>
         {participant.skillBackground && (
@@ -130,7 +132,7 @@ const ROLE_ABBREV: Record<string, string> = {
   "Prompt/AI Engineer": "AI",
   "Backend Engineer": "BE",
   "Frontend Developer": "FE",
-  "Flex": "FX",
+  Flex: "FX",
 };
 
 // Droppable slot inside a team column
@@ -152,9 +154,13 @@ function DroppableSlot({
   pendingUserId?: string | null;
 }) {
   const droppableId = `slot-${teamId}-${slot.role}-${index}`;
+  const droppableData = useMemo(
+    () => ({ teamId, role: slot.role, index }),
+    [teamId, slot.role, index],
+  );
   const { setNodeRef, isOver } = useDroppable({
     id: droppableId,
-    data: { teamId, role: slot.role, index },
+    data: droppableData,
     disabled: !!slot.userId,
   });
 
@@ -163,7 +169,7 @@ function DroppableSlot({
     if (pendingUserId && slot.userId === pendingUserId) {
       return (
         <div className="flex items-center gap-2 rounded-lg border border-dashed border-blue-500/30 bg-blue-500/5 px-3 py-2.5">
-          <span className="text-xs text-blue-400 animate-pulse">Moving...</span>
+          <span className="animate-pulse text-xs text-blue-400">Moving...</span>
         </div>
       );
     }
@@ -171,13 +177,14 @@ function DroppableSlot({
     const assignedParticipant = participants.find(
       (p) => p.userId === slot.userId,
     );
-    const abbrev = ROLE_ABBREV[slot.role] || slot.role.slice(0, 2).toUpperCase();
+    const abbrev =
+      ROLE_ABBREV[slot.role] || slot.role.slice(0, 2).toUpperCase();
     const displayName = assignedParticipant?.name || slot.userName || "Unknown";
     return (
       <div className="group">
         <div
           ref={undefined}
-          className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/5 px-2 py-1.5 cursor-grab"
+          className="flex cursor-grab items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/5 px-2 py-1.5"
         >
           <span
             className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-500/20 text-[9px] font-bold text-green-400"
@@ -196,7 +203,10 @@ function DroppableSlot({
               />
             </div>
           ) : (
-            <span className="min-w-0 flex-1 truncate text-xs text-gray-300" title={displayName}>
+            <span
+              className="min-w-0 flex-1 truncate text-xs text-gray-300"
+              title={displayName}
+            >
               {displayName}
             </span>
           )}
@@ -209,8 +219,18 @@ function DroppableSlot({
             className="flex-shrink-0 rounded p-0.5 text-gray-600 opacity-0 transition-all hover:bg-red-600/20 hover:text-red-400 group-hover:opacity-100"
             title="Remove from team"
           >
-            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="h-3 w-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -245,8 +265,18 @@ function DroppableSlot({
           className="flex-shrink-0 rounded p-0.5 text-gray-600 opacity-0 transition-all hover:bg-red-600/20 hover:text-red-400 group-hover:opacity-100"
           title="Remove slot"
         >
-          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="h-3 w-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       )}
@@ -337,9 +367,7 @@ function SortableTeamColumn({
       }}
       style={style}
       className={`flex w-[85vw] flex-shrink-0 flex-col rounded-xl border p-4 transition-colors sm:w-72 ${
-        isOver
-          ? "border-blue-500 bg-blue-500/5"
-          : "border-gray-700 bg-gray-900"
+        isOver ? "border-blue-500 bg-blue-500/5" : "border-gray-700 bg-gray-900"
       }`}
     >
       {/* Header with drag handle */}
@@ -363,10 +391,14 @@ function SortableTeamColumn({
 
             {/* Add slot controls */}
             <div className="border-t border-gray-700 pt-2">
-              <div className="mb-1 text-[10px] font-medium text-gray-400">Add position:</div>
+              <div className="mb-1 text-[10px] font-medium text-gray-400">
+                Add position:
+              </div>
               <div className="flex flex-wrap gap-1">
                 {hackathon.roles
-                  .filter((r) => !team.slots.some((s) => s.role === r && !s.userId))
+                  .filter(
+                    (r) => !team.slots.some((s) => s.role === r && !s.userId),
+                  )
                   .map((role) => (
                     <button
                       key={role}
@@ -381,11 +413,14 @@ function SortableTeamColumn({
                           { role, required: false },
                         ];
                         setSaving(true);
-                        await fetch(`/api/hackathons/${slug}/teams/${team._id}`, {
-                          method: "PATCH",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ slots: newSlots }),
-                        });
+                        await fetch(
+                          `/api/hackathons/${slug}/teams/${team._id}`,
+                          {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ slots: newSlots }),
+                          },
+                        );
                         setSaving(false);
                         onRefresh();
                       }}
@@ -416,11 +451,14 @@ function SortableTeamColumn({
                           { role: customRole.trim(), required: false },
                         ];
                         setSaving(true);
-                        await fetch(`/api/hackathons/${slug}/teams/${team._id}`, {
-                          method: "PATCH",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ slots: newSlots }),
-                        });
+                        await fetch(
+                          `/api/hackathons/${slug}/teams/${team._id}`,
+                          {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ slots: newSlots }),
+                          },
+                        );
                         setCustomRole("");
                         setSaving(false);
                         onRefresh();
@@ -591,37 +629,62 @@ export default function AdminKanbanBoard({
     teamName?: string;
   } | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [pendingMoveUserId, setPendingMoveUserId] = useState<string | null>(null);
-  const [teamOrder, setTeamOrder] = useState<string[]>(
-    teams.map((t) => t._id),
+  const [pendingMoveUserId, setPendingMoveUserId] = useState<string | null>(
+    null,
   );
+  const [teamOrder, setTeamOrder] = useState<string[]>(teams.map((t) => t._id));
+  const { toast } = useToast();
+  const [confirmState, setConfirmState] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    variant?: "danger" | "default";
+    onConfirm: () => void;
+  }>({ open: false, title: "", message: "", onConfirm: () => {} });
+
+  const showConfirm = (opts: {
+    title: string;
+    message: string;
+    variant?: "danger" | "default";
+    onConfirm: () => void;
+  }) => {
+    setConfirmState({ ...opts, open: true });
+  };
 
   // Keep teamOrder in sync when teams change
-  const orderedTeams = teamOrder
-    .map((id) => teams.find((t) => t._id === id))
-    .filter(Boolean) as EnrichedTeam[];
-  // Add any teams not in the order (newly created)
-  const missingTeams = teams.filter((t) => !teamOrder.includes(t._id));
-  const allOrderedTeams = [...orderedTeams, ...missingTeams];
+  const allOrderedTeams = useMemo(() => {
+    const orderedTeams = teamOrder
+      .map((id) => teams.find((t) => t._id === id))
+      .filter(Boolean) as EnrichedTeam[];
+    // Add any teams not in the order (newly created)
+    const missingTeams = teams.filter((t) => !teamOrder.includes(t._id));
+    return [...orderedTeams, ...missingTeams];
+  }, [teamOrder, teams]);
 
   // All participants for lookups
-  const assignedParticipants: Participant[] = teams.flatMap((t) =>
-    t.slots
-      .filter((s) => s.userId)
-      .map((s) => ({
-        userId: s.userId!,
-        name: s.userName || "Unknown",
-        involvement: "participant",
-        skillBackground: null,
-        aiExperience: null,
-      })),
+  const assignedParticipants = useMemo<Participant[]>(
+    () =>
+      teams.flatMap((t) =>
+        t.slots
+          .filter((s) => s.userId)
+          .map((s) => ({
+            userId: s.userId!,
+            name: s.userName || "Unknown",
+            involvement: "participant",
+            skillBackground: null,
+            aiExperience: null,
+          })),
+      ),
+    [teams],
   );
-  const allParticipants = [
-    ...unassignedParticipants,
-    ...assignedParticipants.filter(
-      (a) => !unassignedParticipants.some((u) => u.userId === a.userId),
-    ),
-  ];
+
+  const allParticipants = useMemo(() => {
+    const unassignedIds = new Set(unassignedParticipants.map((u) => u.userId));
+    return [
+      ...unassignedParticipants,
+      ...assignedParticipants.filter((a) => !unassignedIds.has(a.userId)),
+    ];
+  }, [unassignedParticipants, assignedParticipants]);
 
   const { setNodeRef: setUnassignedRef, isOver: isOverUnassigned } =
     useDroppable({
@@ -636,60 +699,64 @@ export default function AdminKanbanBoard({
     }),
   );
 
-  const updateTeamSlots = async (
-    teamId: string,
-    newSlots: EnrichedSlot[],
-  ) => {
-    const res = await fetch(`/api/hackathons/${slug}/teams/${teamId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        slots: newSlots.map((s) => ({
-          role: s.role,
-          userId: s.userId || undefined,
-          required: s.required,
-        })),
-      }),
-    });
-    return res.ok;
-  };
-
-  const handleRemoveMember = async (teamId: string, userId: string) => {
-    setProcessing(true);
-    try {
-      const team = teams.find((t) => t._id === teamId);
-      if (!team) return;
-      const newSlots = team.slots.map((s) =>
-        s.userId === userId
-          ? { ...s, userId: undefined, userName: null }
-          : s,
-      );
-      const ok = await updateTeamSlots(teamId, newSlots);
-      if (ok) onRefresh();
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const data = event.active.data.current as Record<string, unknown>;
-
-    if (data?.type === "column") {
-      const team = teams.find((t) => t._id === data.teamId);
-      setActiveDragData({
-        type: "column",
-        teamId: data.teamId as string,
-        teamName: team?.name,
+  const updateTeamSlots = useCallback(
+    async (teamId: string, newSlots: EnrichedSlot[]) => {
+      const res = await fetch(`/api/hackathons/${slug}/teams/${teamId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slots: newSlots.map((s) => ({
+            role: s.role,
+            userId: s.userId || undefined,
+            required: s.required,
+          })),
+        }),
       });
-    } else {
-      setActiveDragData({
-        type: "participant",
-        participant: data.participant as Participant,
-        sourceTeamId: data.sourceTeamId as string | undefined,
-        sourceRole: data.sourceRole as string | undefined,
-      });
-    }
-  };
+      return res.ok;
+    },
+    [slug],
+  );
+
+  const handleRemoveMember = useCallback(
+    async (teamId: string, userId: string) => {
+      setProcessing(true);
+      try {
+        const team = teams.find((t) => t._id === teamId);
+        if (!team) return;
+        const newSlots = team.slots.map((s) =>
+          s.userId === userId ? { ...s, userId: undefined, userName: null } : s,
+        );
+        const ok = await updateTeamSlots(teamId, newSlots);
+        if (ok) onRefresh();
+      } finally {
+        setProcessing(false);
+      }
+    },
+    [teams, updateTeamSlots, onRefresh],
+  );
+
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const data = event.active.data.current as Record<string, unknown>;
+
+      if (data?.type === "column") {
+        const team = teams.find((t) => t._id === data.teamId);
+        setActiveDragData({
+          type: "column",
+          teamId: data.teamId as string,
+          teamName: team?.name,
+        });
+      } else {
+        setActiveDragData({
+          type: "participant",
+          participant: data.participant as Participant,
+          sourceTeamId: data.sourceTeamId as string | undefined,
+          sourceRole: data.sourceRole as string | undefined,
+        });
+      }
+    },
+    [teams],
+  );
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const dragData = activeDragData;
@@ -766,7 +833,8 @@ export default function AdminKanbanBoard({
     if (!targetTeamId || !targetRole) return;
 
     // Same team, same role — no-op
-    if (sourceTeamId === targetTeamId && dragData.sourceRole === targetRole) return;
+    if (sourceTeamId === targetTeamId && dragData.sourceRole === targetRole)
+      return;
 
     // Hide the card during the move to prevent snap-back visual
     setPendingMoveUserId(participant.userId);
@@ -787,7 +855,11 @@ export default function AdminKanbanBoard({
             // Assign to new slot
             if (s.role === targetRole && !s.userId && !assigned) {
               assigned = true;
-              return { ...s, userId: participant.userId, userName: participant.name };
+              return {
+                ...s,
+                userId: participant.userId,
+                userName: participant.name,
+              };
             }
             return s;
           });
@@ -836,22 +908,32 @@ export default function AdminKanbanBoard({
     }
   };
 
-  const handleDeleteTeam = async (teamId: string) => {
-    if (!confirm("Delete this team? Members will become unassigned.")) return;
-    try {
-      const res = await fetch(`/api/hackathons/${slug}/teams/${teamId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        setTeamOrder((prev) => prev.filter((id) => id !== teamId));
-        onRefresh();
-      }
-    } catch (error) {
-      console.error("Delete team error:", error);
-    }
+  const handleDeleteTeam = (teamId: string) => {
+    showConfirm({
+      title: "Delete Team",
+      message: "Delete this team? Members will become unassigned.",
+      variant: "danger",
+      onConfirm: async () => {
+        setConfirmState((prev) => ({ ...prev, open: false }));
+        try {
+          const res = await fetch(`/api/hackathons/${slug}/teams/${teamId}`, {
+            method: "DELETE",
+          });
+          if (res.ok) {
+            setTeamOrder((prev) => prev.filter((id) => id !== teamId));
+            onRefresh();
+          }
+        } catch (error) {
+          console.error("Delete team error:", error);
+        }
+      },
+    });
   };
 
-  const columnIds = allOrderedTeams.map((t) => `column-${t._id}`);
+  const columnIds = useMemo(
+    () => allOrderedTeams.map((t) => `column-${t._id}`),
+    [allOrderedTeams],
+  );
 
   return (
     <DndContext
@@ -878,34 +960,36 @@ export default function AdminKanbanBoard({
             </h3>
             {unassignedParticipants.length > 0 && (
               <button
-                onClick={async () => {
+                onClick={() => {
                   if (processing) return;
-                  if (
-                    !confirm(
-                      `Auto-assign ${unassignedParticipants.length} participants to teams based on their role preferences?`,
-                    )
-                  )
-                    return;
-                  setProcessing(true);
-                  try {
-                    const res = await fetch(
-                      `/api/hackathons/${slug}/teams/auto-assign`,
-                      { method: "POST" },
-                    );
-                    const data = await res.json();
-                    if (res.ok) {
-                      alert(
-                        `${data.assigned} assigned${data.teamsCreated ? `, ${data.teamsCreated} new team(s) created` : ""}`,
-                      );
-                      onRefresh();
-                    } else {
-                      alert(data.error || "Auto-assign failed");
-                    }
-                  } catch {
-                    alert("Something went wrong");
-                  } finally {
-                    setProcessing(false);
-                  }
+                  showConfirm({
+                    title: "Auto-Assign Participants",
+                    message: `Auto-assign ${unassignedParticipants.length} participants to teams based on their role preferences?`,
+                    onConfirm: async () => {
+                      setConfirmState((prev) => ({ ...prev, open: false }));
+                      setProcessing(true);
+                      try {
+                        const res = await fetch(
+                          `/api/hackathons/${slug}/teams/auto-assign`,
+                          { method: "POST" },
+                        );
+                        const data = await res.json();
+                        if (res.ok) {
+                          toast(
+                            `${data.assigned} assigned${data.teamsCreated ? `, ${data.teamsCreated} new team(s) created` : ""}`,
+                            "success",
+                          );
+                          onRefresh();
+                        } else {
+                          toast(data.error || "Auto-assign failed", "error");
+                        }
+                      } catch {
+                        toast("Something went wrong", "error");
+                      } finally {
+                        setProcessing(false);
+                      }
+                    },
+                  });
                 }}
                 disabled={processing}
                 className="rounded bg-green-600 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-green-700 disabled:opacity-50"
@@ -961,19 +1045,28 @@ export default function AdminKanbanBoard({
 
       {/* Drag Overlay */}
       <DragOverlay>
-        {activeDragData?.type === "participant" && activeDragData.participant && (
-          <DraggableCard
-            id="overlay"
-            participant={activeDragData.participant}
-            isOverlay
-          />
-        )}
+        {activeDragData?.type === "participant" &&
+          activeDragData.participant && (
+            <DraggableCard
+              id="overlay"
+              participant={activeDragData.participant}
+              isOverlay
+            />
+          )}
         {activeDragData?.type === "column" && (
           <div className="w-72 rounded-xl border border-blue-500 bg-gray-900/90 p-4 shadow-xl shadow-blue-500/20">
             <h3 className="text-sm font-bold">{activeDragData.teamName}</h3>
           </div>
         )}
       </DragOverlay>
+      <ConfirmDialog
+        open={confirmState.open}
+        title={confirmState.title}
+        message={confirmState.message}
+        variant={confirmState.variant}
+        onConfirm={confirmState.onConfirm}
+        onCancel={() => setConfirmState((prev) => ({ ...prev, open: false }))}
+      />
     </DndContext>
   );
 }
