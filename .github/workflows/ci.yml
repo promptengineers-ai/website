@@ -18,5 +18,3 @@ jobs:
         env:
           MONGO_DB_URI: mongodb://localhost:27017/ci
           NEXTAUTH_SECRET: ci-placeholder-secret
-          RESEND_API_KEY: re_placeholder
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
