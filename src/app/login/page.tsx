@@ -10,6 +10,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
   const verified = searchParams.get("verified");
+  const reset = searchParams.get("reset");
   const { login } = useAuth();
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendStatus, setResendStatus] = useState<
@@ -65,6 +66,13 @@ function LoginContent() {
         <div className="fixed left-1/2 top-4 z-50 mx-auto max-w-md -translate-x-1/2 transform rounded-md border border-green-700 bg-green-900/50 p-4">
           <p className="text-center text-green-200">
             Email verified successfully! Please sign in.
+          </p>
+        </div>
+      )}
+      {reset && (
+        <div className="fixed left-1/2 top-4 z-50 mx-auto max-w-md -translate-x-1/2 transform rounded-md border border-green-700 bg-green-900/50 p-4">
+          <p className="text-center text-green-200">
+            Password reset successfully! Please sign in with your new password.
           </p>
         </div>
       )}

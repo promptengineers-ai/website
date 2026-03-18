@@ -33,6 +33,8 @@ export type User = {
   emailVerified: boolean;
   verificationToken?: string;
   verificationTokenExpiry?: Date;
+  passwordResetToken?: string;
+  passwordResetTokenExpiry?: Date;
 };
 
 export type AuthUser = {

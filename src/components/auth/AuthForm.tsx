@@ -233,14 +233,12 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
             <div className="text-center text-sm">
               <p className="text-gray-400">
                 Forgot your password?{" "}
-                <a
-                  href="https://www.linkedin.com/company/prompt-engineers-ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/forgot-password"
                   className="font-medium text-blue-400 hover:text-blue-300"
                 >
-                  Contact us on LinkedIn
-                </a>
+                  Reset it here
+                </Link>
               </p>
             </div>
           )}
