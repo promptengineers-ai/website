@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import { createUser, getUserByEmail } from "@/lib/models/User";
+import {
+  createUser,
+  getUserByEmail,
+  setVerificationToken,
+} from "@/lib/models/User";
 import { createProfile } from "@/lib/models/Profile";
 import { hashPassword, validateEmail, validatePassword } from "@/lib/auth";
 import { initializeDatabase } from "@/lib/initDb";
-import { setAuthCookie, signAuthToken } from "@/lib/jwt";
+import { generateVerificationToken, sendVerificationEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -55,26 +59,25 @@ export async function POST(request: Request) {
     // Create default profile
     await createProfile({ userId: user._id });
 
-    const token = signAuthToken({
-      id: user._id,
-      email: user.email,
-      name: user.name,
-    });
+    // Generate verification token and send email
+    const { token, expiry } = generateVerificationToken();
+    await setVerificationToken(user._id, token, expiry);
 
-    const response = NextResponse.json(
+    try {
+      await sendVerificationEmail(user.email, token, user.name);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      // User was created — they can resend verification later
+    }
+
+    return NextResponse.json(
       {
-        message: "User created successfully",
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.name,
-        },
+        message:
+          "Account created. Please check your email to verify your address.",
+        requiresVerification: true,
       },
       { status: 201 },
     );
-
-    setAuthCookie(response, token);
-    return response;
   } catch (error) {
     console.error("Register error:", error);
     return NextResponse.json(

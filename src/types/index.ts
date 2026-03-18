@@ -31,6 +31,10 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   emailVerified: boolean;
+  verificationToken?: string;
+  verificationTokenExpiry?: Date;
+  passwordResetToken?: string;
+  passwordResetTokenExpiry?: Date;
 };
 
 export type AuthUser = {

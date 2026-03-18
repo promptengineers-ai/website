@@ -9,6 +9,8 @@ export async function createUserIndexes() {
   const collection = db.collection(USERS_COLLECTION);
 
   await collection.createIndex({ email: 1 }, { unique: true });
+  await collection.createIndex({ verificationToken: 1 }, { sparse: true });
+  await collection.createIndex({ passwordResetToken: 1 }, { sparse: true });
 }
 
 export async function createUser(data: {
@@ -113,6 +115,138 @@ export async function updateUserEmailVerified(
   await collection.updateOne(
     { _id: new ObjectId(id) },
     { $set: { emailVerified: verified, updatedAt: new Date() } },
+  );
+}
+
+export async function setVerificationToken(
+  id: string,
+  token: string,
+  expiry: Date,
+): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        verificationToken: token,
+        verificationTokenExpiry: expiry,
+        updatedAt: new Date(),
+      },
+    },
+  );
+}
+
+export async function getUserByVerificationToken(
+  token: string,
+): Promise<User | null> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+
+  const user = await collection.findOne({
+    verificationToken: token,
+    verificationTokenExpiry: { $gt: new Date() },
+  });
+
+  if (!user) return null;
+
+  return {
+    _id: user._id.toString(),
+    email: user.email,
+    passwordHash: user.passwordHash,
+    name: user.name,
+    isAdmin: user.isAdmin || false,
+    emailVerified: user.emailVerified || false,
+    verificationToken: user.verificationToken,
+    verificationTokenExpiry: user.verificationTokenExpiry
+      ? new Date(user.verificationTokenExpiry)
+      : undefined,
+    createdAt: new Date(user.createdAt),
+    updatedAt: new Date(user.updatedAt),
+  };
+}
+
+export async function clearVerificationToken(id: string): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: { updatedAt: new Date() },
+      $unset: { verificationToken: "", verificationTokenExpiry: "" },
+    },
+  );
+}
+
+export async function setPasswordResetToken(
+  id: string,
+  token: string,
+  expiry: Date,
+): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        passwordResetToken: token,
+        passwordResetTokenExpiry: expiry,
+        updatedAt: new Date(),
+      },
+    },
+  );
+}
+
+export async function getUserByPasswordResetToken(
+  token: string,
+): Promise<User | null> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+
+  const user = await collection.findOne({
+    passwordResetToken: token,
+    passwordResetTokenExpiry: { $gt: new Date() },
+  });
+
+  if (!user) return null;
+
+  return {
+    _id: user._id.toString(),
+    email: user.email,
+    passwordHash: user.passwordHash,
+    name: user.name,
+    isAdmin: user.isAdmin || false,
+    emailVerified: user.emailVerified || false,
+    passwordResetToken: user.passwordResetToken,
+    passwordResetTokenExpiry: user.passwordResetTokenExpiry
+      ? new Date(user.passwordResetTokenExpiry)
+      : undefined,
+    createdAt: new Date(user.createdAt),
+    updatedAt: new Date(user.updatedAt),
+  };
+}
+
+export async function clearPasswordResetToken(id: string): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: { updatedAt: new Date() },
+      $unset: { passwordResetToken: "", passwordResetTokenExpiry: "" },
+    },
+  );
+}
+
+export async function updateUserPassword(
+  id: string,
+  passwordHash: string,
+): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: { passwordHash, updatedAt: new Date() } },
   );
 }
 

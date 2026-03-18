@@ -17,6 +17,8 @@ type AuthUser = {
   name?: string;
 };
 
+type RegisterResult = { requiresVerification: true } | AuthUser;
+
 type AuthContextValue = {
   user: AuthUser | null;
   status: AuthStatus;
@@ -25,7 +27,7 @@ type AuthContextValue = {
     email: string;
     password: string;
     name: string;
-  }) => Promise<AuthUser>;
+  }) => Promise<RegisterResult>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<AuthUser | null>;
 };
@@ -35,7 +37,11 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 async function handleJsonResponse(response: Response, fallbackError: string) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.error || fallbackError);
+    const error = new Error(data.error || fallbackError);
+    // Attach extra fields for the caller to inspect
+    (error as unknown as Record<string, unknown>).unverified = data.unverified;
+    (error as unknown as Record<string, unknown>).email = data.email;
+    throw error;
   }
   return data;
 }
@@ -79,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: string;
     password: string;
     name: string;
-  }) => {
+  }): Promise<RegisterResult> => {
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -87,6 +93,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const data = await handleJsonResponse(response, "Registration failed");
+
+    if (data.requiresVerification) {
+      return { requiresVerification: true };
+    }
+
     setUser(data.user);
     setStatus("authenticated");
     return data.user as AuthUser;
