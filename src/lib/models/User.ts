@@ -13,24 +13,22 @@ export async function createUserIndexes() {
 
 export async function createUser(data: {
   email: string;
-  passwordHash?: string;
+  passwordHash: string;
   name: string;
 }): Promise<User> {
   const db = await getDb();
   const collection = db.collection(USERS_COLLECTION);
 
   const now = new Date();
-  const user: Record<string, unknown> = {
+  const user = {
     email: data.email,
+    passwordHash: data.passwordHash,
     name: data.name,
     isAdmin: false,
     emailVerified: false,
     createdAt: now,
     updatedAt: now,
   };
-  if (data.passwordHash) {
-    user.passwordHash = data.passwordHash;
-  }
 
   const result = await collection.insertOne(user);
 
@@ -103,16 +101,6 @@ export async function getUsersByIds(ids: string[]): Promise<Map<string, User>> {
     });
   }
   return map;
-}
-
-export async function createUserForMagicLink(data: {
-  email: string;
-  name: string;
-}): Promise<User> {
-  return createUser({
-    email: data.email,
-    name: data.name,
-  });
 }
 
 export async function updateUserEmailVerified(

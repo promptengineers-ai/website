@@ -162,12 +162,20 @@ const TopNavbar = () => {
                   )}
                 </div>
               ) : (
-                <Link
-                  href={`/login?from=${encodeURIComponent(pathname)}`}
-                  className="rounded-full border border-white/30 bg-transparent px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10"
-                >
-                  Login
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/login?from=${encodeURIComponent(pathname)}`}
+                    className="rounded-full border border-white/30 bg-transparent px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href={`/signup?from=${encodeURIComponent(pathname)}`}
+                    className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
+                  >
+                    Register
+                  </Link>
+                </div>
               )}
             </div>
 

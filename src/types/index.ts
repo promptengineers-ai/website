@@ -25,7 +25,7 @@ export type Contact = {
 export type User = {
   _id: string;
   email: string;
-  passwordHash?: string;
+  passwordHash: string;
   name: string;
   isAdmin: boolean;
   createdAt: Date;
@@ -160,15 +160,6 @@ export type HackathonRegistration = {
   involvement: HackathonInvolvement;
   rolePreference?: HackathonRole;
   registeredAt: Date;
-};
-
-export type MagicLinkToken = {
-  _id: string;
-  email: string;
-  tokenHash: string;
-  expiresAt: Date;
-  usedAt?: Date;
-  createdAt: Date;
 };
 
 export type ResumeMetadata = {
