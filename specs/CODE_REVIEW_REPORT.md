@@ -1,6 +1,7 @@
 # Code Review Report: Hackathon Feature (PR #9)
 
-**Branch:** `feat/hackathon-dir`
+**Feature Branch:** `feat/hackathon-dir` ([PR #9](https://github.com/promptengineers-ai/website/pull/9))
+**Review Branch:** `review/hackathon-dir` ([PR #10](https://github.com/promptengineers-ai/website/pull/10) — review evidence diff)
 **Date:** 2026-03-17
 **Reviewer:** Claude Code (automated)
 **Scope:** 97 files changed, +7,613 / -130 lines across API routes, components, models, types, scripts, and arch-docs
@@ -43,7 +44,7 @@ The hackathon feature introduces a complete end-to-end system for hackathon mana
 
 ## Changes Already Addressed During QA
 
-Commit `f453e60` ("bugfixes, profile updates, styling") was applied during the QA session to fix blockers found via browser testing. These fixes are already included in the current branch — the 54 open issues below were identified against the **post-fix** code.
+Commit `f453e60` ("bugfixes, profile updates, styling") was applied during the QA session to fix blockers found via browser testing. The feat branch was later force-pushed as `e6d2c34` with additional refinements. These fixes are already included in the current branch — the 54 open issues below were identified against the **post-fix** code.
 
 | Change | File(s) | What it fixed |
 |--------|---------|---------------|
@@ -61,6 +62,25 @@ Commit `f453e60` ("bugfixes, profile updates, styling") was applied during the Q
 | Added hackathon badges + skill display on profile | `profile/page.tsx` | Profile page didn't show hackathon registration info |
 
 > **Note:** The top-level import fix for `createProfile` in `auth/register/route.ts` partially addresses issue 6.5 below, but `register/route.ts` and `participants/route.ts` still use dynamic imports.
+
+---
+
+## Merge Conflict Resolution
+
+The feat branch (`feat/hackathon-dir`) was force-pushed as `e6d2c34` after the review branch (`review/hackathon-dir`) was created, causing 4 merge conflicts in `src/components/hackathon/AdminKanbanBoard.tsx`. All conflicts were resolved by accepting the incoming feat branch changes, which contained improvements over the review branch's snapshot.
+
+**File:** `src/components/hackathon/AdminKanbanBoard.tsx`
+
+| # | Location (lines) | Conflict | Resolution |
+|---|-------------------|----------|------------|
+| 1 | 176–179 | Duplicate blank line before `return` statement in `DroppableSlot` | Removed extra blank line (accepted feat) |
+| 2 | 208–216 | Bare `onRemove()` call vs. `confirm()` dialog wrapping `onRemove()` | Kept `confirm()` dialog (accepted feat) — adds user safety on destructive team-remove action |
+| 3 | 775–780 | Duplicate no-op comment block (`// Same team, same role — no-op`) | Removed duplicate (accepted feat) |
+| 4 | 809–883 | `onRefresh()` (sync) vs. `await onRefresh()` (async) at end of drag-end handler | Kept `await onRefresh()` (accepted feat) — ensures data is refreshed before clearing processing state |
+
+**Commit:** `168cdfe` on `review/hackathon-dir`
+
+> **Impact on review findings:** Conflict #2 is relevant to issue **5.2** (`alert()`/`confirm()` for user feedback). The feat branch added a `confirm()` dialog for team member removal — this is the same pattern flagged in the review. While it improves safety over the bare call, it should still be replaced with an accessible custom modal per the recommendation in 5.2.
 
 ---
 
