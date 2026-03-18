@@ -15,3 +15,6 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
+        env:
+          MONGO_DB_URI: mongodb://localhost:27017/ci
+          NEXTAUTH_SECRET: ci-placeholder-secret
