@@ -7,7 +7,9 @@ import AvatarUpload from "./AvatarUpload";
 
 type ProfileFormProps = {
   profile?: UserProfile;
+  userName?: string;
   onSubmit: (data: {
+    name: string;
     links: {
       linkedin?: string;
       github?: string;
@@ -23,7 +25,12 @@ type ProfileFormProps = {
   }) => Promise<void>;
 };
 
-export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
+export default function ProfileForm({
+  profile,
+  userName,
+  onSubmit,
+}: ProfileFormProps) {
+  const [name, setName] = useState(userName || "");
   const [linkedin, setLinkedin] = useState(profile?.links?.linkedin || "");
   const [github, setGithub] = useState(profile?.links?.github || "");
   const [twitter, setTwitter] = useState(profile?.links?.twitter || "");
@@ -58,6 +65,7 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
 
     try {
       await onSubmit({
+        name,
         links: {
           linkedin: linkedin || undefined,
           github: github || undefined,
@@ -84,13 +92,39 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
             <h3 className="text-lg font-medium leading-6 text-white">
+              Display Name
+            </h3>
+            <p className="mt-1 text-sm text-gray-400">
+              Your name as shown to other members
+            </p>
+          </div>
+          <div className="mt-5 md:col-span-2 md:mt-0">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              maxLength={100}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              placeholder="Your display name"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-white">
               Public Profile
             </h3>
             <p className="mt-1 text-sm text-gray-400">
               Manage your profile visibility and avatar
             </p>
           </div>
-          <div className="mt-5 md:col-span-2 md:mt-0 space-y-6">
+          <div className="mt-5 space-y-6 md:col-span-2 md:mt-0">
             <div className="flex items-start">
               <div className="flex h-5 items-center">
                 <input
@@ -103,10 +137,7 @@ export default function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
                 />
               </div>
               <div className="ml-3 text-sm">
-                <label
-                  htmlFor="isPublic"
-                  className="font-medium text-gray-300"
-                >
+                <label htmlFor="isPublic" className="font-medium text-gray-300">
                   Make Profile Public
                 </label>
                 <p className="text-gray-400">

@@ -25,6 +25,9 @@ export async function createProfile(data: {
   seeking?: "work" | "hiring" | "networking" | "other";
   isPublic?: boolean;
   avatarUrl?: string;
+  badges?: string[];
+  skillBackground?: string;
+  aiExperience?: string;
 }): Promise<UserProfile> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
@@ -37,6 +40,9 @@ export async function createProfile(data: {
     seeking: data.seeking || "networking",
     isPublic: data.isPublic || false,
     avatarUrl: data.avatarUrl || "",
+    badges: data.badges || [],
+    skillBackground: data.skillBackground || "",
+    aiExperience: data.aiExperience || "",
     createdAt: now,
     updatedAt: now,
   };
@@ -51,6 +57,9 @@ export async function createProfile(data: {
     seeking: profile.seeking,
     isPublic: profile.isPublic,
     avatarUrl: profile.avatarUrl,
+    badges: profile.badges,
+    skillBackground: profile.skillBackground,
+    aiExperience: profile.aiExperience,
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
   };
@@ -75,9 +84,44 @@ export async function getProfileByUserId(
     resumeId: profile.resumeId?.toString(),
     isPublic: profile.isPublic || false,
     avatarUrl: profile.avatarUrl || "",
+    badges: profile.badges || [],
+    skillBackground: profile.skillBackground || "",
+    aiExperience: profile.aiExperience || "",
     createdAt: new Date(profile.createdAt),
     updatedAt: new Date(profile.updatedAt),
   };
+}
+
+export async function getProfilesByUserIds(
+  userIds: string[],
+): Promise<Map<string, UserProfile>> {
+  if (userIds.length === 0) return new Map();
+  const db = await getDb();
+  const collection = db.collection(PROFILES_COLLECTION);
+
+  const objectIds = userIds.map((id) => new ObjectId(id));
+  const docs = await collection.find({ userId: { $in: objectIds } }).toArray();
+
+  const map = new Map<string, UserProfile>();
+  for (const doc of docs) {
+    const userId = doc.userId.toString();
+    map.set(userId, {
+      _id: doc._id.toString(),
+      userId,
+      links: doc.links || {},
+      background: doc.background || "",
+      seeking: doc.seeking || "networking",
+      resumeId: doc.resumeId?.toString(),
+      isPublic: doc.isPublic || false,
+      avatarUrl: doc.avatarUrl || "",
+      badges: doc.badges || [],
+      skillBackground: doc.skillBackground || "",
+      aiExperience: doc.aiExperience || "",
+      createdAt: new Date(doc.createdAt),
+      updatedAt: new Date(doc.updatedAt),
+    });
+  }
+  return map;
 }
 
 export async function updateProfile(
@@ -96,6 +140,9 @@ export async function updateProfile(
     resumeId?: string;
     isPublic?: boolean;
     avatarUrl?: string;
+    badges?: string[];
+    skillBackground?: string;
+    aiExperience?: string;
   },
 ): Promise<UserProfile | null> {
   const db = await getDb();
@@ -110,6 +157,11 @@ export async function updateProfile(
   if (data.seeking !== undefined) updateData.seeking = data.seeking;
   if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
   if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
+  if (data.badges !== undefined) updateData.badges = data.badges;
+  if (data.skillBackground !== undefined)
+    updateData.skillBackground = data.skillBackground;
+  if (data.aiExperience !== undefined)
+    updateData.aiExperience = data.aiExperience;
   if (data.resumeId !== undefined) {
     updateData.resumeId = data.resumeId ? new ObjectId(data.resumeId) : null;
   }
@@ -131,6 +183,9 @@ export async function updateProfile(
     resumeId: result.resumeId?.toString(),
     isPublic: result.isPublic || false,
     avatarUrl: result.avatarUrl || "",
+    badges: result.badges || [],
+    skillBackground: result.skillBackground || "",
+    aiExperience: result.aiExperience || "",
     createdAt: new Date(result.createdAt),
     updatedAt: new Date(result.updatedAt),
   };
