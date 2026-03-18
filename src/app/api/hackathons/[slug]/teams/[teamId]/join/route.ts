@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/jwt";
+import { parseJsonBody } from "@/lib/validation";
 import { getHackathonBySlug } from "@/lib/models/Hackathon";
 import { getRegistration } from "@/lib/models/HackathonRegistration";
 import {
@@ -57,14 +58,12 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
-    const { role } = body;
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const { role } = parsed.data as { role?: string };
 
     if (!role) {
-      return NextResponse.json(
-        { error: "role is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "role is required" }, { status: 400 });
     }
 
     // Verify role exists as a slot on the target team (supports custom roles)
@@ -73,21 +72,7 @@ export async function POST(
     // Verify team exists and belongs to this hackathon
     const team = await getTeamById(params.teamId);
     if (!team || team.hackathonId !== hackathon._id) {
-      return NextResponse.json(
-        { error: "Team not found" },
-        { status: 404 },
-      );
-    }
-
-    // Check if the role has an open slot
-    const openSlot = team.slots.find(
-      (s) => s.role === role && !s.userId,
-    );
-    if (!openSlot) {
-      return NextResponse.json(
-        { error: `No open "${role}" slot on this team` },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
 
     const updatedTeam = await joinTeam(
@@ -106,9 +91,6 @@ export async function POST(
     return NextResponse.json({ team: updatedTeam });
   } catch (error) {
     console.error("Join team error:", error);
-    return NextResponse.json(
-      { error: "Failed to join team" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to join team" }, { status: 500 });
   }
 }

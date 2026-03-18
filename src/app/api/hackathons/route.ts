@@ -1,23 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromRequest } from "@/lib/jwt";
-import { getUserById } from "@/lib/models/User";
-import {
-  createHackathon,
-  getActiveHackathon,
-} from "@/lib/models/Hackathon";
+import { requireAdmin } from "@/lib/auth-helpers";
+import { parseJsonBody, validateDate } from "@/lib/validation";
+import { createHackathon, getActiveHackathon } from "@/lib/models/Hackathon";
 import { initializeDatabase } from "@/lib/initDb";
 import { HACKATHON_ROLES } from "@/types";
 import type { HackathonRole } from "@/types";
 
-let dbInitialized = false;
-
 // GET /api/hackathons - Get the active hackathon
 export async function GET() {
   try {
-    if (!dbInitialized) {
-      await initializeDatabase();
-      dbInitialized = true;
-    }
+    await initializeDatabase();
 
     const hackathon = await getActiveHackathon();
 
@@ -38,22 +30,13 @@ export async function GET() {
 // POST /api/hackathons - Create a hackathon (admin only)
 export async function POST(request: NextRequest) {
   try {
-    if (!dbInitialized) {
-      await initializeDatabase();
-      dbInitialized = true;
-    }
+    await initializeDatabase();
 
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const body = await request.json();
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
     const {
       slug,
       name,
@@ -65,7 +48,18 @@ export async function POST(request: NextRequest) {
       requiredRoles,
       registrationDeadline,
       teamLockDate,
-    } = body;
+    } = parsed.data as {
+      slug?: string;
+      name?: string;
+      description?: string;
+      date?: string;
+      location?: string;
+      maxTeamSize?: number;
+      roles?: HackathonRole[];
+      requiredRoles?: HackathonRole[];
+      registrationDeadline?: string;
+      teamLockDate?: string;
+    };
 
     if (!slug || !name || !date || !location) {
       return NextResponse.json(
@@ -77,7 +71,33 @@ export async function POST(request: NextRequest) {
     // Validate slug format
     if (!/^[a-z0-9-]+$/.test(slug)) {
       return NextResponse.json(
-        { error: "Slug must contain only lowercase letters, numbers, and hyphens" },
+        {
+          error:
+            "Slug must contain only lowercase letters, numbers, and hyphens",
+        },
+        { status: 400 },
+      );
+    }
+
+    // Validate dates
+    const parsedDate = validateDate(date);
+    if (date && !parsedDate) {
+      return NextResponse.json(
+        { error: "Invalid date format" },
+        { status: 400 },
+      );
+    }
+    const parsedRegistrationDeadline = validateDate(registrationDeadline);
+    if (registrationDeadline && !parsedRegistrationDeadline) {
+      return NextResponse.json(
+        { error: "Invalid registrationDeadline format" },
+        { status: 400 },
+      );
+    }
+    const parsedTeamLockDate = validateDate(teamLockDate);
+    if (teamLockDate && !parsedTeamLockDate) {
+      return NextResponse.json(
+        { error: "Invalid teamLockDate format" },
         { status: 400 },
       );
     }
@@ -99,16 +119,14 @@ export async function POST(request: NextRequest) {
       slug,
       name,
       description: description || "",
-      date: new Date(date),
+      date: parsedDate!,
       location,
       maxTeamSize: maxTeamSize || 5,
       roles: validRoles as HackathonRole[],
       requiredRoles: validRequiredRoles as HackathonRole[],
-      registrationDeadline: registrationDeadline
-        ? new Date(registrationDeadline)
-        : undefined,
-      teamLockDate: teamLockDate ? new Date(teamLockDate) : undefined,
-      createdBy: auth.user.id,
+      registrationDeadline: parsedRegistrationDeadline || undefined,
+      teamLockDate: parsedTeamLockDate || undefined,
+      createdBy: authResult.auth.user.id,
     });
 
     return NextResponse.json({ hackathon }, { status: 201 });

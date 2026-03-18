@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import TopNavBar from "@/components/nav/TopNavBar";
@@ -32,9 +32,11 @@ export default function HackathonLandingPage() {
   const [loading, setLoading] = useState(true);
   const [showRegistration, setShowRegistration] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
+      setError(null);
       const t = Date.now();
       const [hackRes, teamsRes] = await Promise.all([
         fetch(`/api/hackathons/${slug}?_t=${t}`, { cache: "no-store" }),
@@ -50,18 +52,26 @@ export default function HackathonLandingPage() {
       const hackData = await hackRes.json();
       const teamsData = await teamsRes.json();
 
+      // Validate response structure
+      if (!hackData.hackathon) {
+        setHackathon(null);
+        setLoading(false);
+        return;
+      }
+
       setHackathon(hackData.hackathon);
       setTeams(teamsData.teams || []);
       setParticipantCount(hackData.participantCount || 0);
-    } catch (error) {
-      console.error("Failed to load hackathon:", error);
+    } catch (err) {
+      console.error("Failed to load hackathon:", err);
+      setError("Failed to load hackathon data. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug]);
 
   // Check registration status
-  const checkRegistration = async () => {
+  const checkRegistration = useCallback(async () => {
     if (!user || !hackathon) return;
     try {
       const res = await fetch(`/api/hackathons/${slug}/participants`);
@@ -82,11 +92,11 @@ export default function HackathonLandingPage() {
     } catch {
       // Not registered
     }
-  };
+  }, [user, hackathon, slug]);
 
   useEffect(() => {
     fetchData();
-  }, [slug]);
+  }, [fetchData]);
 
   // Check admin status
   useEffect(() => {
@@ -104,7 +114,7 @@ export default function HackathonLandingPage() {
     if (status === "authenticated" && hackathon) {
       checkRegistration();
     }
-  }, [status, hackathon]);
+  }, [status, hackathon, checkRegistration]);
 
   if (loading) return <Loading />;
 
@@ -122,15 +132,34 @@ export default function HackathonLandingPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
+        <h1 className="mb-4 text-2xl font-bold text-red-400">
+          Something went wrong
+        </h1>
+        <p className="mb-6 text-gray-400">{error}</p>
+        <button
+          onClick={() => {
+            setLoading(true);
+            setError(null);
+            fetchData();
+          }}
+          className="rounded-lg bg-blue-600 px-6 py-3 font-medium transition-colors hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   const isRegistered = !!registration;
   const isRegistrationOpen =
     hackathon.status === "registration" || hackathon.status === "active";
   const eventDate = new Date(hackathon.date);
   const daysUntil = Math.max(
     0,
-    Math.ceil(
-      (eventDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-    ),
+    Math.ceil((eventDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
   );
 
   return (
@@ -168,9 +197,7 @@ export default function HackathonLandingPage() {
             {hackathon.name}
           </h1>
 
-          <p className="mb-8 text-lg text-gray-300">
-            {hackathon.description}
-          </p>
+          <p className="mb-8 text-lg text-gray-300">{hackathon.description}</p>
 
           {/* Event Details */}
           <div className="mb-10 flex flex-wrap justify-center gap-8">
@@ -212,18 +239,32 @@ export default function HackathonLandingPage() {
               {status === "authenticated" ? (
                 <button
                   onClick={() => setShowRegistration(true)}
-                  className="group relative inline-flex items-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 px-10 py-5 text-lg font-bold shadow-2xl shadow-green-500/30 transition-all duration-300 hover:scale-105 hover:shadow-green-500/50 animate-pulse-grow-shrink"
+                  className="group relative inline-flex animate-pulse-grow-shrink items-center gap-3 overflow-hidden rounded-xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 px-10 py-5 text-lg font-bold shadow-2xl shadow-green-500/30 transition-all duration-300 hover:scale-105 hover:shadow-green-500/50"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <span className="absolute -inset-1 rounded-xl bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 opacity-30 blur-lg transition-opacity duration-300 group-hover:opacity-50" />
                   <span className="relative flex items-center gap-3">
                     <span className="text-2xl">&#9889;</span>
                     <span>
-                      <span className="block text-left text-lg leading-tight">Join the Hackathon</span>
-                      <span className="block text-left text-xs font-normal opacity-80">Pick your role &amp; find your team</span>
+                      <span className="block text-left text-lg leading-tight">
+                        Join the Hackathon
+                      </span>
+                      <span className="block text-left text-xs font-normal opacity-80">
+                        Pick your role &amp; find your team
+                      </span>
                     </span>
-                    <svg className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    <svg
+                      className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
                     </svg>
                   </span>
                 </button>
@@ -285,18 +326,20 @@ export default function HackathonLandingPage() {
               return (
                 <div
                   key={role}
-                  className={`group relative rounded-lg border p-4 transition-all duration-300 hover:scale-110 hover:-translate-y-1 ${
+                  className={`group relative rounded-lg border p-4 transition-all duration-300 hover:-translate-y-1 hover:scale-110 ${
                     isRequired
                       ? "border-blue-500/50 bg-blue-500/10 hover:bg-blue-500/15"
                       : "border-gray-700 bg-gray-900 hover:bg-gray-800"
                   }`}
                 >
                   {/* Electric border glow pulse on hover */}
-                  <span className={`pointer-events-none absolute -inset-[2px] rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
-                    isRequired
-                      ? "shadow-[0_0_8px_2px_rgba(59,130,246,0.5),inset_0_0_8px_2px_rgba(59,130,246,0.1)] animate-pulse"
-                      : "shadow-[0_0_8px_2px_rgba(168,85,247,0.4),inset_0_0_8px_2px_rgba(168,85,247,0.1)] animate-pulse"
-                  }`} />
+                  <span
+                    className={`pointer-events-none absolute -inset-[2px] rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
+                      isRequired
+                        ? "animate-pulse shadow-[0_0_8px_2px_rgba(59,130,246,0.5),inset_0_0_8px_2px_rgba(59,130,246,0.1)]"
+                        : "animate-pulse shadow-[0_0_8px_2px_rgba(168,85,247,0.4),inset_0_0_8px_2px_rgba(168,85,247,0.1)]"
+                    }`}
+                  />
                   <div className="relative">
                     <div className="mb-1 flex items-center gap-2">
                       {isRequired ? (
@@ -312,7 +355,8 @@ export default function HackathonLandingPage() {
                       </span>
                     )}
                     <p className="text-xs leading-relaxed text-gray-400">
-                      {ROLE_DESCRIPTIONS[role] || "Contributes to the team in a specialized capacity."}
+                      {ROLE_DESCRIPTIONS[role] ||
+                        "Contributes to the team in a specialized capacity."}
                     </p>
                   </div>
                 </div>

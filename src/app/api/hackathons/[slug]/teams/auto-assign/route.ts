@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromRequest } from "@/lib/jwt";
-import { getUserById } from "@/lib/models/User";
+import { requireAdmin } from "@/lib/auth-helpers";
 import { getHackathonBySlug } from "@/lib/models/Hackathon";
 import {
   getTeamsByHackathonId,
@@ -34,15 +33,8 @@ export async function POST(
   { params }: { params: { slug: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {
@@ -99,7 +91,10 @@ export async function POST(
         return p.rolePreference as HackathonRole;
       }
       if (p.skillBackground && SKILL_TO_ROLE[p.skillBackground]) {
-        return SKILL_TO_ROLE[p.skillBackground];
+        const mapped = SKILL_TO_ROLE[p.skillBackground];
+        if (hackathon!.roles.includes(mapped)) {
+          return mapped;
+        }
       }
       return "Flex";
     };
@@ -143,9 +138,7 @@ export async function POST(
       });
 
       for (const team of sorted) {
-        const idx = team.slots.findIndex(
-          (s) => s.role === role && !s.userId,
-        );
+        const idx = team.slots.findIndex((s) => s.role === role && !s.userId);
         if (idx !== -1) return { team, slotIndex: idx };
       }
       return null;
@@ -240,10 +233,10 @@ export async function POST(
         // Create the team in DB
         await createHackathonTeam({
           hackathonId: hackathon._id,
-          name: `Team ${String.fromCharCode(64 + mutableTeams.indexOf(mt) + 1)}`,
+          name: `Team ${teams.length + mutableTeams.filter((m) => m.isNew).indexOf(mt) + 1}`,
           description: "",
           slots,
-          createdBy: auth.user.id,
+          createdBy: authResult.auth.user.id,
         });
       } else {
         // Update existing team

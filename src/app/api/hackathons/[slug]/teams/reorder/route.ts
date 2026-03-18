@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromRequest } from "@/lib/jwt";
-import { getUserById } from "@/lib/models/User";
+import { requireAdmin } from "@/lib/auth-helpers";
+import { parseJsonBody, isValidObjectId } from "@/lib/validation";
 import { getHackathonBySlug } from "@/lib/models/Hackathon";
 import { reorderTeams } from "@/lib/models/HackathonTeam";
 
@@ -10,15 +10,8 @@ export async function POST(
   { params }: { params: { slug: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {
@@ -28,14 +21,25 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
-    const { teamIds } = body;
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const { teamIds } = parsed.data as { teamIds?: string[] };
 
     if (!Array.isArray(teamIds) || teamIds.length === 0) {
       return NextResponse.json(
         { error: "teamIds array is required" },
         { status: 400 },
       );
+    }
+
+    // Validate all teamIds are valid ObjectIds
+    for (const id of teamIds) {
+      if (!isValidObjectId(id)) {
+        return NextResponse.json(
+          { error: "Invalid team ID format" },
+          { status: 400 },
+        );
+      }
     }
 
     await reorderTeams(teamIds);

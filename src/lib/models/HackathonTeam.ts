@@ -10,6 +10,7 @@ export async function createHackathonTeamIndexes() {
 
   await collection.createIndex({ hackathonId: 1 });
   await collection.createIndex({ hackathonId: 1, name: 1 }, { unique: true });
+  await collection.createIndex({ "slots.userId": 1 });
 }
 
 function deserializeSlots(
@@ -22,9 +23,7 @@ function deserializeSlots(
   }));
 }
 
-function serializeSlots(
-  slots: HackathonTeamSlot[],
-): Record<string, unknown>[] {
+function serializeSlots(slots: HackathonTeamSlot[]): Record<string, unknown>[] {
   return slots.map((slot) => ({
     role: slot.role,
     userId: slot.userId ? new ObjectId(slot.userId) : null,
@@ -59,12 +58,11 @@ export async function createHackathonTeam(data: {
   const now = new Date();
 
   // Auto-assign next order value
-  const maxOrderDoc = await collection
-    .find({ hackathonId: new ObjectId(data.hackathonId) })
-    .sort({ order: -1 })
-    .limit(1)
-    .toArray();
-  const nextOrder = maxOrderDoc.length > 0 ? ((maxOrderDoc[0].order as number) ?? 0) + 1 : 0;
+  const maxOrderDoc = await collection.findOne(
+    { hackathonId: new ObjectId(data.hackathonId) },
+    { sort: { order: -1 } },
+  );
+  const nextOrder = maxOrderDoc ? ((maxOrderDoc.order as number) ?? 0) + 1 : 0;
 
   const team = {
     hackathonId: new ObjectId(data.hackathonId),
@@ -219,9 +217,7 @@ export async function getTeamByUserId(
   return docToTeam(doc as unknown as Record<string, unknown>);
 }
 
-export async function reorderTeams(
-  teamIds: string[],
-): Promise<void> {
+export async function reorderTeams(teamIds: string[]): Promise<void> {
   const db = await getDb();
   const collection = db.collection(HACKATHON_TEAMS_COLLECTION);
 

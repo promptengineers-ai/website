@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromRequest } from "@/lib/jwt";
-import { getUserById } from "@/lib/models/User";
+import { requireAdmin } from "@/lib/auth-helpers";
+import { parseJsonBody } from "@/lib/validation";
+import { getUsersByIds } from "@/lib/models/User";
 import { getHackathonBySlug } from "@/lib/models/Hackathon";
 import {
   createHackathonTeam,
@@ -24,30 +25,30 @@ export async function GET(
 
     const teams = await getTeamsByHackathonId(hackathon._id);
 
-    // Enrich teams with member names
-    const enrichedTeams = await Promise.all(
-      teams.map(async (team) => {
-        const slotsWithNames = await Promise.all(
-          team.slots.map(async (slot) => {
-            if (!slot.userId) return { ...slot, userName: null };
-            const user = await getUserById(slot.userId);
-            return {
-              ...slot,
-              userName: user?.name || "Unknown",
-            };
-          }),
-        );
-        return { ...team, slots: slotsWithNames };
-      }),
+    // Batch-fetch all user names for filled slots
+    const allUserIds = Array.from(
+      new Set(
+        teams.flatMap((t) =>
+          t.slots.filter((s) => s.userId).map((s) => s.userId!),
+        ),
+      ),
     );
+    const userMap = await getUsersByIds(allUserIds);
+
+    const enrichedTeams = teams.map((team) => ({
+      ...team,
+      slots: team.slots.map((slot) => ({
+        ...slot,
+        userName: slot.userId
+          ? userMap.get(slot.userId)?.name || "Unknown"
+          : null,
+      })),
+    }));
 
     return NextResponse.json({ teams: enrichedTeams });
   } catch (error) {
     console.error("Get teams error:", error);
-    return NextResponse.json(
-      { error: "Failed to get teams" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to get teams" }, { status: 500 });
   }
 }
 
@@ -57,15 +58,8 @@ export async function POST(
   { params }: { params: { slug: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {
@@ -75,8 +69,13 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
-    const { name, description, slots } = body;
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const { name, description, slots } = parsed.data as {
+      name?: string;
+      description?: string;
+      slots?: HackathonTeamSlot[];
+    };
 
     if (!name) {
       return NextResponse.json(
@@ -118,7 +117,7 @@ export async function POST(
       name,
       description,
       slots: teamSlots,
-      createdBy: auth.user.id,
+      createdBy: authResult.auth.user.id,
     });
 
     return NextResponse.json({ team }, { status: 201 });

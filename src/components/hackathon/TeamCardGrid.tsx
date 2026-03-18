@@ -8,6 +8,7 @@ import {
   type HackathonTeamSlot,
   type HackathonRole,
 } from "@/types";
+import { useToast } from "@/components/ui/Toast";
 
 type EnrichedSlot = HackathonTeamSlot & { userName?: string | null };
 type EnrichedTeam = Omit<HackathonTeam, "slots"> & { slots: EnrichedSlot[] };
@@ -35,6 +36,7 @@ export default function TeamCardGrid({
   } | null>(null);
   const [leavingTeam, setLeavingTeam] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("");
+  const { toast } = useToast();
 
   const currentTeam = currentUserId
     ? teams.find((t) =>
@@ -43,32 +45,27 @@ export default function TeamCardGrid({
     : undefined;
 
   const filteredTeams = filter
-    ? teams.filter((t) =>
-        t.slots.some((s) => s.role === filter && !s.userId),
-      )
+    ? teams.filter((t) => t.slots.some((s) => s.role === filter && !s.userId))
     : teams;
 
   const handleJoin = async (teamId: string, role: HackathonRole) => {
     setJoiningSlot({ teamId, role });
     try {
-      const res = await fetch(
-        `/api/hackathons/${slug}/teams/${teamId}/join`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role }),
-        },
-      );
+      const res = await fetch(`/api/hackathons/${slug}/teams/${teamId}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Failed to join team");
+        toast(data.error || "Failed to join team", "error");
         return;
       }
 
       onRefresh();
     } catch {
-      alert("Something went wrong");
+      toast("Something went wrong", "error");
     } finally {
       setJoiningSlot(null);
     }
@@ -77,22 +74,19 @@ export default function TeamCardGrid({
   const handleLeave = async (teamId: string) => {
     setLeavingTeam(teamId);
     try {
-      const res = await fetch(
-        `/api/hackathons/${slug}/teams/${teamId}/leave`,
-        {
-          method: "POST",
-        },
-      );
+      const res = await fetch(`/api/hackathons/${slug}/teams/${teamId}/leave`, {
+        method: "POST",
+      });
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Failed to leave team");
+        toast(data.error || "Failed to leave team", "error");
         return;
       }
 
       onRefresh();
     } catch {
-      alert("Something went wrong");
+      toast("Something went wrong", "error");
     } finally {
       setLeavingTeam(null);
     }
@@ -148,7 +142,7 @@ export default function TeamCardGrid({
             >
               {/* Glow border for user's team */}
               {isMyTeam && (
-                <span className="pointer-events-none absolute -inset-[2px] rounded-xl shadow-[0_0_25px_6px_rgba(16,185,129,0.25),0_0_50px_12px_rgba(16,185,129,0.1)] animate-pulse" />
+                <span className="pointer-events-none absolute -inset-[2px] animate-pulse rounded-xl shadow-[0_0_25px_6px_rgba(16,185,129,0.25),0_0_50px_12px_rgba(16,185,129,0.1)]" />
               )}
               {/* Header */}
               <div className="relative mb-4 flex items-start justify-between">
@@ -174,7 +168,11 @@ export default function TeamCardGrid({
               {/* Slots */}
               <div className="relative space-y-2">
                 {team.slots.map((slot, idx) => {
-                  const isMe = !!(currentUserId && slot.userId && slot.userId === currentUserId);
+                  const isMe = !!(
+                    currentUserId &&
+                    slot.userId &&
+                    slot.userId === currentUserId
+                  );
                   const isOpen = !slot.userId;
                   const isRequired = slot.required;
                   const isJoining =
@@ -186,10 +184,10 @@ export default function TeamCardGrid({
                       key={`${slot.role}-${idx}`}
                       className={`flex items-center justify-between rounded-lg px-3 py-2 ${
                         isMe
-                          ? "bg-blue-500/15 border border-blue-500/30"
+                          ? "border border-blue-500/30 bg-blue-500/15"
                           : isOpen
-                            ? "bg-gray-800/50 border border-dashed border-gray-600"
-                            : "bg-gray-800 border border-gray-700"
+                            ? "border border-dashed border-gray-600 bg-gray-800/50"
+                            : "border border-gray-700 bg-gray-800"
                       }`}
                     >
                       <div className="flex min-w-0 items-center gap-2">
@@ -210,26 +208,26 @@ export default function TeamCardGrid({
                         </span>
 
                         {!isOpen && (
-                          <span className="truncate text-sm text-gray-400" title={isMe ? "You" : (slot.userName || "")}>
+                          <span
+                            className="truncate text-sm text-gray-400"
+                            title={isMe ? "You" : slot.userName || ""}
+                          >
                             &mdash; {isMe ? "You" : slot.userName}
                           </span>
                         )}
                       </div>
 
                       {/* Actions */}
-                      {isOpen &&
-                        isRegistered &&
-                        !currentTeam &&
-                        !isJoining && (
-                          <button
-                            onClick={() =>
-                              handleJoin(team._id, slot.role as HackathonRole)
-                            }
-                            className="rounded bg-blue-600 px-3 py-1 text-xs font-medium transition-colors hover:bg-blue-700"
-                          >
-                            Join
-                          </button>
-                        )}
+                      {isOpen && isRegistered && !currentTeam && !isJoining && (
+                        <button
+                          onClick={() =>
+                            handleJoin(team._id, slot.role as HackathonRole)
+                          }
+                          className="rounded bg-blue-600 px-3 py-1 text-xs font-medium transition-colors hover:bg-blue-700"
+                        >
+                          Join
+                        </button>
+                      )}
 
                       {isJoining && (
                         <span className="text-xs text-gray-400">
@@ -254,7 +252,7 @@ export default function TeamCardGrid({
               {/* My team indicator */}
               {isMyTeam && (
                 <div className="relative mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                   Your Team
                 </div>
               )}

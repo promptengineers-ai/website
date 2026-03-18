@@ -1,8 +1,8 @@
-import { ObjectId } from 'mongodb';
-import { getDb } from '../mongodb';
-import type { User } from '@/types';
+import { ObjectId } from "mongodb";
+import { getDb } from "../mongodb";
+import type { User } from "@/types";
 
-export const USERS_COLLECTION = 'users';
+export const USERS_COLLECTION = "users";
 
 export async function createUserIndexes() {
   const db = await getDb();
@@ -76,4 +76,29 @@ export async function getUserById(id: string): Promise<User | null> {
     createdAt: new Date(user.createdAt),
     updatedAt: new Date(user.updatedAt),
   };
+}
+
+export async function getUsersByIds(ids: string[]): Promise<Map<string, User>> {
+  if (ids.length === 0) return new Map();
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+
+  const objectIds = ids.map((id) => new ObjectId(id));
+  const docs = await collection.find({ _id: { $in: objectIds } }).toArray();
+
+  const map = new Map<string, User>();
+  for (const doc of docs) {
+    const id = doc._id.toString();
+    map.set(id, {
+      _id: id,
+      email: doc.email,
+      passwordHash: doc.passwordHash,
+      name: doc.name,
+      isAdmin: doc.isAdmin || false,
+      emailVerified: doc.emailVerified || false,
+      createdAt: new Date(doc.createdAt),
+      updatedAt: new Date(doc.updatedAt),
+    });
+  }
+  return map;
 }

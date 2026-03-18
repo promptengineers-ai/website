@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthFromRequest } from "@/lib/jwt";
-import { getUserById } from "@/lib/models/User";
+import { requireAdmin } from "@/lib/auth-helpers";
+import { parseJsonBody, validateSlug } from "@/lib/validation";
 import {
   getHackathonBySlug,
   updateHackathon,
   deleteHackathon,
 } from "@/lib/models/Hackathon";
+import type { HackathonRole, HackathonStatus } from "@/types";
 import { getRegistrationCount } from "@/lib/models/HackathonRegistration";
 import { getTeamsByHackathonId } from "@/lib/models/HackathonTeam";
 
@@ -15,6 +16,13 @@ export async function GET(
   { params }: { params: { slug: string } },
 ) {
   try {
+    if (!validateSlug(params.slug)) {
+      return NextResponse.json(
+        { error: "Invalid slug format" },
+        { status: 400 },
+      );
+    }
+
     const hackathon = await getHackathonBySlug(params.slug);
 
     if (!hackathon) {
@@ -49,15 +57,8 @@ export async function PATCH(
   { params }: { params: { slug: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {
@@ -67,7 +68,20 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data as Partial<{
+      name: string;
+      description: string;
+      date: Date;
+      location: string;
+      maxTeamSize: number;
+      roles: HackathonRole[];
+      requiredRoles: HackathonRole[];
+      registrationDeadline: Date | null;
+      teamLockDate: Date | null;
+      status: HackathonStatus;
+    }>;
 
     const updated = await updateHackathon(hackathon._id, body);
 
@@ -87,15 +101,8 @@ export async function DELETE(
   { params }: { params: { slug: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await getUserById(auth.user.id);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {

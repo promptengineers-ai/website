@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getAuthFromRequest } from "@/lib/jwt";
-import { getUserById } from "@/lib/models/User";
+import { requireAdmin } from "@/lib/auth-helpers";
+import { parseJsonBody, isValidObjectId } from "@/lib/validation";
+import { getUserById, getUsersByIds } from "@/lib/models/User";
 import { getHackathonBySlug } from "@/lib/models/Hackathon";
 import {
   getRegistrationsByHackathonId,
   updateRegistration,
 } from "@/lib/models/HackathonRegistration";
-import { getProfileByUserId, updateProfile } from "@/lib/models/Profile";
+import {
+  getProfileByUserId,
+  getProfilesByUserIds,
+  updateProfile,
+  createProfile,
+} from "@/lib/models/Profile";
 import { getDb } from "@/lib/mongodb";
+import type { HackathonRole, HackathonInvolvement } from "@/types";
 
 // GET /api/hackathons/[slug]/participants - List registered participants
 export async function GET(
@@ -34,26 +42,30 @@ export async function GET(
 
     const registrations = await getRegistrationsByHackathonId(hackathon._id);
 
-    const participants = await Promise.all(
-      registrations.map(async (reg) => {
-        const user = await getUserById(reg.userId);
-        const profile = await getProfileByUserId(reg.userId);
+    // Batch-fetch users and profiles
+    const userIds = registrations.map((r) => r.userId);
+    const [userMap, profileMap] = await Promise.all([
+      getUsersByIds(userIds),
+      getProfilesByUserIds(userIds),
+    ]);
 
-        return {
-          userId: reg.userId,
-          name: user?.name || "Unknown",
-          involvement: reg.involvement,
-          rolePreference: reg.rolePreference,
-          registeredAt: reg.registeredAt,
-          skillBackground: profile?.skillBackground || null,
-          aiExperience: profile?.aiExperience || null,
-          avatarUrl: profile?.avatarUrl || null,
-          linkedIn: profile?.links?.linkedin || null,
-          // Only include email for admins
-          ...(isAdmin ? { email: user?.email } : {}),
-        };
-      }),
-    );
+    const participants = registrations.map((reg) => {
+      const user = userMap.get(reg.userId);
+      const profile = profileMap.get(reg.userId);
+
+      return {
+        userId: reg.userId,
+        name: user?.name || "Unknown",
+        involvement: reg.involvement,
+        rolePreference: reg.rolePreference,
+        registeredAt: reg.registeredAt,
+        skillBackground: profile?.skillBackground || null,
+        aiExperience: profile?.aiExperience || null,
+        avatarUrl: profile?.avatarUrl || null,
+        linkedIn: profile?.links?.linkedin || null,
+        ...(isAdmin ? { email: user?.email } : {}),
+      };
+    });
 
     return NextResponse.json({
       participants,
@@ -74,15 +86,8 @@ export async function PUT(
   { params }: { params: { slug: string } },
 ) {
   try {
-    const auth = await getAuthFromRequest(request);
-    if (!auth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const adminUser = await getUserById(auth.user.id);
-    if (!adminUser || !adminUser.isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const authResult = await requireAdmin(request);
+    if (!authResult.ok) return authResult.response;
 
     const hackathon = await getHackathonBySlug(params.slug);
     if (!hackathon) {
@@ -92,8 +97,24 @@ export async function PUT(
       );
     }
 
-    const body = await request.json();
-    const { userId, name, skillBackground, aiExperience, rolePreference, involvement } = body;
+    const parsed = await parseJsonBody(request);
+    if (!parsed.ok) return parsed.response;
+    const body = parsed.data;
+    const {
+      userId,
+      name,
+      skillBackground,
+      aiExperience,
+      rolePreference,
+      involvement,
+    } = body as {
+      userId?: string;
+      name?: string;
+      skillBackground?: string;
+      aiExperience?: string;
+      rolePreference?: HackathonRole;
+      involvement?: HackathonInvolvement;
+    };
 
     if (!userId) {
       return NextResponse.json(
@@ -102,13 +123,22 @@ export async function PUT(
       );
     }
 
+    if (!isValidObjectId(userId)) {
+      return NextResponse.json(
+        { error: "Invalid userId format" },
+        { status: 400 },
+      );
+    }
+
     // Update user name
     if (name !== undefined) {
       const db = await getDb();
-      await db.collection("users").updateOne(
-        { _id: new ObjectId(userId) },
-        { $set: { name: name.trim(), updatedAt: new Date() } },
-      );
+      await db
+        .collection("users")
+        .updateOne(
+          { _id: new ObjectId(userId) },
+          { $set: { name: name.trim(), updatedAt: new Date() } },
+        );
     }
 
     // Update profile fields (create profile if it doesn't exist)
@@ -120,7 +150,6 @@ export async function PUT(
           ...(aiExperience !== undefined ? { aiExperience } : {}),
         });
       } else {
-        const { createProfile } = await import("@/lib/models/Profile");
         await createProfile({
           userId,
           ...(skillBackground !== undefined ? { skillBackground } : {}),
@@ -131,14 +160,10 @@ export async function PUT(
 
     // Update registration fields
     if (rolePreference !== undefined || involvement !== undefined) {
-      await updateRegistration(
-        hackathon._id,
-        userId,
-        {
-          ...(involvement !== undefined ? { involvement } : {}),
-          ...(rolePreference !== undefined ? { rolePreference } : {}),
-        },
-      );
+      await updateRegistration(hackathon._id, userId, {
+        ...(involvement !== undefined ? { involvement } : {}),
+        ...(rolePreference !== undefined ? { rolePreference } : {}),
+      });
     }
 
     return NextResponse.json({ success: true });

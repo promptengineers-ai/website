@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import TopNavBar from "@/components/nav/TopNavBar";
 import Loading from "@/components/loaders/Loading";
@@ -38,25 +38,31 @@ export default function HackathonAdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showCreateTeam, setShowCreateTeam] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTabState] = useState<"kanban" | "participants">(() => {
-    if (typeof window !== "undefined" && window.location.hash === "#participants") {
-      return "participants";
-    }
-    return "kanban";
-  });
+  const searchParams = useSearchParams();
+  const activeTab = (
+    searchParams.get("tab") === "participants" ? "participants" : "kanban"
+  ) as "kanban" | "participants";
   const setActiveTab = (tab: "kanban" | "participants") => {
-    setActiveTabState(tab);
-    window.location.hash = tab === "kanban" ? "" : tab;
+    const params = new URLSearchParams(searchParams.toString());
+    if (tab === "kanban") {
+      params.delete("tab");
+    } else {
+      params.set("tab", tab);
+    }
+    router.replace(`?${params.toString()}`, { scroll: false });
   };
-  const [editingParticipant, setEditingParticipant] = useState<Participant | null>(null);
+  const [editingParticipant, setEditingParticipant] =
+    useState<Participant | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const t = Date.now();
       const [hackRes, teamsRes, participantsRes] = await Promise.all([
         fetch(`/api/hackathons/${slug}?_t=${t}`, { cache: "no-store" }),
         fetch(`/api/hackathons/${slug}/teams?_t=${t}`, { cache: "no-store" }),
-        fetch(`/api/hackathons/${slug}/participants?_t=${t}`, { cache: "no-store" }),
+        fetch(`/api/hackathons/${slug}/participants?_t=${t}`, {
+          cache: "no-store",
+        }),
       ]);
 
       if (!hackRes.ok) {
@@ -76,35 +82,33 @@ export default function HackathonAdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug, router]);
 
   // Check admin status
   useEffect(() => {
     if (status === "authenticated" && user) {
       fetch("/api/auth/session")
         .then((r) => r.json())
-        .then(async () => {
-          const res = await fetch(`/api/hackathons/${slug}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
-          });
-          // If PATCH succeeds or returns non-403, user is admin
-          setIsAdmin(res.status !== 403);
-          if (res.status === 403) {
+        .then((data) => {
+          const admin = data.user?.isAdmin || false;
+          setIsAdmin(admin);
+          if (!admin) {
             router.push(`/hackathon/${slug}`);
           }
+        })
+        .catch(() => {
+          router.push(`/login?from=/hackathon/${slug}/admin`);
         });
     } else if (status === "unauthenticated") {
       router.push(`/login?from=/hackathon/${slug}/admin`);
     }
-  }, [status, user]);
+  }, [status, user, slug, router]);
 
   useEffect(() => {
     if (isAdmin) {
       fetchData();
     }
-  }, [isAdmin, slug]);
+  }, [isAdmin, fetchData]);
 
   if (loading || !isAdmin) return <Loading />;
   if (!hackathon) return <Loading />;
@@ -126,8 +130,12 @@ export default function HackathonAdminPage() {
           {/* Header */}
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold sm:text-2xl">{hackathon.name}</h1>
-              <p className="text-xs text-gray-400 sm:text-sm">Admin Dashboard</p>
+              <h1 className="truncate text-lg font-bold sm:text-2xl">
+                {hackathon.name}
+              </h1>
+              <p className="text-xs text-gray-400 sm:text-sm">
+                Admin Dashboard
+              </p>
             </div>
             <div className="flex gap-2">
               <a
@@ -157,7 +165,9 @@ export default function HackathonAdminPage() {
               <div className="text-lg font-bold text-blue-400 sm:text-xl">
                 {participants.length}
               </div>
-              <div className="text-[10px] text-gray-400 sm:text-xs">Registered</div>
+              <div className="text-[10px] text-gray-400 sm:text-xs">
+                Registered
+              </div>
             </div>
             <div className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 sm:px-4 sm:py-3">
               <div className="text-lg font-bold text-purple-400 sm:text-xl">
@@ -169,13 +179,17 @@ export default function HackathonAdminPage() {
               <div className="text-lg font-bold text-green-400 sm:text-xl">
                 {assignedUserIds.size}
               </div>
-              <div className="text-[10px] text-gray-400 sm:text-xs">Assigned</div>
+              <div className="text-[10px] text-gray-400 sm:text-xs">
+                Assigned
+              </div>
             </div>
             <div className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 sm:px-4 sm:py-3">
               <div className="text-lg font-bold text-yellow-400 sm:text-xl">
                 {unassignedParticipants.length}
               </div>
-              <div className="text-[10px] text-gray-400 sm:text-xs">Unassigned</div>
+              <div className="text-[10px] text-gray-400 sm:text-xs">
+                Unassigned
+              </div>
             </div>
           </div>
 
@@ -206,13 +220,13 @@ export default function HackathonAdminPage() {
           {/* Content */}
           {activeTab === "kanban" && (
             <div className="flex min-h-0 flex-1 flex-col">
-            <AdminKanbanBoard
-              hackathon={hackathon}
-              teams={teams}
-              unassignedParticipants={unassignedParticipants}
-              slug={slug}
-              onRefresh={fetchData}
-            />
+              <AdminKanbanBoard
+                hackathon={hackathon}
+                teams={teams}
+                unassignedParticipants={unassignedParticipants}
+                slug={slug}
+                onRefresh={fetchData}
+              />
             </div>
           )}
 
@@ -248,14 +262,28 @@ export default function HackathonAdminPage() {
                   {participants.map((p) => (
                     <tr
                       key={p.userId}
-                      className="cursor-pointer hover:bg-gray-800/50 transition-colors"
+                      className="cursor-pointer transition-colors hover:bg-gray-800/50"
                       onClick={() => setEditingParticipant(p)}
                     >
-                      <td className="max-w-[200px] truncate px-4 py-3 font-medium" title={p.name}>
+                      <td
+                        className="max-w-[200px] truncate px-4 py-3 font-medium"
+                        title={p.name}
+                        aria-label={p.name}
+                      >
                         <span className="flex items-center gap-2">
                           {p.name}
-                          <svg className="h-3 w-3 flex-shrink-0 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          <svg
+                            className="h-3 w-3 flex-shrink-0 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                            />
                           </svg>
                         </span>
                       </td>
@@ -270,13 +298,15 @@ export default function HackathonAdminPage() {
                         {p.rolePreference || "—"}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`rounded-full px-2 py-0.5 text-xs capitalize ${
-                          p.involvement === "mentor"
-                            ? "bg-purple-600/20 text-purple-400"
-                            : p.involvement === "volunteer"
-                              ? "bg-blue-600/20 text-blue-400"
-                              : "bg-gray-600/20 text-gray-400"
-                        }`}>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs capitalize ${
+                            p.involvement === "mentor"
+                              ? "bg-purple-600/20 text-purple-400"
+                              : p.involvement === "volunteer"
+                                ? "bg-blue-600/20 text-blue-400"
+                                : "bg-gray-600/20 text-gray-400"
+                          }`}
+                        >
                           {p.involvement}
                         </span>
                       </td>
