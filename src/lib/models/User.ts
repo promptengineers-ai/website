@@ -13,22 +13,24 @@ export async function createUserIndexes() {
 
 export async function createUser(data: {
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   name: string;
 }): Promise<User> {
   const db = await getDb();
   const collection = db.collection(USERS_COLLECTION);
 
   const now = new Date();
-  const user = {
+  const user: Record<string, unknown> = {
     email: data.email,
-    passwordHash: data.passwordHash,
     name: data.name,
     isAdmin: false,
     emailVerified: false,
     createdAt: now,
     updatedAt: now,
   };
+  if (data.passwordHash) {
+    user.passwordHash = data.passwordHash;
+  }
 
   const result = await collection.insertOne(user);
 
@@ -101,4 +103,37 @@ export async function getUsersByIds(ids: string[]): Promise<Map<string, User>> {
     });
   }
   return map;
+}
+
+export async function createUserForMagicLink(data: {
+  email: string;
+  name: string;
+}): Promise<User> {
+  return createUser({
+    email: data.email,
+    name: data.name,
+  });
+}
+
+export async function updateUserEmailVerified(
+  id: string,
+  verified: boolean,
+): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: { emailVerified: verified, updatedAt: new Date() } },
+  );
+}
+
+export async function updateUserName(id: string, name: string): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: { name, updatedAt: new Date() } },
+  );
 }

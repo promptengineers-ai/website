@@ -23,10 +23,10 @@ const TopNavbar = () => {
     const handleScroll = () => {
       const currentScroll = window.pageYOffset;
       setShowSolidBackground(currentScroll > 50);
-      
+
       // Detect which section is currently in view
       const sections = ["contact"];
-      sections.forEach(section => {
+      sections.forEach((section) => {
         const element = document.getElementById(section);
         if (element) {
           const rect = element.getBoundingClientRect();
@@ -53,10 +53,10 @@ const TopNavbar = () => {
     try {
       await logout();
       setShowUserMenu(false);
-      router.push('/');
+      router.push("/");
       router.refresh();
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -74,8 +74,8 @@ const TopNavbar = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
         className={`fixed left-0 top-0 z-50 w-full transition-all duration-300 ease-in-out ${
-          showSolidBackground 
-            ? "bg-black/90 backdrop-blur-lg shadow-lg shadow-black/20 py-2" 
+          showSolidBackground
+            ? "bg-black/90 py-2 shadow-lg shadow-black/20 backdrop-blur-lg"
             : "bg-transparent py-4"
         }`}
       >
@@ -86,13 +86,13 @@ const TopNavbar = () => {
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <a href="/" className="flex items-center ml-2 gap-3">
-                <span className="text-lg font-bold tracking-tight text-white hover:text-gray-300 transition-colors duration-200">
+              <a href="/" className="ml-2 flex items-center gap-3">
+                <span className="text-lg font-bold tracking-tight text-white transition-colors duration-200 hover:text-gray-300">
                   Prompt Engineers <span className="text-blue-400">AI</span>
                 </span>
               </a>
             </motion.div>
-            
+
             {/* Right side - GitHub link and Auth */}
             <div className="flex items-center gap-4">
               {/* <a
@@ -109,14 +109,16 @@ const TopNavbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 rounded-full bg-gray-800/70 px-3 py-2 text-white hover:bg-gray-700/70 transition-colors duration-200"
+                    className="flex items-center gap-2 rounded-full bg-gray-800/70 px-3 py-2 text-white transition-colors duration-200 hover:bg-gray-700/70"
                   >
                     <FiUser className="text-lg" />
-                    <span className="hidden sm:inline text-sm">{user.name}</span>
+                    <span className="hidden text-sm sm:inline">
+                      {user.name}
+                    </span>
                   </button>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="absolute right-0 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
                       <div className="py-1">
                         <Link
                           href="/profile"
@@ -148,7 +150,7 @@ const TopNavbar = () => {
                         </Link>
                         <button
                           onClick={handleSignOut}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
                         >
                           <span className="flex items-center gap-2">
                             <FiLogOut />
@@ -160,20 +162,12 @@ const TopNavbar = () => {
                   )}
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/login?from=${encodeURIComponent(pathname)}`}
-                    className="rounded-full bg-transparent border border-white/30 text-white px-4 py-2 text-sm font-medium hover:bg-white/10 transition-all duration-200"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href={`/signup?from=${encodeURIComponent(pathname)}`}
-                    className="rounded-full bg-white text-black px-4 py-2 text-sm font-medium hover:bg-gray-200 transition-all duration-200"
-                  >
-                    Register
-                  </Link>
-                </div>
+                <Link
+                  href={`/login?from=${encodeURIComponent(pathname)}`}
+                  className="rounded-full border border-white/30 bg-transparent px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10"
+                >
+                  Login
+                </Link>
               )}
             </div>
 
@@ -187,7 +181,7 @@ const TopNavbar = () => {
             >
               <MdMenu className="h-6 w-6" />
             </motion.button> */}
-            
+
             {/* Desktop menu */}
             {/* <div className="hidden sm:flex items-center space-x-1">
               
@@ -203,7 +197,6 @@ const TopNavbar = () => {
           </div>
         </div>
       </motion.nav>
-      
     </>
   );
 };

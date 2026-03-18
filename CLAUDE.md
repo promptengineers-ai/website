@@ -38,6 +38,11 @@ Utility scripts (run with `npx ts-node --compiler-options '{"module":"commonjs"}
 - Custom JWT auth with HTTP-only cookies (cookie name: `auth-token`)
 - Two JWT libraries: `jose` for Edge Runtime (middleware), `jsonwebtoken` for Node API routes
 - Middleware (`src/middleware.ts`) protects `/profile/*` routes, redirects to `/login?from={path}`
+- **Magic link auth**: parallel login flow via Resend email — users click a link to authenticate (no password required)
+  - `magicLinkTokens` collection with TTL auto-cleanup, SHA-256 hashed tokens, 15-min expiry
+  - Auto-registration: new emails get an account created on first magic link verification
+  - `passwordHash` is optional on User — magic-link-only users have no password
+  - Rate limited: max 3 tokens per email per 15 minutes
 - Auto-refresh: tokens valid 30 days, refreshed when <7 days remain
 - Password hashing: bcryptjs with 12 salt rounds
 
@@ -92,6 +97,9 @@ Optional:
 - `AIRTABLE_API_KEY` — Airtable API key for contact form
 - `BREVO_API_KEY` — Brevo email service key
 - `NEXT_PUBLIC_GA_ID` — Google Analytics 4 measurement ID
+- `RESEND_API_KEY` — Resend API key for magic link emails
+- `RESEND_FROM_EMAIL` — From address for magic link emails (default: `onboarding@resend.dev`)
+- `NEXT_PUBLIC_APP_URL` — Base URL for magic link URLs (e.g. `https://promptengineers.ai`)
 
 ## Testing
 
