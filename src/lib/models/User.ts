@@ -9,6 +9,7 @@ export async function createUserIndexes() {
   const collection = db.collection(USERS_COLLECTION);
 
   await collection.createIndex({ email: 1 }, { unique: true });
+  await collection.createIndex({ verificationToken: 1 }, { sparse: true });
 }
 
 export async function createUser(data: {
@@ -113,6 +114,66 @@ export async function updateUserEmailVerified(
   await collection.updateOne(
     { _id: new ObjectId(id) },
     { $set: { emailVerified: verified, updatedAt: new Date() } },
+  );
+}
+
+export async function setVerificationToken(
+  id: string,
+  token: string,
+  expiry: Date,
+): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        verificationToken: token,
+        verificationTokenExpiry: expiry,
+        updatedAt: new Date(),
+      },
+    },
+  );
+}
+
+export async function getUserByVerificationToken(
+  token: string,
+): Promise<User | null> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+
+  const user = await collection.findOne({
+    verificationToken: token,
+    verificationTokenExpiry: { $gt: new Date() },
+  });
+
+  if (!user) return null;
+
+  return {
+    _id: user._id.toString(),
+    email: user.email,
+    passwordHash: user.passwordHash,
+    name: user.name,
+    isAdmin: user.isAdmin || false,
+    emailVerified: user.emailVerified || false,
+    verificationToken: user.verificationToken,
+    verificationTokenExpiry: user.verificationTokenExpiry
+      ? new Date(user.verificationTokenExpiry)
+      : undefined,
+    createdAt: new Date(user.createdAt),
+    updatedAt: new Date(user.updatedAt),
+  };
+}
+
+export async function clearVerificationToken(id: string): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+  await collection.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: { updatedAt: new Date() },
+      $unset: { verificationToken: "", verificationTokenExpiry: "" },
+    },
   );
 }
 

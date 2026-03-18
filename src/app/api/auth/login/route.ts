@@ -33,6 +33,18 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        {
+          error:
+            "Please verify your email address before signing in. Check your inbox for a verification link.",
+          unverified: true,
+          email: user.email,
+        },
+        { status: 403 },
+      );
+    }
+
     const token = signAuthToken({
       id: user._id,
       email: user.email,

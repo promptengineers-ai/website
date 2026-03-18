@@ -15,14 +15,19 @@ function SignupContent() {
     password: string;
     name?: string;
   }) => {
-    await register({
+    const result = await register({
       email: data.email,
       password: data.password,
       name: data.name || "",
     });
-    const redirectTo = searchParams.get("from") || "/profile";
-    router.push(redirectTo);
-    router.refresh();
+
+    if ("requiresVerification" in result) {
+      router.push("/login?registered=true");
+    } else {
+      const redirectTo = searchParams.get("from") || "/profile";
+      router.push(redirectTo);
+      router.refresh();
+    }
   };
 
   return <AuthForm type="signup" onSubmit={handleSignup} />;
