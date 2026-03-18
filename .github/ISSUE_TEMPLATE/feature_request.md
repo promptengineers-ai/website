@@ -81,11 +81,25 @@ worktree_path: "$WORKSPACE/.worktrees/feat-[issue#]"
 
 ---
 
+## Test Plan (TDD)
+
+> **TDD is the best approach.** Write failing tests _before_ implementation. Tests define the contract; code makes them pass. This order catches misunderstandings early and keeps scope tight.
+
+<!-- List the test files and cases that will be written BEFORE implementation code.
+     Follow existing patterns: Vitest + @testing-library/react, tests in `__tests__/` dirs next to source. -->
+
+| Test File                                             | Case(s)                                   | Validates                |
+| ----------------------------------------------------- | ----------------------------------------- | ------------------------ |
+| _e.g., `src/lib/__tests__/feature.test.ts`_           | _e.g., `creates record with valid input`_ | _e.g., Model CRUD logic_ |
+| _e.g., `src/app/api/feature/__tests__/route.test.ts`_ | _e.g., `returns 401 without auth`_        | _e.g., API auth guard_   |
+
+---
+
 ## Design Principles
 
 - Simplicity is beauty, complexity is pain.
 - _ALWAYS_ look at the current codebase first — achieve the goal in the **least amount of changes**.
-- TDD-first: write tests before implementation.
+- **TDD-first**: write tests _before_ implementation — this is the **best** approach. Red → Green → Refactor.
 - Follow existing patterns: native MongoDB driver (no ORM), Tailwind CSS only, App Router conventions.
 - <!-- Add any feature-specific principles here -->
 
@@ -103,7 +117,8 @@ worktree_path: "$WORKSPACE/.worktrees/feat-[issue#]"
 
 - [ ] Implementation plan is thoroughly documented
 - [ ] `npm run lint` passes
-- [ ] `npm run test` passes (new tests added if applicable)
+- [ ] Tests written **before** implementation (TDD)
+- [ ] `npm run test` passes (new tests required for all new logic)
 - [ ] `npm run build` succeeds
 - [ ] New code follows existing repo patterns (`src/lib/models/` for data, `src/app/api/` for routes, Tailwind for styles)
 - [ ] No new dependencies added beyond what's already in the project (or justified in PR description)
