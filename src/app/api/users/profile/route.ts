@@ -11,7 +11,9 @@ import {
   refreshAuthToken,
   setAuthCookie,
   shouldRefreshToken,
+  signAuthToken,
 } from "@/lib/jwt";
+import { updateUserName } from "@/lib/models/User";
 
 export async function GET() {
   try {
@@ -63,7 +65,23 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { links, background, seeking, isPublic, avatarUrl } = body;
+    const { name, links, background, seeking, isPublic, avatarUrl } = body;
+
+    // Validate name if provided
+    if (name !== undefined) {
+      if (typeof name !== "string" || name.trim().length === 0) {
+        return NextResponse.json(
+          { error: "Name must be a non-empty string" },
+          { status: 400 },
+        );
+      }
+      if (name.length > 100) {
+        return NextResponse.json(
+          { error: "Name must not exceed 100 characters" },
+          { status: 400 },
+        );
+      }
+    }
 
     // Validate URLs if provided
     if (links) {
@@ -133,12 +151,26 @@ export async function POST(request: Request) {
       });
     }
 
+    // Update user name if provided
+    let newToken: string | null = null;
+    if (name !== undefined) {
+      const trimmedName = name.trim();
+      await updateUserName(auth.user.id, trimmedName);
+      newToken = signAuthToken({
+        id: auth.user.id,
+        email: auth.user.email,
+        name: trimmedName,
+      });
+    }
+
     const response = NextResponse.json(
       { message: "Profile saved successfully", profile },
       { status: 200 },
     );
 
-    if (shouldRefreshToken(auth.payload)) {
+    if (newToken) {
+      setAuthCookie(response, newToken);
+    } else if (shouldRefreshToken(auth.payload)) {
       const refreshed = refreshAuthToken(auth.payload);
       setAuthCookie(response, refreshed);
     }

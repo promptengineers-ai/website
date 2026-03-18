@@ -10,7 +10,7 @@ import type { UserProfile } from "@/types";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function EditProfilePage() {
-  const { status } = useAuth();
+  const { status, user, refreshSession } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,6 +56,7 @@ export default function EditProfilePage() {
   }, [status, router, fetchProfile]);
 
   const handleSubmit = async (data: {
+    name: string;
     links: {
       linkedin?: string;
       github?: string;
@@ -121,6 +122,7 @@ export default function EditProfilePage() {
       }
     }
 
+    await refreshSession();
     router.push("/profile");
   };
 
@@ -190,7 +192,11 @@ export default function EditProfilePage() {
           </p>
         </div>
 
-        <ProfileForm profile={profile || undefined} onSubmit={handleSubmit} />
+        <ProfileForm
+          profile={profile || undefined}
+          userName={user?.name}
+          onSubmit={handleSubmit}
+        />
 
         <div className="mt-6 border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
           <div className="md:grid md:grid-cols-3 md:gap-6">

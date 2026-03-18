@@ -2,14 +2,14 @@ import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Montserrat, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import Head from "next/head";
 import InitialLoadActiveUsers from "@/components/users/InitialLoadActiveUsers";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 import { GA_ID, NODE_ENV } from "@/config/app";
 // import { botScript } from "@/config/bot";
 
 // Primary font - Montserrat for clean, minimal UI elements
-const montserrat = Montserrat({ 
+const montserrat = Montserrat({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-montserrat",
@@ -26,7 +26,7 @@ const APP_NAME = "Prompt Engineers AI";
 const APP_DEFAULT_TITLE = "Prompt Engineers AI - Dallas Plano AI Community";
 const APP_TITLE_TEMPLATE = "%s | Prompt Engineers AI";
 const APP_DESCRIPTION =
-  "Join 1,700+ developers and tech enthusiasts in Plano, TX exploring ChatGPT, LLMs, and the future of AI. Monthly meetups focused on prompt engineering, machine learning, and AI development.";
+  "Join 2,450+ developers and tech enthusiasts in Plano, TX exploring ChatGPT, LLMs, and the future of AI. Monthly meetups focused on prompt engineering, machine learning, and AI development.";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: APP_DEFAULT_TITLE,
     // startUpImage: [],
   },
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     "Software Development",
     "Technology",
     "OpenAI",
-    "Langchain"
+    "Langchain",
   ],
   authors: [{ name: "Prompt Engineers AI Community" }],
   creator: "Prompt Engineers AI Community",
@@ -98,15 +98,18 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
 
 export const viewport: Viewport = {
   themeColor: "#000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -114,22 +117,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
-    <html lang="en" className={`${montserrat.variable} ${spaceGrotesk.variable}`}>
-      <Head>
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
-        <meta name="theme-color" content="#000" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1"
-        />
-      </Head>
+    <html
+      lang="en"
+      className={`${montserrat.variable} ${spaceGrotesk.variable}`}
+    >
       <body className="font-montserrat">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
       </body>
       {NODE_ENV === "production" && GA_ID && (
         <>
