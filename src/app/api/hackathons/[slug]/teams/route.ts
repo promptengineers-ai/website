@@ -103,11 +103,11 @@ export async function POST(
       );
     }
 
-    // Validate roles exist in hackathon
+    // Validate slot role names are non-empty
     for (const slot of teamSlots) {
-      if (!hackathon.roles.includes(slot.role)) {
+      if (!slot.role || typeof slot.role !== "string" || !slot.role.trim()) {
         return NextResponse.json(
-          { error: `Role "${slot.role}" is not defined for this hackathon` },
+          { error: "Each slot must have a role name" },
           { status: 400 },
         );
       }

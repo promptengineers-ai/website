@@ -140,12 +140,16 @@ function DroppableSlot({
   index,
   participants,
   onRemove,
+  onRemoveSlot,
+  pendingUserId,
 }: {
   teamId: string;
   slot: EnrichedSlot;
   index: number;
   participants: Participant[];
   onRemove: (teamId: string, userId: string) => void;
+  onRemoveSlot?: (teamId: string, index: number) => void;
+  pendingUserId?: string | null;
 }) {
   const droppableId = `slot-${teamId}-${slot.role}-${index}`;
   const { setNodeRef, isOver } = useDroppable({
@@ -155,12 +159,20 @@ function DroppableSlot({
   });
 
   if (slot.userId) {
+    // Show placeholder for card being moved
+    if (pendingUserId && slot.userId === pendingUserId) {
+      return (
+        <div className="flex items-center gap-2 rounded-lg border border-dashed border-blue-500/30 bg-blue-500/5 px-3 py-2.5">
+          <span className="text-xs text-blue-400 animate-pulse">Moving...</span>
+        </div>
+      );
+    }
+
     const assignedParticipant = participants.find(
       (p) => p.userId === slot.userId,
     );
     const abbrev = ROLE_ABBREV[slot.role] || slot.role.slice(0, 2).toUpperCase();
     const displayName = assignedParticipant?.name || slot.userName || "Unknown";
-
     return (
       <div className="group">
         <div
@@ -189,7 +201,11 @@ function DroppableSlot({
             </span>
           )}
           <button
-            onClick={() => onRemove(teamId, slot.userId!)}
+            onClick={() => {
+              if (confirm(`Remove ${displayName} from this team?`)) {
+                onRemove(teamId, slot.userId!);
+              }
+            }}
             className="flex-shrink-0 rounded p-0.5 text-gray-600 opacity-0 transition-all hover:bg-red-600/20 hover:text-red-400 group-hover:opacity-100"
             title="Remove from team"
           >
@@ -205,7 +221,7 @@ function DroppableSlot({
   return (
     <div
       ref={setNodeRef}
-      className={`flex items-center gap-2 rounded-lg border border-dashed px-3 py-2.5 transition-colors ${
+      className={`group flex items-center gap-2 rounded-lg border border-dashed px-3 py-2.5 transition-colors ${
         isOver
           ? "border-blue-500 bg-blue-500/10"
           : "border-gray-600 bg-gray-800/30"
@@ -216,9 +232,24 @@ function DroppableSlot({
       ) : (
         <span className="h-2 w-2 flex-shrink-0 rounded-full border border-gray-500" />
       )}
-      <span className="text-xs text-gray-400">
+      <span className="flex-1 text-xs text-gray-400">
         {isOver ? `Drop to assign as ${slot.role}` : slot.role}
       </span>
+      {onRemoveSlot && (
+        <button
+          onClick={() => {
+            if (confirm(`Remove the "${slot.role}" slot from this team?`)) {
+              onRemoveSlot(teamId, index);
+            }
+          }}
+          className="flex-shrink-0 rounded p-0.5 text-gray-600 opacity-0 transition-all hover:bg-red-600/20 hover:text-red-400 group-hover:opacity-100"
+          title="Remove slot"
+        >
+          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
@@ -232,6 +263,7 @@ function SortableTeamColumn({
   onRefresh,
   onDeleteTeam,
   onRemoveMember,
+  pendingMoveUserId,
 }: {
   team: EnrichedTeam;
   hackathon: Hackathon;
@@ -240,11 +272,13 @@ function SortableTeamColumn({
   onRefresh: () => void;
   onDeleteTeam: (id: string) => void;
   onRemoveMember: (teamId: string, userId: string) => void;
+  pendingMoveUserId: string | null;
 }) {
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(team.name);
   const [editDesc, setEditDesc] = useState(team.description || "");
   const [saving, setSaving] = useState(false);
+  const [customRole, setCustomRole] = useState("");
 
   const columnId = `column-${team._id}`;
 
@@ -326,6 +360,105 @@ function SortableTeamColumn({
               placeholder="Description"
               className="w-full rounded border border-gray-600 bg-gray-800 px-2 py-1 text-xs text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
             />
+
+            {/* Add slot controls */}
+            <div className="border-t border-gray-700 pt-2">
+              <div className="mb-1 text-[10px] font-medium text-gray-400">Add position:</div>
+              <div className="flex flex-wrap gap-1">
+                {hackathon.roles
+                  .filter((r) => !team.slots.some((s) => s.role === r && !s.userId))
+                  .map((role) => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={async () => {
+                        const newSlots = [
+                          ...team.slots.map((s) => ({
+                            role: s.role,
+                            userId: s.userId || undefined,
+                            required: s.required,
+                          })),
+                          { role, required: false },
+                        ];
+                        setSaving(true);
+                        await fetch(`/api/hackathons/${slug}/teams/${team._id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ slots: newSlots }),
+                        });
+                        setSaving(false);
+                        onRefresh();
+                      }}
+                      className="rounded bg-gray-700 px-1.5 py-0.5 text-[10px] text-gray-300 hover:bg-gray-600"
+                    >
+                      + {ROLE_ABBREV[role] || role.slice(0, 2)}
+                    </button>
+                  ))}
+              </div>
+              {/* Custom role input */}
+              <div className="mt-1 flex gap-1">
+                <input
+                  type="text"
+                  value={customRole}
+                  onChange={(e) => setCustomRole(e.target.value)}
+                  placeholder="Custom role..."
+                  className="min-w-0 flex-1 rounded border border-gray-600 bg-gray-800 px-1.5 py-0.5 text-[10px] text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && customRole.trim()) {
+                      e.preventDefault();
+                      const addCustom = async () => {
+                        const newSlots = [
+                          ...team.slots.map((s) => ({
+                            role: s.role,
+                            userId: s.userId || undefined,
+                            required: s.required,
+                          })),
+                          { role: customRole.trim(), required: false },
+                        ];
+                        setSaving(true);
+                        await fetch(`/api/hackathons/${slug}/teams/${team._id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ slots: newSlots }),
+                        });
+                        setCustomRole("");
+                        setSaving(false);
+                        onRefresh();
+                      };
+                      addCustom();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={!customRole.trim() || saving}
+                  onClick={async () => {
+                    if (!customRole.trim()) return;
+                    const newSlots = [
+                      ...team.slots.map((s) => ({
+                        role: s.role,
+                        userId: s.userId || undefined,
+                        required: s.required,
+                      })),
+                      { role: customRole.trim(), required: false },
+                    ];
+                    setSaving(true);
+                    await fetch(`/api/hackathons/${slug}/teams/${team._id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ slots: newSlots }),
+                    });
+                    setCustomRole("");
+                    setSaving(false);
+                    onRefresh();
+                  }}
+                  className="rounded bg-blue-600 px-1.5 py-0.5 text-[10px] hover:bg-blue-700 disabled:opacity-50"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
             <div className="flex gap-1">
               <button
                 onClick={handleSaveEdit}
@@ -339,6 +472,7 @@ function SortableTeamColumn({
                   setEditing(false);
                   setEditName(team.name);
                   setEditDesc(team.description || "");
+                  setCustomRole("");
                 }}
                 className="rounded bg-gray-700 px-2 py-0.5 text-xs hover:bg-gray-600"
               >
@@ -418,6 +552,22 @@ function SortableTeamColumn({
             index={idx}
             participants={allParticipants}
             onRemove={onRemoveMember}
+            pendingUserId={pendingMoveUserId}
+            onRemoveSlot={async (tId, slotIdx) => {
+              const newSlots = team.slots
+                .filter((_, i) => i !== slotIdx)
+                .map((s) => ({
+                  role: s.role,
+                  userId: s.userId || undefined,
+                  required: s.required,
+                }));
+              await fetch(`/api/hackathons/${slug}/teams/${tId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ slots: newSlots }),
+              });
+              onRefresh();
+            }}
           />
         ))}
       </div>
@@ -441,6 +591,7 @@ export default function AdminKanbanBoard({
     teamName?: string;
   } | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [pendingMoveUserId, setPendingMoveUserId] = useState<string | null>(null);
   const [teamOrder, setTeamOrder] = useState<string[]>(
     teams.map((t) => t._id),
   );
@@ -590,7 +741,9 @@ export default function AdminKanbanBoard({
     // Dropped on unassigned zone
     if (overData?.zone === "unassigned" || over.id === "unassigned-zone") {
       if (sourceTeamId) {
+        setPendingMoveUserId(participant.userId);
         await handleRemoveMember(sourceTeamId, participant.userId);
+        setPendingMoveUserId(null);
       }
       return;
     }
@@ -615,6 +768,8 @@ export default function AdminKanbanBoard({
     // Same team, same role — no-op
     if (sourceTeamId === targetTeamId && dragData.sourceRole === targetRole) return;
 
+    // Hide the card during the move to prevent snap-back visual
+    setPendingMoveUserId(participant.userId);
     setProcessing(true);
     try {
       if (sourceTeamId === targetTeamId) {
@@ -672,11 +827,12 @@ export default function AdminKanbanBoard({
         }
       }
 
-      onRefresh();
+      await onRefresh();
     } catch (error) {
       console.error("Move error:", error);
     } finally {
       setProcessing(false);
+      setPendingMoveUserId(null);
     }
   };
 
@@ -765,13 +921,15 @@ export default function AdminKanbanBoard({
             </div>
           )}
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
-            {unassignedParticipants.map((p) => (
-              <DraggableCard
-                key={p.userId}
-                id={`participant-${p.userId}`}
-                participant={p}
-              />
-            ))}
+            {unassignedParticipants
+              .filter((p) => p.userId !== pendingMoveUserId)
+              .map((p) => (
+                <DraggableCard
+                  key={p.userId}
+                  id={`participant-${p.userId}`}
+                  participant={p}
+                />
+              ))}
             {unassignedParticipants.length === 0 && !isOverUnassigned && (
               <div className="py-4 text-center text-xs text-gray-500">
                 All participants assigned
@@ -795,6 +953,7 @@ export default function AdminKanbanBoard({
               onRefresh={onRefresh}
               onDeleteTeam={handleDeleteTeam}
               onRemoveMember={handleRemoveMember}
+              pendingMoveUserId={pendingMoveUserId}
             />
           ))}
         </SortableContext>
