@@ -1,14 +1,25 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FiMail } from "react-icons/fi";
+
+const REMEMBERED_EMAIL_KEY = "remembered-email";
 
 export default function MagicLinkForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(REMEMBERED_EMAIL_KEY);
+    if (saved) {
+      setEmail(saved);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,6 +37,12 @@ export default function MagicLinkForm() {
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to send magic link");
+      }
+
+      if (rememberMe) {
+        localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
+      } else {
+        localStorage.removeItem(REMEMBERED_EMAIL_KEY);
       }
 
       router.push(`/auth/magic-link/sent?email=${encodeURIComponent(email)}`);
@@ -60,6 +77,20 @@ export default function MagicLinkForm() {
             className="relative block w-full appearance-none rounded-md border border-gray-700 bg-gray-900 px-3 py-3 text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
             placeholder="Email address"
           />
+        </div>
+
+        <div className="flex items-center">
+          <input
+            id="remember-me"
+            name="remember-me"
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-600 bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+          />
+          <label htmlFor="remember-me" className="ml-2 text-sm text-gray-400">
+            Remember my email
+          </label>
         </div>
 
         {error && (
