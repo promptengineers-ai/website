@@ -30,7 +30,10 @@ export async function POST(
     }
 
     // Check team lock
-    if (hackathon.teamLockDate && new Date() > hackathon.teamLockDate) {
+    if (
+      hackathon.teamsLocked ||
+      (hackathon.teamLockDate && new Date() > hackathon.teamLockDate)
+    ) {
       return NextResponse.json(
         { error: "Teams are locked and can no longer be modified" },
         { status: 400 },

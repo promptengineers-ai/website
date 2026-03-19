@@ -50,4 +50,4 @@ public/workbox-*.js
 **/openspec/
 **/AGENTS.md
 **/CLAUDE.md
-# .claude/
+.claude/

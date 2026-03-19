@@ -133,6 +133,7 @@ export type Hackathon = {
   requiredRoles: HackathonRole[];
   registrationDeadline?: Date;
   teamLockDate?: Date;
+  teamsLocked: boolean;
   status: HackathonStatus;
   createdBy: string;
   createdAt: Date;

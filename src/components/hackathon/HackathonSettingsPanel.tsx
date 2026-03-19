@@ -25,6 +25,7 @@ export default function HackathonSettingsPanel({
   );
   const [maxTeamSize, setMaxTeamSize] = useState(hackathon.maxTeamSize);
   const [status, setStatus] = useState<HackathonStatus>(hackathon.status);
+  const [teamsLocked, setTeamsLocked] = useState(hackathon.teamsLocked);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -46,6 +47,7 @@ export default function HackathonSettingsPanel({
           date: new Date(date),
           maxTeamSize,
           status,
+          teamsLocked,
         }),
       });
 
@@ -172,6 +174,31 @@ export default function HackathonSettingsPanel({
                   <option value="completed">Completed</option>
                 </select>
               </div>
+            </div>
+
+            {/* Teams Lock Toggle */}
+            <div className="flex items-center justify-between rounded-lg border border-gray-700 bg-gray-800/50 px-4 py-3">
+              <div>
+                <div className="text-sm font-medium text-gray-300">
+                  Lock Teams
+                </div>
+                <div className="text-xs text-gray-500">
+                  Prevents participants from joining or leaving teams
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTeamsLocked(!teamsLocked)}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+                  teamsLocked ? "bg-red-500" : "bg-gray-600"
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${
+                    teamsLocked ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
             </div>
 
             {error && (

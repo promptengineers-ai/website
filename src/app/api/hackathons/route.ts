@@ -1,15 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { parseJsonBody, validateDate } from "@/lib/validation";
-import { createHackathon, getActiveHackathon } from "@/lib/models/Hackathon";
+import {
+  createHackathon,
+  getActiveHackathon,
+  getAllHackathons,
+} from "@/lib/models/Hackathon";
 import { initializeDatabase } from "@/lib/initDb";
 import { HACKATHON_ROLES } from "@/types";
 import type { HackathonRole } from "@/types";
 
-// GET /api/hackathons - Get the active hackathon
-export async function GET() {
+// GET /api/hackathons - Get the active hackathon, or all hackathons if ?all=true (admin only)
+export async function GET(request: NextRequest) {
   try {
     await initializeDatabase();
+
+    const { searchParams } = new URL(request.url);
+    if (searchParams.get("all") === "true") {
+      const authResult = await requireAdmin(request);
+      if (!authResult.ok) return authResult.response;
+
+      const hackathons = await getAllHackathons();
+      return NextResponse.json({ hackathons });
+    }
 
     const hackathon = await getActiveHackathon();
 

@@ -47,9 +47,9 @@ export default function HackathonRegistrationForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           involvement,
-          rolePreference: rolePreference || undefined,
-          skillBackground: skillBackground || undefined,
-          aiExperience: aiExperience || undefined,
+          rolePreference,
+          skillBackground,
+          aiExperience,
         }),
       });
 
@@ -132,6 +132,7 @@ export default function HackathonRegistrationForm({
                 onChange={(e) =>
                   setSkillBackground(e.target.value as SkillBackground)
                 }
+                required
                 className="w-full rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none"
               >
                 <option value="">Select your background</option>
@@ -153,6 +154,7 @@ export default function HackathonRegistrationForm({
                 onChange={(e) =>
                   setAiExperience(e.target.value as AiExperience)
                 }
+                required
                 className="w-full rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none"
               >
                 <option value="">Select your experience</option>
@@ -167,16 +169,17 @@ export default function HackathonRegistrationForm({
             {/* Role Preference */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-300">
-                Preferred role (optional)
+                Preferred role
               </label>
               <select
                 value={rolePreference}
                 onChange={(e) =>
                   setRolePreference(e.target.value as HackathonRole)
                 }
+                required
                 className="w-full rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none"
               >
-                <option value="">No preference</option>
+                <option value="">Select your preferred role</option>
                 {hackathon.roles.map((role) => (
                   <option key={role} value={role}>
                     {role}

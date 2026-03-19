@@ -70,9 +70,9 @@ export async function POST(
         aiExperience?: string;
       };
 
-    if (!involvement) {
+    if (!involvement || !rolePreference || !skillBackground || !aiExperience) {
       return NextResponse.json(
-        { error: "involvement is required" },
+        { error: "All fields are required: involvement, rolePreference, skillBackground, aiExperience" },
         { status: 400 },
       );
     }

@@ -29,6 +29,7 @@ function docToHackathon(doc: Record<string, unknown>): Hackathon {
     teamLockDate: doc.teamLockDate
       ? new Date(doc.teamLockDate as string | Date)
       : undefined,
+    teamsLocked: (doc.teamsLocked as boolean) || false,
     status: doc.status as HackathonStatus,
     createdBy: (doc.createdBy as ObjectId).toString(),
     createdAt: new Date(doc.createdAt as string | Date),
@@ -111,6 +112,16 @@ export async function getActiveHackathon(): Promise<Hackathon | null> {
   return docToHackathon(doc as unknown as Record<string, unknown>);
 }
 
+export async function getAllHackathons(): Promise<Hackathon[]> {
+  const db = await getDb();
+  const collection = db.collection(HACKATHONS_COLLECTION);
+
+  const docs = await collection.find({}).sort({ date: -1 }).toArray();
+  return docs.map((doc) =>
+    docToHackathon(doc as unknown as Record<string, unknown>),
+  );
+}
+
 export async function updateHackathon(
   id: string,
   data: Partial<{
@@ -123,6 +134,7 @@ export async function updateHackathon(
     requiredRoles: HackathonRole[];
     registrationDeadline: Date | null;
     teamLockDate: Date | null;
+    teamsLocked: boolean;
     status: HackathonStatus;
   }>,
 ): Promise<Hackathon | null> {
