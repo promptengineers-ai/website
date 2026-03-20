@@ -2,19 +2,13 @@
 
 import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import {
-  SKILL_BACKGROUNDS,
-  AI_EXPERIENCE_LEVELS,
-  HACKATHON_ROLES,
-} from "@/types";
-import type { HackathonRole, SkillBackground, AiExperience } from "@/types";
+import { SKILL_BACKGROUNDS, AI_EXPERIENCE_LEVELS } from "@/types";
 
 interface Participant {
   userId: string;
   name: string;
   email?: string;
   involvement: string;
-  rolePreference?: string;
   skillBackground?: string | null;
   aiExperience?: string | null;
 }
@@ -41,9 +35,6 @@ export default function EditParticipantModal({
   const [aiExperience, setAiExperience] = useState(
     participant.aiExperience || "",
   );
-  const [rolePreference, setRolePreference] = useState(
-    participant.rolePreference || "",
-  );
   const [involvement, setInvolvement] = useState(participant.involvement);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -61,7 +52,6 @@ export default function EditParticipantModal({
         name: name.trim(),
         skillBackground,
         aiExperience,
-        rolePreference: rolePreference || null,
         involvement,
       };
 
@@ -193,24 +183,6 @@ export default function EditParticipantModal({
                 {AI_EXPERIENCE_LEVELS.map((level) => (
                   <option key={level} value={level}>
                     {level}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-300">
-                Role Preference
-              </label>
-              <select
-                value={rolePreference}
-                onChange={(e) => setRolePreference(e.target.value)}
-                className="w-full rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none"
-              >
-                <option value="">No preference</option>
-                {HACKATHON_ROLES.map((role) => (
-                  <option key={role} value={role}>
-                    {role}
                   </option>
                 ))}
               </select>

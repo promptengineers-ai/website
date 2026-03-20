@@ -85,7 +85,6 @@ export default function HackathonLandingPage() {
           hackathonId: hackathon._id,
           userId: user.id,
           involvement: myReg.involvement,
-          rolePreference: myReg.rolePreference,
           registeredAt: new Date(myReg.registeredAt),
         });
       }

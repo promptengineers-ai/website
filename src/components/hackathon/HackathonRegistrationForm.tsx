@@ -2,15 +2,10 @@
 
 import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import {
-  SKILL_BACKGROUNDS,
-  AI_EXPERIENCE_LEVELS,
-  HACKATHON_ROLES,
-} from "@/types";
+import { SKILL_BACKGROUNDS, AI_EXPERIENCE_LEVELS } from "@/types";
 import type {
   Hackathon,
   HackathonInvolvement,
-  HackathonRole,
   SkillBackground,
   AiExperience,
 } from "@/types";
@@ -28,7 +23,6 @@ export default function HackathonRegistrationForm({
 }: Props) {
   const [involvement, setInvolvement] =
     useState<HackathonInvolvement>("participant");
-  const [rolePreference, setRolePreference] = useState<HackathonRole | "">("");
   const [skillBackground, setSkillBackground] = useState<SkillBackground | "">(
     "",
   );
@@ -47,7 +41,6 @@ export default function HackathonRegistrationForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           involvement,
-          rolePreference,
           skillBackground,
           aiExperience,
         }),
@@ -161,28 +154,6 @@ export default function HackathonRegistrationForm({
                 {AI_EXPERIENCE_LEVELS.map((level) => (
                   <option key={level} value={level}>
                     {level}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Role Preference */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300">
-                Preferred role
-              </label>
-              <select
-                value={rolePreference}
-                onChange={(e) =>
-                  setRolePreference(e.target.value as HackathonRole)
-                }
-                required
-                className="w-full rounded-lg border border-gray-600 bg-gray-800 px-4 py-2.5 text-white focus:border-blue-500 focus:outline-none"
-              >
-                <option value="">Select your preferred role</option>
-                {hackathon.roles.map((role) => (
-                  <option key={role} value={role}>
-                    {role}
                   </option>
                 ))}
               </select>
