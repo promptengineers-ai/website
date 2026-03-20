@@ -366,7 +366,7 @@ function SortableTeamColumn({
         setDropRef(node);
       }}
       style={style}
-      className={`flex w-[85vw] flex-shrink-0 flex-col rounded-xl border p-4 transition-colors sm:w-72 ${
+      className={`flex min-h-0 w-[85vw] flex-shrink-0 flex-col rounded-xl border p-4 transition-colors sm:w-72 ${
         isOver ? "border-blue-500 bg-blue-500/5" : "border-gray-700 bg-gray-900"
       }`}
     >
@@ -581,7 +581,7 @@ function SortableTeamColumn({
       </div>
 
       {/* Slots */}
-      <div className="space-y-2">
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto scrollbar-none">
         {team.slots.map((slot, idx) => (
           <DroppableSlot
             key={`${slot.role}-${idx}`}
@@ -802,6 +802,7 @@ export default function AdminKanbanBoard({
     const overData = over.data.current as {
       teamId?: string;
       role?: string;
+      index?: number;
       zone?: string;
     };
 
@@ -815,25 +816,32 @@ export default function AdminKanbanBoard({
       return;
     }
 
-    // Determine target team and role
+    // Determine target team, role, and slot index
     let targetTeamId: string | undefined;
-    let targetRole: string | undefined;
+    let targetSlotIndex: number | undefined;
 
-    if (overData?.role) {
+    if (overData?.role != null && overData.index != null) {
       targetTeamId = overData.teamId;
-      targetRole = overData.role;
+      targetSlotIndex = overData.index;
     } else if (over.id.toString().startsWith("team-")) {
       targetTeamId = over.id.toString().replace("team-", "");
       const team = teams.find((t) => t._id === targetTeamId);
-      const openSlot = team?.slots.find((s) => !s.userId);
-      if (!openSlot) return;
-      targetRole = openSlot.role;
+      const firstOpenIndex = team?.slots.findIndex((s) => !s.userId);
+      if (firstOpenIndex == null || firstOpenIndex === -1) return;
+      targetSlotIndex = firstOpenIndex;
     }
 
-    if (!targetTeamId || !targetRole) return;
+    if (!targetTeamId || targetSlotIndex == null) return;
 
-    // Same team, same role — no-op
-    if (sourceTeamId === targetTeamId && dragData.sourceRole === targetRole)
+    // Find the source slot index for same-team no-op check
+    const sourceSlotIndex = sourceTeamId
+      ? teams
+          .find((t) => t._id === sourceTeamId)
+          ?.slots.findIndex((s) => s.userId === participant.userId)
+      : undefined;
+
+    // Same team, same slot — no-op
+    if (sourceTeamId === targetTeamId && sourceSlotIndex === targetSlotIndex)
       return;
 
     // Hide the card during the move to prevent snap-back visual
@@ -844,17 +852,13 @@ export default function AdminKanbanBoard({
         // Moving within the same team (role swap)
         const team = teams.find((t) => t._id === sourceTeamId);
         if (team) {
-          let removed = false;
-          let assigned = false;
-          const newSlots = team.slots.map((s) => {
+          const newSlots = team.slots.map((s, i) => {
             // Remove from old slot
-            if (s.userId === participant.userId && !removed) {
-              removed = true;
+            if (i === sourceSlotIndex) {
               return { ...s, userId: undefined, userName: null };
             }
-            // Assign to new slot
-            if (s.role === targetRole && !s.userId && !assigned) {
-              assigned = true;
+            // Assign to target slot
+            if (i === targetSlotIndex) {
               return {
                 ...s,
                 userId: participant.userId,
@@ -880,13 +884,11 @@ export default function AdminKanbanBoard({
           }
         }
 
-        // Assign to target team
+        // Assign to target team by index
         const targetTeam = teams.find((t) => t._id === targetTeamId);
         if (targetTeam) {
-          let filled = false;
-          const targetSlots = targetTeam.slots.map((s) => {
-            if (s.role === targetRole && !s.userId && !filled) {
-              filled = true;
+          const targetSlots = targetTeam.slots.map((s, i) => {
+            if (i === targetSlotIndex && !s.userId) {
               return {
                 ...s,
                 userId: participant.userId,
@@ -1004,7 +1006,7 @@ export default function AdminKanbanBoard({
               Drop to unassign
             </div>
           )}
-          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto scrollbar-none">
             {unassignedParticipants
               .filter((p) => p.userId !== pendingMoveUserId)
               .map((p) => (
