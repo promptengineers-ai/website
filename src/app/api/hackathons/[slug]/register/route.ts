@@ -62,17 +62,18 @@ export async function POST(
     const parsed = await parseJsonBody(request);
     if (!parsed.ok) return parsed.response;
     const body = parsed.data;
-    const { involvement, rolePreference, skillBackground, aiExperience } =
-      body as {
-        involvement?: string;
-        rolePreference?: string;
-        skillBackground?: string;
-        aiExperience?: string;
-      };
+    const { involvement, skillBackground, aiExperience } = body as {
+      involvement?: string;
+      skillBackground?: string;
+      aiExperience?: string;
+    };
 
-    if (!involvement || !rolePreference || !skillBackground || !aiExperience) {
+    if (!involvement || !skillBackground || !aiExperience) {
       return NextResponse.json(
-        { error: "All fields are required: involvement, rolePreference, skillBackground, aiExperience" },
+        {
+          error:
+            "All fields are required: involvement, skillBackground, aiExperience",
+        },
         { status: 400 },
       );
     }
@@ -82,7 +83,6 @@ export async function POST(
       hackathonId: hackathon._id,
       userId: auth.user.id,
       involvement: involvement as HackathonInvolvement,
-      rolePreference: rolePreference as HackathonRole | undefined,
     });
 
     // Update profile with hackathon fields, badge, and make public

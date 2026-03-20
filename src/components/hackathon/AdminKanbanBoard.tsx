@@ -33,7 +33,6 @@ interface Participant {
   name: string;
   email?: string;
   involvement: string;
-  rolePreference?: string;
   skillBackground?: string | null;
   aiExperience?: string | null;
 }
@@ -81,9 +80,8 @@ function DraggableCard({
     );
   }
 
-  const prefAbbrev = participant.rolePreference
-    ? ROLE_ABBREV[participant.rolePreference] ||
-      participant.rolePreference.slice(0, 2).toUpperCase()
+  const skillRole = participant.skillBackground
+    ? SKILL_ABBREV[participant.skillBackground] || null
     : null;
 
   return (
@@ -97,12 +95,12 @@ function DraggableCard({
           : "border-blue-500/30 bg-blue-500/5 hover:border-blue-500/50"
       }`}
     >
-      {prefAbbrev ? (
+      {skillRole ? (
         <span
           className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-[9px] font-bold text-blue-400"
-          title={`Wants: ${participant.rolePreference}`}
+          title={`Background: ${participant.skillBackground}`}
         >
-          {prefAbbrev}
+          {skillRole}
         </span>
       ) : (
         <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-500 text-[9px] text-gray-500">
@@ -133,6 +131,16 @@ const ROLE_ABBREV: Record<string, string> = {
   "Backend Engineer": "BE",
   "Frontend Developer": "FE",
   Flex: "FX",
+};
+
+const SKILL_ABBREV: Record<string, string> = {
+  "Frontend development": "FE",
+  "Backend development": "BE",
+  "Data / Machine Learning / AI": "AI",
+  "Design / UX": "UX",
+  "Product Management": "PM",
+  "DevOps / Infrastructure": "BE",
+  "Non-technical (learning AI tools)": "FX",
 };
 
 // Droppable slot inside a team column
@@ -581,7 +589,7 @@ function SortableTeamColumn({
       </div>
 
       {/* Slots */}
-      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto scrollbar-none">
+      <div className="scrollbar-none min-h-0 flex-1 space-y-2 overflow-y-auto">
         {team.slots.map((slot, idx) => (
           <DroppableSlot
             key={`${slot.role}-${idx}`}
@@ -960,30 +968,72 @@ export default function AdminKanbanBoard({
                 ({unassignedParticipants.length})
               </span>
             </h3>
-            {unassignedParticipants.length > 0 && (
+            <div className="flex gap-1">
+              {unassignedParticipants.length > 0 && (
+                <button
+                  onClick={() => {
+                    if (processing) return;
+                    showConfirm({
+                      title: "Auto-Assign Participants",
+                      message: `Auto-assign ${unassignedParticipants.length} participants to teams based on their role preferences?`,
+                      onConfirm: async () => {
+                        setConfirmState((prev) => ({ ...prev, open: false }));
+                        setProcessing(true);
+                        try {
+                          const res = await fetch(
+                            `/api/hackathons/${slug}/teams/auto-assign`,
+                            { method: "POST" },
+                          );
+                          const data = await res.json();
+                          if (res.ok) {
+                            toast(
+                              `${data.assigned} assigned${data.teamsCreated ? `, ${data.teamsCreated} new team(s) created` : ""}`,
+                              "success",
+                            );
+                            onRefresh();
+                          } else {
+                            toast(data.error || "Auto-assign failed", "error");
+                          }
+                        } catch {
+                          toast("Something went wrong", "error");
+                        } finally {
+                          setProcessing(false);
+                        }
+                      },
+                    });
+                  }}
+                  disabled={processing}
+                  className="rounded bg-green-600 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-green-700 disabled:opacity-50"
+                  title="Auto-assign all unassigned participants to teams based on their role preferences"
+                >
+                  &#9889; Auto
+                </button>
+              )}
               <button
                 onClick={() => {
                   if (processing) return;
                   showConfirm({
-                    title: "Auto-Assign Participants",
-                    message: `Auto-assign ${unassignedParticipants.length} participants to teams based on their role preferences?`,
+                    title: "Reset All Assignments",
+                    message:
+                      "Remove all participants from their teams? They will be moved back to unassigned.",
+                    variant: "danger",
                     onConfirm: async () => {
                       setConfirmState((prev) => ({ ...prev, open: false }));
                       setProcessing(true);
                       try {
                         const res = await fetch(
-                          `/api/hackathons/${slug}/teams/auto-assign`,
+                          `/api/hackathons/${slug}/teams/reset-assignments`,
                           { method: "POST" },
                         );
                         const data = await res.json();
                         if (res.ok) {
                           toast(
-                            `${data.assigned} assigned${data.teamsCreated ? `, ${data.teamsCreated} new team(s) created` : ""}`,
+                            `${data.cleared} assignments cleared`,
                             "success",
                           );
                           onRefresh();
                         } else {
-                          toast(data.error || "Auto-assign failed", "error");
+                          toast(data.error || "Reset failed", "error");
                         }
                       } catch {
                         toast("Something went wrong", "error");
@@ -994,19 +1044,19 @@ export default function AdminKanbanBoard({
                   });
                 }}
                 disabled={processing}
-                className="rounded bg-green-600 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-green-700 disabled:opacity-50"
-                title="Auto-assign all unassigned participants to teams based on their role preferences"
+                className="rounded bg-gray-700 px-2 py-1 text-[10px] font-medium text-gray-300 transition-colors hover:bg-red-600/20 hover:text-red-400 disabled:opacity-50"
+                title="Remove all participants from teams"
               >
-                &#9889; Auto
+                Reset
               </button>
-            )}
+            </div>
           </div>
           {isOverUnassigned && activeDragData?.sourceTeamId && (
             <div className="mb-2 rounded-lg border border-dashed border-yellow-500 bg-yellow-500/10 px-3 py-2 text-center text-xs text-yellow-400">
               Drop to unassign
             </div>
           )}
-          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto scrollbar-none">
+          <div className="scrollbar-none min-h-0 flex-1 space-y-2 overflow-y-auto">
             {unassignedParticipants
               .filter((p) => p.userId !== pendingMoveUserId)
               .map((p) => (

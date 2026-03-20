@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import TopNavBar from "@/components/nav/TopNavBar";
@@ -19,7 +19,6 @@ interface Participant {
   name: string;
   email?: string;
   involvement: string;
-  rolePreference?: string;
   skillBackground?: string | null;
   aiExperience?: string | null;
   avatarUrl?: string | null;
@@ -53,6 +52,16 @@ export default function HackathonAdminPage() {
   };
   const [editingParticipant, setEditingParticipant] =
     useState<Participant | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortField, setSortField] = useState<
+    | "name"
+    | "email"
+    | "skillBackground"
+    | "aiExperience"
+    | "involvement"
+    | "status"
+  >("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const fetchData = useCallback(async () => {
     try {
@@ -120,6 +129,73 @@ export default function HackathonAdminPage() {
   const unassignedParticipants = participants.filter(
     (p) => !assignedUserIds.has(p.userId),
   );
+
+  // Filter and sort participants for the list view
+  const query = searchQuery.toLowerCase();
+  const filteredParticipants = participants
+    .filter((p) => {
+      if (!query) return true;
+      return (
+        p.name.toLowerCase().includes(query) ||
+        (p.email && p.email.toLowerCase().includes(query)) ||
+        (p.skillBackground &&
+          p.skillBackground.toLowerCase().includes(query)) ||
+        (p.aiExperience && p.aiExperience.toLowerCase().includes(query)) ||
+        p.involvement.toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => {
+      let aVal = "";
+      let bVal = "";
+
+      switch (sortField) {
+        case "name":
+          aVal = a.name;
+          bVal = b.name;
+          break;
+        case "email":
+          aVal = a.email || "";
+          bVal = b.email || "";
+          break;
+        case "skillBackground":
+          aVal = a.skillBackground || "";
+          bVal = b.skillBackground || "";
+          break;
+        case "aiExperience":
+          aVal = a.aiExperience || "";
+          bVal = b.aiExperience || "";
+          break;
+        case "involvement":
+          aVal = a.involvement;
+          bVal = b.involvement;
+          break;
+        case "status":
+          aVal = assignedUserIds.has(a.userId) ? "assigned" : "unassigned";
+          bVal = assignedUserIds.has(b.userId) ? "assigned" : "unassigned";
+          break;
+      }
+
+      const cmp = aVal.localeCompare(bVal);
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+
+  const handleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDir("asc");
+    }
+  };
+
+  const SortIcon = ({ field }: { field: typeof sortField }) => {
+    if (sortField !== field) return null;
+    return (
+      <span className="ml-1 text-blue-400">
+        {sortDir === "asc" ? "↑" : "↓"}
+      </span>
+    );
+  };
 
   return (
     <div className="flex h-screen flex-col bg-black text-white">
@@ -231,105 +307,177 @@ export default function HackathonAdminPage() {
           )}
 
           {activeTab === "participants" && (
-            <div className="overflow-x-auto rounded-lg border border-gray-700">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-gray-700 bg-gray-900">
-                  <tr>
-                    <th className="px-4 py-3 font-medium text-gray-300">
-                      Name
-                    </th>
-                    <th className="px-4 py-3 font-medium text-gray-300">
-                      Email
-                    </th>
-                    <th className="px-4 py-3 font-medium text-gray-300">
-                      Background
-                    </th>
-                    <th className="px-4 py-3 font-medium text-gray-300">
-                      Experience
-                    </th>
-                    <th className="px-4 py-3 font-medium text-gray-300">
-                      Role Pref
-                    </th>
-                    <th className="px-4 py-3 font-medium text-gray-300">
-                      Involvement
-                    </th>
-                    <th className="px-4 py-3 font-medium text-gray-300">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-800">
-                  {participants.map((p) => (
-                    <tr
-                      key={p.userId}
-                      className="cursor-pointer transition-colors hover:bg-gray-800/50"
-                      onClick={() => setEditingParticipant(p)}
+            <div className="flex min-h-0 flex-1 flex-col">
+              {/* Search bar */}
+              <div className="mb-3 flex items-center gap-3">
+                <div className="relative flex-1">
+                  <svg
+                    className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by name, email, background..."
+                    className="w-full rounded-lg border border-gray-700 bg-gray-900 py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
                     >
-                      <td
-                        className="max-w-[200px] truncate px-4 py-3 font-medium"
-                        title={p.name}
-                        aria-label={p.name}
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <span className="flex items-center gap-2">
-                          {p.name}
-                          <svg
-                            className="h-3 w-3 flex-shrink-0 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                            />
-                          </svg>
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-400">{p.email}</td>
-                      <td className="px-4 py-3 text-gray-400">
-                        {p.skillBackground || "—"}
-                      </td>
-                      <td className="px-4 py-3 text-gray-400">
-                        {p.aiExperience || "—"}
-                      </td>
-                      <td className="px-4 py-3 text-gray-400">
-                        {p.rolePreference || "—"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs capitalize ${
-                            p.involvement === "mentor"
-                              ? "bg-purple-600/20 text-purple-400"
-                              : p.involvement === "volunteer"
-                                ? "bg-blue-600/20 text-blue-400"
-                                : "bg-gray-600/20 text-gray-400"
-                          }`}
-                        >
-                          {p.involvement}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {assignedUserIds.has(p.userId) ? (
-                          <span className="rounded-full bg-green-600/20 px-2 py-0.5 text-xs text-green-400">
-                            Assigned
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-yellow-600/20 px-2 py-0.5 text-xs text-yellow-400">
-                            Unassigned
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {participants.length === 0 && (
-                <div className="p-8 text-center text-gray-400">
-                  No participants registered yet.
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </div>
-              )}
+                <span className="flex-shrink-0 text-xs text-gray-500">
+                  {filteredParticipants.length} of {participants.length}
+                </span>
+              </div>
+
+              {/* Table */}
+              <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-gray-700">
+                <table className="w-full text-left text-sm">
+                  <thead className="sticky top-0 border-b border-gray-700 bg-gray-900">
+                    <tr>
+                      <th
+                        onClick={() => handleSort("name")}
+                        className="cursor-pointer px-4 py-3 font-medium text-gray-300 hover:text-white"
+                      >
+                        Name
+                        <SortIcon field="name" />
+                      </th>
+                      <th
+                        onClick={() => handleSort("email")}
+                        className="cursor-pointer px-4 py-3 font-medium text-gray-300 hover:text-white"
+                      >
+                        Email
+                        <SortIcon field="email" />
+                      </th>
+                      <th
+                        onClick={() => handleSort("skillBackground")}
+                        className="cursor-pointer px-4 py-3 font-medium text-gray-300 hover:text-white"
+                      >
+                        Background
+                        <SortIcon field="skillBackground" />
+                      </th>
+                      <th
+                        onClick={() => handleSort("aiExperience")}
+                        className="cursor-pointer px-4 py-3 font-medium text-gray-300 hover:text-white"
+                      >
+                        Experience
+                        <SortIcon field="aiExperience" />
+                      </th>
+                      <th
+                        onClick={() => handleSort("involvement")}
+                        className="cursor-pointer px-4 py-3 font-medium text-gray-300 hover:text-white"
+                      >
+                        Involvement
+                        <SortIcon field="involvement" />
+                      </th>
+                      <th
+                        onClick={() => handleSort("status")}
+                        className="cursor-pointer px-4 py-3 font-medium text-gray-300 hover:text-white"
+                      >
+                        Status
+                        <SortIcon field="status" />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800">
+                    {filteredParticipants.map((p) => (
+                      <tr
+                        key={p.userId}
+                        className="cursor-pointer transition-colors hover:bg-gray-800/50"
+                        onClick={() => setEditingParticipant(p)}
+                      >
+                        <td
+                          className="max-w-[200px] truncate px-4 py-3 font-medium"
+                          title={p.name}
+                          aria-label={p.name}
+                        >
+                          <span className="flex items-center gap-2">
+                            {p.name}
+                            <svg
+                              className="h-3 w-3 flex-shrink-0 text-gray-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                              />
+                            </svg>
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-gray-400">{p.email}</td>
+                        <td className="px-4 py-3 text-gray-400">
+                          {p.skillBackground || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-400">
+                          {p.aiExperience || "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs capitalize ${
+                              p.involvement === "mentor"
+                                ? "bg-purple-600/20 text-purple-400"
+                                : p.involvement === "volunteer"
+                                  ? "bg-blue-600/20 text-blue-400"
+                                  : "bg-gray-600/20 text-gray-400"
+                            }`}
+                          >
+                            {p.involvement}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          {assignedUserIds.has(p.userId) ? (
+                            <span className="rounded-full bg-green-600/20 px-2 py-0.5 text-xs text-green-400">
+                              Assigned
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-yellow-600/20 px-2 py-0.5 text-xs text-yellow-400">
+                              Unassigned
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredParticipants.length === 0 && (
+                  <div className="p-8 text-center text-gray-400">
+                    {participants.length === 0
+                      ? "No participants registered yet."
+                      : "No participants match your search."}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
