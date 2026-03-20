@@ -33,7 +33,6 @@ interface Participant {
   name: string;
   email?: string;
   involvement: string;
-  rolePreference?: string;
   skillBackground?: string | null;
   aiExperience?: string | null;
 }
@@ -81,9 +80,8 @@ function DraggableCard({
     );
   }
 
-  const prefAbbrev = participant.rolePreference
-    ? ROLE_ABBREV[participant.rolePreference] ||
-      participant.rolePreference.slice(0, 2).toUpperCase()
+  const skillRole = participant.skillBackground
+    ? SKILL_ABBREV[participant.skillBackground] || null
     : null;
 
   return (
@@ -97,12 +95,12 @@ function DraggableCard({
           : "border-blue-500/30 bg-blue-500/5 hover:border-blue-500/50"
       }`}
     >
-      {prefAbbrev ? (
+      {skillRole ? (
         <span
           className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-[9px] font-bold text-blue-400"
-          title={`Wants: ${participant.rolePreference}`}
+          title={`Background: ${participant.skillBackground}`}
         >
-          {prefAbbrev}
+          {skillRole}
         </span>
       ) : (
         <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-gray-500 text-[9px] text-gray-500">
@@ -133,6 +131,16 @@ const ROLE_ABBREV: Record<string, string> = {
   "Backend Engineer": "BE",
   "Frontend Developer": "FE",
   Flex: "FX",
+};
+
+const SKILL_ABBREV: Record<string, string> = {
+  "Frontend development": "FE",
+  "Backend development": "BE",
+  "Data / Machine Learning / AI": "AI",
+  "Design / UX": "UX",
+  "Product Management": "PM",
+  "DevOps / Infrastructure": "BE",
+  "Non-technical (learning AI tools)": "FX",
 };
 
 // Droppable slot inside a team column
@@ -366,7 +374,7 @@ function SortableTeamColumn({
         setDropRef(node);
       }}
       style={style}
-      className={`flex w-[85vw] flex-shrink-0 flex-col rounded-xl border p-4 transition-colors sm:w-72 ${
+      className={`flex min-h-0 w-[85vw] flex-shrink-0 flex-col rounded-xl border p-4 transition-colors sm:w-72 ${
         isOver ? "border-blue-500 bg-blue-500/5" : "border-gray-700 bg-gray-900"
       }`}
     >
@@ -581,7 +589,7 @@ function SortableTeamColumn({
       </div>
 
       {/* Slots */}
-      <div className="space-y-2">
+      <div className="scrollbar-none min-h-0 flex-1 space-y-2 overflow-y-auto">
         {team.slots.map((slot, idx) => (
           <DroppableSlot
             key={`${slot.role}-${idx}`}
@@ -802,6 +810,7 @@ export default function AdminKanbanBoard({
     const overData = over.data.current as {
       teamId?: string;
       role?: string;
+      index?: number;
       zone?: string;
     };
 
@@ -815,25 +824,32 @@ export default function AdminKanbanBoard({
       return;
     }
 
-    // Determine target team and role
+    // Determine target team, role, and slot index
     let targetTeamId: string | undefined;
-    let targetRole: string | undefined;
+    let targetSlotIndex: number | undefined;
 
-    if (overData?.role) {
+    if (overData?.role != null && overData.index != null) {
       targetTeamId = overData.teamId;
-      targetRole = overData.role;
+      targetSlotIndex = overData.index;
     } else if (over.id.toString().startsWith("team-")) {
       targetTeamId = over.id.toString().replace("team-", "");
       const team = teams.find((t) => t._id === targetTeamId);
-      const openSlot = team?.slots.find((s) => !s.userId);
-      if (!openSlot) return;
-      targetRole = openSlot.role;
+      const firstOpenIndex = team?.slots.findIndex((s) => !s.userId);
+      if (firstOpenIndex == null || firstOpenIndex === -1) return;
+      targetSlotIndex = firstOpenIndex;
     }
 
-    if (!targetTeamId || !targetRole) return;
+    if (!targetTeamId || targetSlotIndex == null) return;
 
-    // Same team, same role — no-op
-    if (sourceTeamId === targetTeamId && dragData.sourceRole === targetRole)
+    // Find the source slot index for same-team no-op check
+    const sourceSlotIndex = sourceTeamId
+      ? teams
+          .find((t) => t._id === sourceTeamId)
+          ?.slots.findIndex((s) => s.userId === participant.userId)
+      : undefined;
+
+    // Same team, same slot — no-op
+    if (sourceTeamId === targetTeamId && sourceSlotIndex === targetSlotIndex)
       return;
 
     // Hide the card during the move to prevent snap-back visual
@@ -844,17 +860,13 @@ export default function AdminKanbanBoard({
         // Moving within the same team (role swap)
         const team = teams.find((t) => t._id === sourceTeamId);
         if (team) {
-          let removed = false;
-          let assigned = false;
-          const newSlots = team.slots.map((s) => {
+          const newSlots = team.slots.map((s, i) => {
             // Remove from old slot
-            if (s.userId === participant.userId && !removed) {
-              removed = true;
+            if (i === sourceSlotIndex) {
               return { ...s, userId: undefined, userName: null };
             }
-            // Assign to new slot
-            if (s.role === targetRole && !s.userId && !assigned) {
-              assigned = true;
+            // Assign to target slot
+            if (i === targetSlotIndex) {
               return {
                 ...s,
                 userId: participant.userId,
@@ -880,13 +892,11 @@ export default function AdminKanbanBoard({
           }
         }
 
-        // Assign to target team
+        // Assign to target team by index
         const targetTeam = teams.find((t) => t._id === targetTeamId);
         if (targetTeam) {
-          let filled = false;
-          const targetSlots = targetTeam.slots.map((s) => {
-            if (s.role === targetRole && !s.userId && !filled) {
-              filled = true;
+          const targetSlots = targetTeam.slots.map((s, i) => {
+            if (i === targetSlotIndex && !s.userId) {
               return {
                 ...s,
                 userId: participant.userId,
@@ -958,30 +968,72 @@ export default function AdminKanbanBoard({
                 ({unassignedParticipants.length})
               </span>
             </h3>
-            {unassignedParticipants.length > 0 && (
+            <div className="flex gap-1">
+              {unassignedParticipants.length > 0 && (
+                <button
+                  onClick={() => {
+                    if (processing) return;
+                    showConfirm({
+                      title: "Auto-Assign Participants",
+                      message: `Auto-assign ${unassignedParticipants.length} participants to teams based on their role preferences?`,
+                      onConfirm: async () => {
+                        setConfirmState((prev) => ({ ...prev, open: false }));
+                        setProcessing(true);
+                        try {
+                          const res = await fetch(
+                            `/api/hackathons/${slug}/teams/auto-assign`,
+                            { method: "POST" },
+                          );
+                          const data = await res.json();
+                          if (res.ok) {
+                            toast(
+                              `${data.assigned} assigned${data.teamsCreated ? `, ${data.teamsCreated} new team(s) created` : ""}`,
+                              "success",
+                            );
+                            onRefresh();
+                          } else {
+                            toast(data.error || "Auto-assign failed", "error");
+                          }
+                        } catch {
+                          toast("Something went wrong", "error");
+                        } finally {
+                          setProcessing(false);
+                        }
+                      },
+                    });
+                  }}
+                  disabled={processing}
+                  className="rounded bg-green-600 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-green-700 disabled:opacity-50"
+                  title="Auto-assign all unassigned participants to teams based on their role preferences"
+                >
+                  &#9889; Auto
+                </button>
+              )}
               <button
                 onClick={() => {
                   if (processing) return;
                   showConfirm({
-                    title: "Auto-Assign Participants",
-                    message: `Auto-assign ${unassignedParticipants.length} participants to teams based on their role preferences?`,
+                    title: "Reset All Assignments",
+                    message:
+                      "Remove all participants from their teams? They will be moved back to unassigned.",
+                    variant: "danger",
                     onConfirm: async () => {
                       setConfirmState((prev) => ({ ...prev, open: false }));
                       setProcessing(true);
                       try {
                         const res = await fetch(
-                          `/api/hackathons/${slug}/teams/auto-assign`,
+                          `/api/hackathons/${slug}/teams/reset-assignments`,
                           { method: "POST" },
                         );
                         const data = await res.json();
                         if (res.ok) {
                           toast(
-                            `${data.assigned} assigned${data.teamsCreated ? `, ${data.teamsCreated} new team(s) created` : ""}`,
+                            `${data.cleared} assignments cleared`,
                             "success",
                           );
                           onRefresh();
                         } else {
-                          toast(data.error || "Auto-assign failed", "error");
+                          toast(data.error || "Reset failed", "error");
                         }
                       } catch {
                         toast("Something went wrong", "error");
@@ -992,19 +1044,19 @@ export default function AdminKanbanBoard({
                   });
                 }}
                 disabled={processing}
-                className="rounded bg-green-600 px-2 py-1 text-[10px] font-medium transition-colors hover:bg-green-700 disabled:opacity-50"
-                title="Auto-assign all unassigned participants to teams based on their role preferences"
+                className="rounded bg-gray-700 px-2 py-1 text-[10px] font-medium text-gray-300 transition-colors hover:bg-red-600/20 hover:text-red-400 disabled:opacity-50"
+                title="Remove all participants from teams"
               >
-                &#9889; Auto
+                Reset
               </button>
-            )}
+            </div>
           </div>
           {isOverUnassigned && activeDragData?.sourceTeamId && (
             <div className="mb-2 rounded-lg border border-dashed border-yellow-500 bg-yellow-500/10 px-3 py-2 text-center text-xs text-yellow-400">
               Drop to unassign
             </div>
           )}
-          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+          <div className="scrollbar-none min-h-0 flex-1 space-y-2 overflow-y-auto">
             {unassignedParticipants
               .filter((p) => p.userId !== pendingMoveUserId)
               .map((p) => (
