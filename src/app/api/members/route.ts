@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { PROFILES_COLLECTION } from "@/lib/models/Profile";
-import { ObjectId } from "mongodb";
 
 export async function GET(request: Request) {
   try {
@@ -10,23 +9,24 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "20");
     const seeking = searchParams.get("seeking");
     const location = searchParams.get("location");
+    const name = searchParams.get("name");
     const random = searchParams.get("random") === "true";
 
     const db = await getDb();
     const collection = db.collection(PROFILES_COLLECTION);
 
-    const query: any = { isPublic: true };
+    const query: Record<string, unknown> = { isPublic: true };
 
     if (seeking) {
       query.seeking = seeking;
     }
 
     if (location) {
-      // Simple case-insensitive search in background for location
-      query.background = { $regex: location, $options: "i" };
+      const escapedLocation = location.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      query.background = { $regex: escapedLocation, $options: "i" };
     }
 
-    let pipeline: any[] = [{ $match: query }];
+    const pipeline: Record<string, unknown>[] = [{ $match: query }];
 
     // Lookup user details (name)
     pipeline.push({
@@ -46,6 +46,7 @@ export async function GET(request: Request) {
         _id: 1,
         userId: 1,
         name: "$user.name",
+        email: "$user.email",
         avatarUrl: 1,
         seeking: 1,
         background: 1,
@@ -55,40 +56,63 @@ export async function GET(request: Request) {
       },
     });
 
+    // Name filter (applied after $project since name comes from $lookup)
+    if (name) {
+      const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      pipeline.push({
+        $match: { name: { $regex: escapedName, $options: "i" } },
+      });
+    }
+
     // Randomization or Pagination
     if (random) {
       pipeline.push({ $sample: { size: limit } });
-    } else {
-      pipeline.push({ $sort: { updatedAt: -1 } });
-      pipeline.push({ $skip: (page - 1) * limit });
-      pipeline.push({ $limit: limit });
+
+      const members = await collection.aggregate(pipeline).toArray();
+
+      return NextResponse.json({
+        members: members.map((m) => ({
+          ...m,
+          _id: m._id.toString(),
+          userId: m.userId.toString(),
+          createdAt: m.createdAt,
+          updatedAt: m.updatedAt,
+        })),
+        pagination: null,
+      });
     }
 
-    const members = await collection.aggregate(pipeline).toArray();
+    // Use $facet to get both results and total in one query
+    // (needed because name filter is post-lookup)
+    pipeline.push({
+      $facet: {
+        results: [
+          { $sort: { updatedAt: -1 } },
+          { $skip: (page - 1) * limit },
+          { $limit: limit },
+        ],
+        total: [{ $count: "count" }],
+      },
+    });
 
-    // Get total count for pagination (only if not random)
-    let total = 0;
-    if (!random) {
-      const countResult = await collection.countDocuments(query);
-      total = countResult;
-    }
+    const [facetResult] = await collection.aggregate(pipeline).toArray();
+    const members = facetResult?.results || [];
+    const total = facetResult?.total?.[0]?.count || 0;
 
     return NextResponse.json({
-      members: members.map((m) => ({
+      members: members.map((m: Record<string, unknown>) => ({
         ...m,
-        _id: m._id.toString(),
-        userId: m.userId.toString(),
+        _id: String(m._id),
+        userId: String(m.userId),
         createdAt: m.createdAt,
         updatedAt: m.updatedAt,
       })),
-      pagination: random
-        ? null
-        : {
-            page,
-            limit,
-            total,
-            pages: Math.ceil(total / limit),
-          },
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error("Get members error:", error);
@@ -98,4 +122,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

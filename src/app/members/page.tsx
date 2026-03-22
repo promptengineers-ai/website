@@ -9,6 +9,7 @@ type Member = {
   _id: string;
   userId: string;
   name: string;
+  email?: string;
   avatarUrl?: string;
   seeking: string | string[];
   background?: string;
@@ -21,7 +22,7 @@ export default function MembersPage() {
   const [hasMore, setHasMore] = useState(false);
 
   // Filters
-  const [location, setLocation] = useState("");
+  const [name, setName] = useState("");
   const [seeking, setSeeking] = useState("");
 
   const fetchMembers = async (pageToFetch: number, reset: boolean) => {
@@ -32,7 +33,7 @@ export default function MembersPage() {
         limit: "20",
       });
 
-      if (location) params.append("location", location);
+      if (name) params.append("name", name);
       if (seeking) params.append("seeking", seeking);
 
       const response = await fetch(`/api/members?${params.toString()}`);
@@ -99,10 +100,10 @@ export default function MembersPage() {
           >
             <div className="flex-1">
               <label
-                htmlFor="location"
+                htmlFor="name"
                 className="mb-1 block text-sm font-medium text-gray-300"
               >
-                Location (Search Bio)
+                Search by Name
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -110,16 +111,12 @@ export default function MembersPage() {
                 </div>
                 <input
                   type="text"
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Under development..."
-                  disabled
-                  className="block w-full rounded-md border border-gray-700 bg-gray-800 py-3 pl-10 text-gray-500 placeholder-gray-600 opacity-60 cursor-not-allowed sm:text-sm"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter a name..."
+                  className="block w-full rounded-md border border-gray-700 bg-gray-800 py-3 pl-10 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-yellow-500 font-medium">
-                  Coming Soon
-                </span>
               </div>
             </div>
 
@@ -151,8 +148,7 @@ export default function MembersPage() {
 
             <button
               type="submit"
-              disabled
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm opacity-50 cursor-not-allowed"
+              className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
             >
               Search
             </button>

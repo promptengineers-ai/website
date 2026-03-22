@@ -158,6 +158,17 @@ export type HackathonTeam = {
   updatedAt: Date;
 };
 
+export type EnrichedTeamSlot = HackathonTeamSlot & {
+  userName?: string | null;
+  avatarUrl?: string | null;
+  isPublic?: boolean;
+  email?: string | null;
+};
+
+export type EnrichedHackathonTeam = Omit<HackathonTeam, "slots"> & {
+  slots: EnrichedTeamSlot[];
+};
+
 export type HackathonRegistration = {
   _id: string;
   hackathonId: string;

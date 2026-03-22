@@ -11,12 +11,8 @@ import {
   ROLE_DESCRIPTIONS,
   type Hackathon,
   type HackathonRegistration,
-  type HackathonTeam,
-  type HackathonTeamSlot,
+  type EnrichedHackathonTeam,
 } from "@/types";
-
-type EnrichedSlot = HackathonTeamSlot & { userName?: string | null };
-type EnrichedTeam = Omit<HackathonTeam, "slots"> & { slots: EnrichedSlot[] };
 
 export default function HackathonLandingPage() {
   const params = useParams();
@@ -25,7 +21,7 @@ export default function HackathonLandingPage() {
   const slug = params.slug as string;
 
   const [hackathon, setHackathon] = useState<Hackathon | null>(null);
-  const [teams, setTeams] = useState<EnrichedTeam[]>([]);
+  const [teams, setTeams] = useState<EnrichedHackathonTeam[]>([]);
   const [registration, setRegistration] =
     useState<HackathonRegistration | null>(null);
   const [participantCount, setParticipantCount] = useState(0);

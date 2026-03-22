@@ -1,20 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { FaEnvelope } from "react-icons/fa";
 import {
   ROLE_DESCRIPTIONS,
   type Hackathon,
-  type HackathonTeam,
-  type HackathonTeamSlot,
+  type EnrichedHackathonTeam,
   type HackathonRole,
 } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 
-type EnrichedSlot = HackathonTeamSlot & { userName?: string | null };
-type EnrichedTeam = Omit<HackathonTeam, "slots"> & { slots: EnrichedSlot[] };
-
 interface Props {
-  teams: EnrichedTeam[];
+  teams: EnrichedHackathonTeam[];
   hackathon: Hackathon;
   isRegistered: boolean;
   currentUserId?: string;
@@ -92,7 +91,7 @@ export default function TeamCardGrid({
     }
   };
 
-  const filledCount = (team: EnrichedTeam) =>
+  const filledCount = (team: EnrichedHackathonTeam) =>
     team.slots.filter((s) => s.userId).length;
 
   return (
@@ -208,12 +207,62 @@ export default function TeamCardGrid({
                         </span>
 
                         {!isOpen && (
-                          <span
-                            className="truncate text-sm text-gray-400"
-                            title={isMe ? "You" : slot.userName || ""}
-                          >
-                            &mdash; {isMe ? "You" : slot.userName}
-                          </span>
+                          <div className="flex min-w-0 items-center gap-1.5">
+                            <span className="text-sm text-gray-400">
+                              &mdash;
+                            </span>
+
+                            {/* Avatar */}
+                            {slot.avatarUrl ? (
+                              <Image
+                                src={slot.avatarUrl}
+                                alt={slot.userName || ""}
+                                width={20}
+                                height={20}
+                                className="flex-shrink-0 rounded-full"
+                              />
+                            ) : (
+                              <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gray-600 text-[10px] font-medium text-gray-300">
+                                {(slot.userName || "?")[0].toUpperCase()}
+                              </span>
+                            )}
+
+                            {/* Name — clickable if public profile */}
+                            {isMe ? (
+                              <span
+                                className="truncate text-sm text-blue-400"
+                                title="You"
+                              >
+                                You
+                              </span>
+                            ) : slot.isPublic && slot.userId ? (
+                              <Link
+                                href={`/members/${slot.userId}`}
+                                className="truncate text-sm text-gray-400 hover:text-blue-400 hover:underline"
+                                title={slot.userName || ""}
+                              >
+                                {slot.userName}
+                              </Link>
+                            ) : (
+                              <span
+                                className="truncate text-sm text-gray-400"
+                                title={slot.userName || ""}
+                              >
+                                {slot.userName}
+                              </span>
+                            )}
+
+                            {/* Email icon for teammates */}
+                            {slot.email && !isMe && (
+                              <a
+                                href={`mailto:${slot.email}`}
+                                title={slot.email}
+                                className="flex-shrink-0 text-gray-500 transition-colors hover:text-blue-400"
+                              >
+                                <FaEnvelope className="h-3 w-3" />
+                              </a>
+                            )}
+                          </div>
                         )}
                       </div>
 
