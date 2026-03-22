@@ -124,7 +124,7 @@ export default async function MemberProfilePage({
                 <h1 className="text-3xl font-bold text-white">{user.name}</h1>
                 <a
                   href={`mailto:${user.email}`}
-                  className="mt-1 inline-flex items-center gap-2 text-sm text-white/80 transition-colors hover:text-white"
+                  className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-white underline decoration-white/40 transition-colors hover:decoration-white"
                 >
                   <FaEnvelope className="h-3.5 w-3.5" />
                   {user.email}
