@@ -13,19 +13,19 @@ const HeroSection = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      const response = await apiClient.contactFormSubmit({ 
+      const response = await apiClient.contactFormSubmit({
         Email: email,
-        // Name: "Newsletter Subscriber", 
+        // Name: "Newsletter Subscriber",
         Referrer: "Enso Contact Form",
-        Message: "Beta invite request" 
+        Message: "Beta invite request",
       });
-      
+
       setIsSubmitting(false);
       setIsSubmitted(true);
       setEmail("");
-      
+
       // Reset success message after delay
       setTimeout(() => {
         setIsSubmitted(false);
@@ -123,7 +123,7 @@ const HeroSection = () => {
         className="flex justify-center gap-6"
       >
         <a
-          href="https://join.slack.com/t/promptengineersai/shared_invite/zt-21upjsftv-gX~gNjTCU~2HfbeM_ZwTEQ"
+          href="https://join.slack.com/t/promptengineersai/shared_invite/zt-3t4w1meid-10gQHbgoWO~UYPJprH~Cyw"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
