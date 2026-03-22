@@ -7,6 +7,8 @@ import {
   createHackathonTeam,
   getTeamsByHackathonId,
 } from "@/lib/models/HackathonTeam";
+import { getProfilesByUserIds } from "@/lib/models/Profile";
+import { getAuthFromRequest } from "@/lib/jwt";
 import type { HackathonTeamSlot } from "@/types";
 
 // GET /api/hackathons/[slug]/teams - List all teams
@@ -25,7 +27,7 @@ export async function GET(
 
     const teams = await getTeamsByHackathonId(hackathon._id);
 
-    // Batch-fetch all user names for filled slots
+    // Batch-fetch all user names and profiles for filled slots
     const allUserIds = Array.from(
       new Set(
         teams.flatMap((t) =>
@@ -34,16 +36,40 @@ export async function GET(
       ),
     );
     const userMap = await getUsersByIds(allUserIds);
+    const profileMap = await getProfilesByUserIds(allUserIds);
 
-    const enrichedTeams = teams.map((team) => ({
-      ...team,
-      slots: team.slots.map((slot) => ({
-        ...slot,
-        userName: slot.userId
-          ? userMap.get(slot.userId)?.name || "Unknown"
-          : null,
-      })),
-    }));
+    // Determine current user's team for email visibility
+    const auth = getAuthFromRequest(request);
+    const currentUserId = auth?.user?.id;
+    const isAdmin = currentUserId
+      ? userMap.get(currentUserId)?.isAdmin === true
+      : false;
+
+    // Find which team the current user is on
+    const currentUserTeamId = currentUserId
+      ? teams.find((t) => t.slots.some((s) => s.userId === currentUserId))?._id
+      : undefined;
+
+    const enrichedTeams = teams.map((team) => {
+      const isSameTeam = currentUserTeamId === team._id;
+
+      return {
+        ...team,
+        slots: team.slots.map((slot) => {
+          const user = slot.userId ? userMap.get(slot.userId) : undefined;
+          const profile = slot.userId ? profileMap.get(slot.userId) : undefined;
+          const showEmail = !!(slot.userId && user && (isAdmin || isSameTeam));
+
+          return {
+            ...slot,
+            userName: user?.name || (slot.userId ? "Unknown" : null),
+            avatarUrl: profile?.avatarUrl || null,
+            isPublic: profile?.isPublic || false,
+            email: showEmail ? user!.email : null,
+          };
+        }),
+      };
+    });
 
     return NextResponse.json({ teams: enrichedTeams });
   } catch (error) {

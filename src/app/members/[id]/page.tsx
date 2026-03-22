@@ -13,6 +13,7 @@ import {
   FaUserFriends,
   FaUsers,
   FaMeetup,
+  FaEnvelope,
 } from "react-icons/fa";
 import { getProfileByUserId } from "@/lib/models/Profile";
 import { getUserById } from "@/lib/models/User";
@@ -121,10 +122,13 @@ export default async function MemberProfilePage({
               )}
               <div>
                 <h1 className="text-3xl font-bold text-white">{user.name}</h1>
-                {/* We might not want to show email publicly? Spec says: Avatar, Name, Title, Skills. 
-                    I'll hide email for now unless explicitly public. 
-                    The mock doesn't show email.
-                */}
+                <a
+                  href={`mailto:${user.email}`}
+                  className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-white underline decoration-white/40 transition-colors hover:decoration-white"
+                >
+                  <FaEnvelope className="h-3.5 w-3.5" />
+                  {user.email}
+                </a>
 
                 {/* Career Intentions Badges */}
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -147,110 +151,114 @@ export default async function MemberProfilePage({
         </div>
 
         {/* Social Links Card */}
-        {(profile.links.linkedin ||
-          profile.links.github ||
-          profile.links.twitter ||
-          profile.links.portfolio ||
-          profile.links.meetup ||
-          profile.links.other) && (
-          <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
-            <h2 className="mb-4 text-xl font-semibold text-white">
-              Connect With Me
-            </h2>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {profile.links.linkedin && (
-                <a
-                  href={profile.links.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
-                >
-                  <div className="text-blue-400 group-hover:text-blue-300">
-                    {getSocialIcon("linkedin")}
-                  </div>
-                  <span className="text-gray-300 group-hover:text-white">
-                    LinkedIn
-                  </span>
-                </a>
-              )}
-              {profile.links.github && (
-                <a
-                  href={profile.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
-                >
-                  <div className="text-blue-400 group-hover:text-blue-300">
-                    {getSocialIcon("github")}
-                  </div>
-                  <span className="text-gray-300 group-hover:text-white">
-                    GitHub
-                  </span>
-                </a>
-              )}
-              {profile.links.twitter && (
-                <a
-                  href={profile.links.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
-                >
-                  <div className="text-blue-400 group-hover:text-blue-300">
-                    {getSocialIcon("twitter")}
-                  </div>
-                  <span className="text-gray-300 group-hover:text-white">
-                    Twitter
-                  </span>
-                </a>
-              )}
-              {profile.links.portfolio && (
-                <a
-                  href={profile.links.portfolio}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
-                >
-                  <div className="text-blue-400 group-hover:text-blue-300">
-                    {getSocialIcon("portfolio")}
-                  </div>
-                  <span className="text-gray-300 group-hover:text-white">
-                    Portfolio
-                  </span>
-                </a>
-              )}
-              {profile.links.meetup && (
-                <a
-                  href={profile.links.meetup}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
-                >
-                  <div className="text-blue-400 group-hover:text-blue-300">
-                    {getSocialIcon("meetup")}
-                  </div>
-                  <span className="text-gray-300 group-hover:text-white">
-                    Meetup
-                  </span>
-                </a>
-              )}
-              {profile.links.other && (
-                <a
-                  href={profile.links.other}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
-                >
-                  <div className="text-blue-400 group-hover:text-blue-300">
-                    {getSocialIcon("other")}
-                  </div>
-                  <span className="text-gray-300 group-hover:text-white">
-                    Other Link
-                  </span>
-                </a>
-              )}
-            </div>
+        <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
+          <h2 className="mb-4 text-xl font-semibold text-white">
+            Connect With Me
+          </h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <a
+              href={`mailto:${user.email}`}
+              className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+            >
+              <div className="text-blue-400 group-hover:text-blue-300">
+                <FaEnvelope className="h-5 w-5" />
+              </div>
+              <span className="text-gray-300 group-hover:text-white">
+                {user.email}
+              </span>
+            </a>
+            {profile.links.linkedin && (
+              <a
+                href={profile.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  {getSocialIcon("linkedin")}
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  LinkedIn
+                </span>
+              </a>
+            )}
+            {profile.links.github && (
+              <a
+                href={profile.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  {getSocialIcon("github")}
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  GitHub
+                </span>
+              </a>
+            )}
+            {profile.links.twitter && (
+              <a
+                href={profile.links.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  {getSocialIcon("twitter")}
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  Twitter
+                </span>
+              </a>
+            )}
+            {profile.links.portfolio && (
+              <a
+                href={profile.links.portfolio}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  {getSocialIcon("portfolio")}
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  Portfolio
+                </span>
+              </a>
+            )}
+            {profile.links.meetup && (
+              <a
+                href={profile.links.meetup}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  {getSocialIcon("meetup")}
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  Meetup
+                </span>
+              </a>
+            )}
+            {profile.links.other && (
+              <a
+                href={profile.links.other}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  {getSocialIcon("other")}
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  Other Link
+                </span>
+              </a>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Background Card */}
         {profile.background && (
