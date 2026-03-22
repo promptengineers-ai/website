@@ -11,12 +11,8 @@ import {
   ROLE_DESCRIPTIONS,
   type Hackathon,
   type HackathonRegistration,
-  type HackathonTeam,
-  type HackathonTeamSlot,
+  type EnrichedHackathonTeam,
 } from "@/types";
-
-type EnrichedSlot = HackathonTeamSlot & { userName?: string | null };
-type EnrichedTeam = Omit<HackathonTeam, "slots"> & { slots: EnrichedSlot[] };
 
 export default function HackathonLandingPage() {
   const params = useParams();
@@ -25,7 +21,7 @@ export default function HackathonLandingPage() {
   const slug = params.slug as string;
 
   const [hackathon, setHackathon] = useState<Hackathon | null>(null);
-  const [teams, setTeams] = useState<EnrichedTeam[]>([]);
+  const [teams, setTeams] = useState<EnrichedHackathonTeam[]>([]);
   const [registration, setRegistration] =
     useState<HackathonRegistration | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
@@ -312,6 +308,35 @@ export default function HackathonLandingPage() {
         />
       )}
 
+      {/* Teams Section */}
+      <section className="border-t border-gray-800 px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-2 text-center text-3xl font-bold">Teams</h2>
+          <p className="mb-8 text-center text-gray-400">
+            {isRegistered
+              ? "Join a team by clicking an open slot"
+              : "Register to join a team"}
+          </p>
+
+          {teams.length === 0 ? (
+            <div className="rounded-lg border border-gray-800 p-12 text-center">
+              <p className="text-gray-400">
+                Teams haven&apos;t been created yet. Check back soon!
+              </p>
+            </div>
+          ) : (
+            <TeamCardGrid
+              teams={teams}
+              hackathon={hackathon}
+              isRegistered={isRegistered}
+              currentUserId={user?.id}
+              onRefresh={fetchData}
+              slug={slug}
+            />
+          )}
+        </div>
+      </section>
+
       {/* Roles Section */}
       <section className="border-t border-gray-800 px-4 py-16">
         <div className="mx-auto max-w-4xl">
@@ -362,35 +387,6 @@ export default function HackathonLandingPage() {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      {/* Teams Section */}
-      <section className="border-t border-gray-800 px-4 py-16">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="mb-2 text-center text-3xl font-bold">Teams</h2>
-          <p className="mb-8 text-center text-gray-400">
-            {isRegistered
-              ? "Join a team by clicking an open slot"
-              : "Register to join a team"}
-          </p>
-
-          {teams.length === 0 ? (
-            <div className="rounded-lg border border-gray-800 p-12 text-center">
-              <p className="text-gray-400">
-                Teams haven&apos;t been created yet. Check back soon!
-              </p>
-            </div>
-          ) : (
-            <TeamCardGrid
-              teams={teams}
-              hackathon={hackathon}
-              isRegistered={isRegistered}
-              currentUserId={user?.id}
-              onRefresh={fetchData}
-              slug={slug}
-            />
-          )}
         </div>
       </section>
     </div>

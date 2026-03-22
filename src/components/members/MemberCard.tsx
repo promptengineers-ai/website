@@ -1,12 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaMapMarkerAlt, FaBriefcase, FaUserFriends, FaUsers, FaLink } from "react-icons/fa";
+import {
+  FaBriefcase,
+  FaUserFriends,
+  FaUsers,
+  FaLink,
+  FaEnvelope,
+} from "react-icons/fa";
 
 type MemberCardProps = {
   member: {
     _id: string;
     userId: string;
     name: string;
+    email?: string;
     avatarUrl?: string;
     seeking: string | string[];
     background?: string;
@@ -43,7 +50,7 @@ export default function MemberCard({ member }: MemberCardProps) {
   // Extract location from background if possible (simple heuristic)
   // Or just display "Member"
   // For now, let's just show seeking tags.
-  
+
   const seekingArray = Array.isArray(member.seeking)
     ? member.seeking
     : [member.seeking];
@@ -69,11 +76,16 @@ export default function MemberCard({ member }: MemberCardProps) {
                 </div>
               )}
             </div>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-lg font-semibold text-white group-hover:text-blue-400">
                 {member.name}
               </h3>
-              {/* Could extract title/role from background if we had a structured field */}
+              {member.email && (
+                <span className="flex items-center gap-1.5 text-xs text-gray-400">
+                  <FaEnvelope className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate">{member.email}</span>
+                </span>
+              )}
             </div>
           </div>
 
@@ -90,15 +102,14 @@ export default function MemberCard({ member }: MemberCardProps) {
           </div>
 
           {member.background && (
-             <div className="mt-4 text-sm text-gray-400 line-clamp-3">
-                 {/* Strip HTML tags for preview */}
-                 {member.background.replace(/<[^>]*>/g, '').substring(0, 150)}
-                 {member.background.length > 150 && "..."}
-             </div>
+            <div className="mt-4 line-clamp-3 text-sm text-gray-400">
+              {/* Strip HTML tags for preview */}
+              {member.background.replace(/<[^>]*>/g, "").substring(0, 150)}
+              {member.background.length > 150 && "..."}
+            </div>
           )}
         </div>
       </div>
     </Link>
   );
 }
-
