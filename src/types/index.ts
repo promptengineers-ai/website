@@ -151,6 +151,8 @@ export type HackathonTeam = {
   hackathonId: string;
   name: string;
   description?: string;
+  repoUrl?: string;
+  contactEmail?: string;
   order: number;
   slots: HackathonTeamSlot[];
   createdBy: string;

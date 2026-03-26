@@ -146,7 +146,14 @@ export default function TeamCardGrid({
               {/* Header */}
               <div className="relative mb-4 flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg font-bold">{team.name}</h3>
+                  <h3 className="text-lg font-bold">
+                    <Link
+                      href={`/hackathon/${slug}/teams/${team._id}`}
+                      className="transition-colors hover:text-blue-400 hover:underline"
+                    >
+                      {team.name}
+                    </Link>
+                  </h3>
                   {team.description && (
                     <p className="mt-1 text-sm text-gray-400">
                       {team.description}
