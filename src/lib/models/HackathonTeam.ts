@@ -37,6 +37,8 @@ function docToTeam(doc: Record<string, unknown>): HackathonTeam {
     hackathonId: (doc.hackathonId as ObjectId).toString(),
     name: doc.name as string,
     description: (doc.description as string) || undefined,
+    repoUrl: (doc.repoUrl as string) || undefined,
+    contactEmail: (doc.contactEmail as string) || undefined,
     order: (doc.order as number) ?? 0,
     slots: deserializeSlots(doc.slots as Record<string, unknown>[]),
     createdBy: (doc.createdBy as ObjectId).toString(),
@@ -114,6 +116,8 @@ export async function updateHackathonTeam(
   data: Partial<{
     name: string;
     description: string;
+    repoUrl: string;
+    contactEmail: string;
     slots: HackathonTeamSlot[];
   }>,
 ): Promise<HackathonTeam | null> {
@@ -126,6 +130,9 @@ export async function updateHackathonTeam(
 
   if (data.name !== undefined) updateData.name = data.name;
   if (data.description !== undefined) updateData.description = data.description;
+  if (data.repoUrl !== undefined) updateData.repoUrl = data.repoUrl;
+  if (data.contactEmail !== undefined)
+    updateData.contactEmail = data.contactEmail;
   if (data.slots !== undefined) updateData.slots = serializeSlots(data.slots);
 
   const result = await collection.findOneAndUpdate(
