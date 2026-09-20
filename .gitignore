@@ -36,6 +36,7 @@ yarn-error.log*
 next-env.d.ts
 
 # public
+public/sw.js
 public/sw.js.map
 public/swe-*.js
 public/fallback-*.js
@@ -48,6 +49,5 @@ public/workbox-*.js
 
 # openpsec
 **/openspec/
-**/AGENTS.md
 **/CLAUDE.md
 .claude/

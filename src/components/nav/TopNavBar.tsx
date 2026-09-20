@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { MdClose, MdMenu } from "react-icons/md";
-import { FaGithub } from "react-icons/fa";
 import { FiUser, FiLogOut } from "react-icons/fi";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { CHAPTERS } from "@/config/chapters";
+
+const MOBILE_MENU_ID = "top-nav-mobile-menu";
 
 const TopNavbar = () => {
   const { user, logout, status } = useAuth();
@@ -18,6 +19,7 @@ const TopNavbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,10 +51,23 @@ const TopNavbar = () => {
     setIsDrawerOpen(false);
   };
 
+  useEffect(() => {
+    setIsDrawerOpen(false);
+  }, [pathname]);
+
+  const handleMenuKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Escape" && isDrawerOpen) {
+      event.preventDefault();
+      closeDrawer();
+      menuButtonRef.current?.focus();
+    }
+  };
+
   const handleSignOut = async () => {
     try {
       await logout();
       setShowUserMenu(false);
+      setIsDrawerOpen(false);
       router.push("/");
       router.refresh();
     } catch (error) {
@@ -79,42 +94,49 @@ const TopNavbar = () => {
             : "bg-transparent py-4"
         }`}
       >
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4" onKeyDown={handleMenuKeyDown}>
           <div className="flex items-center justify-between">
             <motion.div
               className="flex items-center"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <a href="/" className="ml-2 flex items-center gap-3">
-                <span className="text-lg font-bold tracking-tight text-white transition-colors duration-200 hover:text-gray-300">
+              <a href="/" className="flex items-center gap-3 md:ml-2">
+                <span className="whitespace-nowrap text-base font-bold tracking-tight text-white transition-colors duration-200 hover:text-gray-300 md:text-lg">
                   Prompt Engineers <span className="text-blue-400">AI</span>
                 </span>
               </a>
             </motion.div>
 
-            {/* Right side - GitHub link and Auth */}
-            <div className="flex items-center gap-4">
-              {/* <a
-                href="https://github.com/promptengineers-ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors duration-200"
-                aria-label="GitHub"
+            {/* Right side - public links and Auth */}
+            <div className="hidden items-center gap-4 md:flex">
+              <Link
+                href="/members"
+                className="text-sm font-medium text-gray-300 transition-colors duration-200 hover:text-white"
               >
-                <FaGithub className="text-xl" />
-              </a> */}
+                Members
+              </Link>
+              {CHAPTERS.map((chapter) => (
+                <Link
+                  key={chapter.slug}
+                  href={`/chapters/${chapter.slug}`}
+                  className="text-sm font-medium text-gray-300 transition-colors duration-200 hover:text-white"
+                >
+                  {chapter.name}
+                </Link>
+              ))}
 
               {user ? (
                 <div className="relative">
                   <button
+                    type="button"
                     onClick={() => setShowUserMenu(!showUserMenu)}
+                    aria-expanded={showUserMenu}
+                    aria-haspopup="true"
                     className="flex items-center gap-2 rounded-full bg-gray-800/70 px-3 py-2 text-white transition-colors duration-200 hover:bg-gray-700/70"
                   >
-                    <FiUser className="text-lg" />
-                    <span className="hidden text-sm sm:inline">
-                      {user.name}
-                    </span>
+                    <FiUser className="text-lg" aria-hidden="true" />
+                    <span className="text-sm">{user.name}</span>
                   </button>
 
                   {showUserMenu && (
@@ -149,11 +171,12 @@ const TopNavbar = () => {
                           Hackathon
                         </Link>
                         <button
+                          type="button"
                           onClick={handleSignOut}
                           className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
                         >
                           <span className="flex items-center gap-2">
-                            <FiLogOut />
+                            <FiLogOut aria-hidden="true" />
                             Sign Out
                           </span>
                         </button>
@@ -161,7 +184,7 @@ const TopNavbar = () => {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : status === "unauthenticated" ? (
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/login?from=${encodeURIComponent(pathname)}`}
@@ -169,40 +192,113 @@ const TopNavbar = () => {
                   >
                     Login
                   </Link>
-                  <Link
-                    href={`/signup?from=${encodeURIComponent(pathname)}`}
-                    className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
-                  >
-                    Register
-                  </Link>
+                  {pathname !== "/" && (
+                    <Link
+                      href="/"
+                      className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
+                    >
+                      Register
+                    </Link>
+                  )}
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Mobile menu button */}
-            {/* <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleDrawer} 
-              className="flex items-center justify-center rounded-full bg-gray-800/70 p-2 text-white hover:bg-gray-700/70 transition-colors duration-200 sm:hidden"
-              aria-label="Open menu"
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={toggleDrawer}
+              aria-label={isDrawerOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isDrawerOpen}
+              aria-controls={MOBILE_MENU_ID}
+              className="flex items-center justify-center rounded-full bg-gray-800/70 p-2 text-white transition-colors duration-200 hover:bg-gray-700/70 md:hidden"
             >
-              <MdMenu className="h-6 w-6" />
-            </motion.button> */}
-
-            {/* Desktop menu */}
-            {/* <div className="hidden sm:flex items-center space-x-1">
-              
-              <motion.a
-                href="/#contact"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="ml-2 rounded-full bg-white text-black px-5 py-2 text-sm font-montserrat tracking-wide font-medium shadow-lg shadow-white/10 hover:bg-gray-200 transition-all duration-200"
-              >
-                Join Beta
-              </motion.a>
-            </div> */}
+              {isDrawerOpen ? (
+                <MdClose className="h-6 w-6" aria-hidden="true" />
+              ) : (
+                <MdMenu className="h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
           </div>
+
+          {isDrawerOpen && (
+            <div
+              id={MOBILE_MENU_ID}
+              className="mt-3 flex flex-col gap-1 rounded-2xl bg-black/90 p-2 shadow-lg shadow-black/20 backdrop-blur-lg md:hidden"
+            >
+              <Link
+                href="/members"
+                onClick={closeDrawer}
+                className="rounded-xl px-4 py-3 text-base font-medium text-gray-200 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+              >
+                Members
+              </Link>
+              {CHAPTERS.map((chapter) => (
+                <Link
+                  key={chapter.slug}
+                  href={`/chapters/${chapter.slug}`}
+                  onClick={closeDrawer}
+                  className="rounded-xl px-4 py-3 text-base font-medium text-gray-200 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+                >
+                  {chapter.name}
+                </Link>
+              ))}
+
+              {user ? (
+                <>
+                  <Link
+                    href="/profile"
+                    onClick={closeDrawer}
+                    className="rounded-xl px-4 py-3 text-base font-medium text-gray-200 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+                  >
+                    My Profile
+                  </Link>
+                  <Link
+                    href="/profile/edit"
+                    onClick={closeDrawer}
+                    className="rounded-xl px-4 py-3 text-base font-medium text-gray-200 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+                  >
+                    Edit Profile
+                  </Link>
+                  <Link
+                    href="/hackathon"
+                    onClick={closeDrawer}
+                    className="rounded-xl px-4 py-3 text-base font-medium text-gray-200 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+                  >
+                    Hackathon
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-gray-200 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+                  >
+                    <FiLogOut aria-hidden="true" />
+                    Sign Out
+                  </button>
+                </>
+              ) : status === "unauthenticated" ? (
+                <div className="mt-1 flex items-center gap-2 px-2 pb-1">
+                  <Link
+                    href={`/login?from=${encodeURIComponent(pathname)}`}
+                    onClick={closeDrawer}
+                    className="flex-1 rounded-full border border-white/30 bg-transparent px-4 py-2 text-center text-sm font-medium text-white transition-all duration-200 hover:bg-white/10"
+                  >
+                    Login
+                  </Link>
+                  {pathname !== "/" && (
+                    <Link
+                      href="/"
+                      onClick={closeDrawer}
+                      className="flex-1 rounded-full bg-white px-4 py-2 text-center text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
+                    >
+                      Register
+                    </Link>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
       </motion.nav>
     </>

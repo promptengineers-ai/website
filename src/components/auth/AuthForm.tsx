@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FiEye, FiEyeOff, FiArrowLeft } from "react-icons/fi";
@@ -67,7 +68,7 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
 
         {/* Logo */}
         <div className="flex justify-center">
-          <div className="text-6xl">🤖</div>
+          <Image src="/pe-logo.png" alt="" width={60} height={60} />
         </div>
 
         <div>
@@ -81,7 +82,7 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
               <>
                 Or{" "}
                 <Link
-                  href={`/signup${fromQuery}`}
+                  href="/"
                   className="font-medium text-blue-400 hover:text-blue-300"
                 >
                   create a new account
@@ -154,13 +155,15 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
               />
               <button
                 type="button"
+                aria-label="Show password"
+                aria-pressed={showPassword}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-300"
               >
                 {showPassword ? (
-                  <FiEyeOff className="h-5 w-5" />
+                  <FiEyeOff className="h-5 w-5" aria-hidden="true" />
                 ) : (
-                  <FiEye className="h-5 w-5" />
+                  <FiEye className="h-5 w-5" aria-hidden="true" />
                 )}
               </button>
             </div>
@@ -182,13 +185,15 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
                 />
                 <button
                   type="button"
+                  aria-label="Show confirm password"
+                  aria-pressed={showConfirmPassword}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-300"
                 >
                   {showConfirmPassword ? (
-                    <FiEyeOff className="h-5 w-5" />
+                    <FiEyeOff className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <FiEye className="h-5 w-5" />
+                    <FiEye className="h-5 w-5" aria-hidden="true" />
                   )}
                 </button>
               </div>

@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+import { chapterLabel } from "@/config/chapters";
 import {
   FaBriefcase,
+  FaMapMarkerAlt,
   FaUserFriends,
   FaUsers,
   FaLink,
-  FaEnvelope,
 } from "react-icons/fa";
 
 type MemberCardProps = {
@@ -13,9 +14,9 @@ type MemberCardProps = {
     _id: string;
     userId: string;
     name: string;
-    email?: string;
     avatarUrl?: string;
     seeking: string | string[];
+    chapters?: string[];
     background?: string;
   };
 };
@@ -80,14 +81,22 @@ export default function MemberCard({ member }: MemberCardProps) {
               <h3 className="text-lg font-semibold text-white group-hover:text-blue-400">
                 {member.name}
               </h3>
-              {member.email && (
-                <span className="flex items-center gap-1.5 text-xs text-gray-400">
-                  <FaEnvelope className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">{member.email}</span>
-                </span>
-              )}
             </div>
           </div>
+
+          {member.chapters && member.chapters.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {member.chapters.map((slug) => (
+                <span
+                  key={slug}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-300"
+                >
+                  <FaMapMarkerAlt className="h-3 w-3" />
+                  {chapterLabel(slug)}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="mt-4 flex flex-wrap gap-2">
             {seekingArray.map((s) => (

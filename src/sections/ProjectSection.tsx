@@ -8,7 +8,7 @@ const projects = [
     image:
       "https://secure.meetupstatic.com/photos/event/1/2/3/5/clean_513484661.webp",
     description:
-      "A meetup group (1k+ members) for engineers, developers, and tech enthusiasts in Plano, TX. Join us for tech talks, networking, and more!",
+      "A meetup group for engineers, developers, and tech enthusiasts in Plano, TX. Join us for tech talks, networking, and more!",
     link: "https://www.meetup.com/plano-prompt-engineers",
   },
   {
@@ -41,7 +41,9 @@ const ProjectSection = () => {
   return (
     <section className="bg-black py-12" id="projects">
       <div className="container mx-auto px-4">
-        <h2 className="mb-8 text-4xl md:text-5xl font-semibold text-white">Community First</h2>
+        <h2 className="mb-8 text-4xl font-semibold text-white md:text-5xl">
+          Community First
+        </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {currentProjects.map((project, index) => (
             <div
