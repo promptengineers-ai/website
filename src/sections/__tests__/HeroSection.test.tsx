@@ -614,4 +614,23 @@ describe("HeroSection", () => {
       expect(field).toHaveValue("Partial1");
     });
   });
+
+  describe("mobile spacing (#56)", () => {
+    it("hero reserves top space for the fixed nav", () => {
+      const { container } = render(<HeroSection />);
+
+      const hero = container.firstElementChild as HTMLElement;
+      expect(hero).toHaveClass("min-h-screen", "justify-center");
+      expect(hero).toHaveClass("pt-24");
+    });
+
+    it("social links carry bottom spacing", () => {
+      render(<HeroSection />);
+
+      const socials = screen.getByRole("link", { name: /slack/i })
+        .parentElement as HTMLElement;
+      expect(socials).toHaveClass("flex", "justify-center");
+      expect(socials).toHaveClass("mb-16");
+    });
+  });
 });

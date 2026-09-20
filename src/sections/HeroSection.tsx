@@ -129,7 +129,7 @@ const HeroSection = ({
     "w-full rounded-full border border-white/20 bg-white/10 px-5 py-3 text-base text-white placeholder-gray-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 disabled:opacity-60";
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-black text-white">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-black pt-24 text-white">
       {/* Logo/Icon Area */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -497,7 +497,7 @@ const HeroSection = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.1 }}
-        className="flex justify-center gap-6"
+        className="mb-16 flex justify-center gap-6"
       >
         <a
           href="https://join.slack.com/t/promptengineersai/shared_invite/zt-3t4w1meid-10gQHbgoWO~UYPJprH~Cyw"
