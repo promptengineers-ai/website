@@ -22,6 +22,7 @@ import Image from "next/image";
 import QRCode from "react-qr-code";
 import type { UserProfile } from "@/types";
 import { useAuth } from "@/components/auth/AuthProvider";
+import DeleteAccountCard from "@/components/profile/DeleteAccountCard";
 
 export default function ProfilePage() {
   const { user, status } = useAuth();
@@ -197,6 +198,8 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {user?.email && <DeleteAccountCard email={user.email} />}
         </div>
       </div>
     );
@@ -465,6 +468,8 @@ export default function ProfilePage() {
             </a>
           </div>
         )}
+
+        {user?.email && <DeleteAccountCard email={user.email} />}
       </div>
     </div>
   );
