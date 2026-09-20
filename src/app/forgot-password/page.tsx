@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, FormEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { FiArrowLeft, FiMail } from "react-icons/fi";
 
@@ -50,9 +51,7 @@ function ForgotPasswordContent() {
         </div>
 
         <div className="flex justify-center">
-          <div className="text-6xl" aria-hidden="true">
-            🧑‍💻
-          </div>
+          <Image src="/pe-logo.png" alt="" width={60} height={60} />
         </div>
 
         <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FiEye, FiEyeOff, FiArrowLeft } from "react-icons/fi";
@@ -67,9 +68,7 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
 
         {/* Logo */}
         <div className="flex justify-center">
-          <div className="text-6xl" aria-hidden="true">
-            🧑‍💻
-          </div>
+          <Image src="/pe-logo.png" alt="" width={60} height={60} />
         </div>
 
         <div>

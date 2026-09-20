@@ -2,6 +2,7 @@
 
 import { Suspense, useState, FormEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { FiArrowLeft, FiEye, FiEyeOff, FiXCircle } from "react-icons/fi";
 
@@ -85,9 +86,7 @@ function ResetPasswordContent() {
         </div>
 
         <div className="flex justify-center">
-          <div className="text-6xl" aria-hidden="true">
-            🧑‍💻
-          </div>
+          <Image src="/pe-logo.png" alt="" width={60} height={60} />
         </div>
 
         <div>

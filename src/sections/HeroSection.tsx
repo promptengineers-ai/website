@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ApiError, apiClient } from "@/utils/client";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -136,9 +137,7 @@ const HeroSection = ({
         transition={{ duration: 0.8 }}
         className="mb-5 flex items-center justify-center"
       >
-        <div className="text-7xl" aria-hidden="true">
-          🧑‍💻
-        </div>
+        <Image src="/pe-logo.png" alt="" width={72} height={72} />
       </motion.div>
 
       {/* Headline */}

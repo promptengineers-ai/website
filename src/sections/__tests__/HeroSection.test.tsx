@@ -550,12 +550,12 @@ describe("HeroSection", () => {
     });
   });
 
-  describe("technologist emoji, not the robot (#54)", () => {
-    const TECHNOLOGIST = String.fromCodePoint(0x1f9d1, 0x200d, 0x1f4bb);
+  describe("logo image, not the robot emoji (#54)", () => {
     const ROBOT = String.fromCodePoint(0x1f916);
+    const logo = () => document.querySelector('img[src="/pe-logo.png"]');
 
     it.each(["unauthenticated", "authenticated", "loading"] as const)(
-      "renders the technologist emoji and no robot emoji (%s)",
+      "renders the logo image and no robot emoji (%s)",
       (status) => {
         auth.status = status;
         auth.user =
@@ -564,11 +564,12 @@ describe("HeroSection", () => {
             : null;
         render(<HeroSection />);
 
-        const emoji = screen.getByText(TECHNOLOGIST);
-        expect(emoji).toBeInTheDocument();
-        expect(emoji).toHaveAttribute("aria-hidden", "true");
-        expect(emoji).toHaveClass("text-7xl");
-        expect(screen.queryByText(ROBOT)).not.toBeInTheDocument();
+        const image = logo();
+        expect(image).not.toBeNull();
+        expect(image).toHaveAttribute("width", "72");
+        expect(image).toHaveAttribute("height", "72");
+        expect(image).toHaveAttribute("alt", "");
+        expect(screen.queryByRole("img")).not.toBeInTheDocument();
         expect(document.body.textContent).not.toContain(ROBOT);
       },
     );
