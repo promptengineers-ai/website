@@ -25,8 +25,7 @@ vi.mock("@/components/profile/DeleteAccountCard", () => ({
 }));
 
 import ProfilePage from "../page";
-
-const SURVEY_URL = "https://forms.gle/DYBEgiiFGUUisw7V6";
+import { SURVEY_URL } from "@/config/survey";
 
 const jsonResponse = (status: number, body: unknown) =>
   ({

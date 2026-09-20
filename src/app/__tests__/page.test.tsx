@@ -3,6 +3,10 @@ import { vi } from "vitest";
 import { CHAPTERS } from "@/config/chapters";
 import { FALLBACK_MEETUP_STATS } from "@/lib/meetup";
 
+vi.mock("@/components/auth/AuthProvider", () => ({
+  useAuth: () => ({ user: null, status: "unauthenticated" }),
+}));
+
 vi.mock("@/components/nav/TopNavBar", () => ({
   default: () => <div data-testid="top-nav-bar" />,
 }));

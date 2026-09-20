@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ApiError, apiClient } from "@/utils/client";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { SURVEY_URL } from "@/config/survey";
 import { FaSlack, FaMeetup, FaLinkedin } from "react-icons/fa";
 import {
   FALLBACK_MEETUP_STATS,
@@ -11,13 +13,30 @@ import {
 } from "@/lib/meetup";
 import type { MeetupStats } from "@/types";
 
-const SURVEY_URL = "https://forms.gle/DYBEgiiFGUUisw7V6";
+const SURVEY_DISMISSED_KEY = "hero-survey-dismissed";
+const AUTH_SLOT_CLASS = "flex min-h-[22rem] w-full flex-col items-center";
+
+function readSurveyDismissed(): boolean {
+  try {
+    return window.localStorage.getItem(SURVEY_DISMISSED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeSurveyDismissed() {
+  try {
+    window.localStorage.setItem(SURVEY_DISMISSED_KEY, "1");
+  } catch {}
+}
 
 const HeroSection = ({
   stats = FALLBACK_MEETUP_STATS,
 }: {
   stats?: MeetupStats;
 }) => {
+  const { status } = useAuth();
+  const [surveyDismissed, setSurveyDismissed] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -93,6 +112,15 @@ const HeroSection = ({
     }
   };
 
+  useEffect(() => {
+    setSurveyDismissed(readSurveyDismissed());
+  }, []);
+
+  const dismissSurvey = () => {
+    writeSurveyDismissed();
+    setSurveyDismissed(true);
+  };
+
   const passwordsDiffer =
     confirmPassword.length > 0 && password !== confirmPassword;
 
@@ -161,10 +189,12 @@ const HeroSection = ({
           </div>
           <div className="text-sm text-gray-400">Rating</div>
         </div>
-        <p className="basis-full text-sm text-gray-300">
-          An account creates a member profile you can choose to list in the
-          browsable members directory.
-        </p>
+        {status === "unauthenticated" ? (
+          <p className="basis-full text-sm text-gray-300">
+            An account creates a member profile you can choose to list in the
+            browsable members directory.
+          </p>
+        ) : null}
       </motion.div>
 
       {/* Primary CTA - Signup form */}
@@ -174,232 +204,291 @@ const HeroSection = ({
         transition={{ duration: 0.8, delay: 0.9 }}
         className="mb-12 flex w-full max-w-xl flex-col items-center gap-4 px-4"
       >
-        {createdEmail ? (
-          <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 px-6 py-5 text-center text-sm text-green-200">
-            <div
-              role="status"
-              className="flex w-full flex-col items-center gap-3"
-            >
-              <p className="text-base font-semibold text-green-300">
-                Account created.
-              </p>
+        {status === "loading" ? (
+          <div
+            data-testid="hero-auth-placeholder"
+            aria-hidden="true"
+            className={AUTH_SLOT_CLASS}
+          />
+        ) : status === "authenticated" ? (
+          <div
+            data-testid="hero-survey-slot"
+            className={`${AUTH_SLOT_CLASS} justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-5 text-center text-sm text-gray-300`}
+          >
+            {surveyDismissed ? (
               <p>
-                Check <span className="font-medium">{createdEmail}</span> for a
-                verification link. If it does not arrive, you can resend it.
+                Survey prompt hidden on this device. The community survey stays
+                open on your{" "}
+                <a
+                  href="/profile"
+                  className="font-medium text-blue-300 underline underline-offset-4 hover:text-white"
+                >
+                  profile page
+                </a>
+                .
               </p>
-              {resendState === "sent" ? (
-                <p>Verification email sent again.</p>
-              ) : (
+            ) : (
+              <>
+                <p className="text-base font-semibold text-white">
+                  Community survey
+                </p>
+                <p>
+                  Optional: the community survey is open if you would like to
+                  tell us about yourself.
+                </p>
+                <a
+                  href={SURVEY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3 text-base font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                >
+                  Take the community survey
+                </a>
                 <button
                   type="button"
-                  onClick={handleResend}
-                  disabled={resendState === "sending"}
-                  className="font-medium text-green-300 underline underline-offset-4 hover:text-white disabled:opacity-60"
+                  onClick={dismissSurvey}
+                  className="text-gray-400 underline-offset-4 hover:text-white hover:underline"
                 >
-                  {resendState === "sending"
-                    ? "Sending…"
-                    : resendState === "failed"
-                      ? "Resend failed — try again"
-                      : "Resend verification email"}
+                  Already filled it out? Hide this.
                 </button>
-              )}
-            </div>
-            <div className="mt-2 w-full border-t border-green-500/20 pt-3 text-gray-300">
-              {surveySkipped ? (
-                <p>
-                  You can take the community survey later from your profile
-                  page.
+                <p className="text-xs text-gray-500">
+                  Hiding it only affects this device. The survey stays open on
+                  your profile page.
                 </p>
-              ) : (
-                <>
-                  <p>
-                    Optional: the community survey is open if you would like to
-                    tell us about yourself.
-                  </p>
-                  <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-                    <a
-                      href={SURVEY_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-green-300 underline underline-offset-4 hover:text-white"
-                    >
-                      Take the community survey
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => setSurveySkipped(true)}
-                      className="text-gray-400 underline-offset-4 hover:text-white hover:underline"
-                    >
-                      Skip for now
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+              </>
+            )}
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="flex w-full flex-col gap-3"
-            aria-describedby={error ? "hero-signup-error" : undefined}
-          >
-            <label htmlFor="hero-name" className="sr-only">
-              Name
-            </label>
-            <input
-              id="hero-name"
-              name="name"
-              type="text"
-              required
-              autoComplete="name"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isSubmitting}
-              className={fieldClass}
-            />
-            <label htmlFor="hero-email" className="sr-only">
-              Email address
-            </label>
-            <input
-              id="hero-email"
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isSubmitting}
-              aria-invalid={error?.status === 409 ? true : undefined}
-              className={fieldClass}
-            />
-            <label htmlFor="hero-password" className="sr-only">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                id="hero-password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={8}
-                autoComplete="new-password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isSubmitting}
-                aria-invalid={error?.details.length ? true : undefined}
-                aria-describedby={error ? undefined : "hero-password-rules"}
-                className={`${fieldClass} pr-20`}
-              />
-              <button
-                type="button"
-                aria-label="Show password"
-                aria-pressed={showPassword}
-                onClick={() => setShowPassword((current) => !current)}
-                disabled={isSubmitting}
-                className="absolute inset-y-0 right-0 flex items-center rounded-full px-4 text-sm font-medium text-gray-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 disabled:opacity-60"
+          <>
+            {createdEmail ? (
+              <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 px-6 py-5 text-center text-sm text-green-200">
+                <div
+                  role="status"
+                  className="flex w-full flex-col items-center gap-3"
+                >
+                  <p className="text-base font-semibold text-green-300">
+                    Account created.
+                  </p>
+                  <p>
+                    Check <span className="font-medium">{createdEmail}</span>{" "}
+                    for a verification link. If it does not arrive, you can
+                    resend it.
+                  </p>
+                  {resendState === "sent" ? (
+                    <p>Verification email sent again.</p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      disabled={resendState === "sending"}
+                      className="font-medium text-green-300 underline underline-offset-4 hover:text-white disabled:opacity-60"
+                    >
+                      {resendState === "sending"
+                        ? "Sending…"
+                        : resendState === "failed"
+                          ? "Resend failed — try again"
+                          : "Resend verification email"}
+                    </button>
+                  )}
+                </div>
+                <div className="mt-2 w-full border-t border-green-500/20 pt-3 text-gray-300">
+                  {surveySkipped ? (
+                    <p>
+                      You can take the community survey later from your profile
+                      page.
+                    </p>
+                  ) : (
+                    <>
+                      <p>
+                        Optional: the community survey is open if you would like
+                        to tell us about yourself.
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+                        <a
+                          href={SURVEY_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-green-300 underline underline-offset-4 hover:text-white"
+                        >
+                          Take the community survey
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setSurveySkipped(true)}
+                          className="text-gray-400 underline-offset-4 hover:text-white hover:underline"
+                        >
+                          Skip for now
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                className="flex w-full flex-col gap-3"
+                aria-describedby={error ? "hero-signup-error" : undefined}
               >
-                {showPassword ? "Hide" : "Show"}
-              </button>
-            </div>
-            <label htmlFor="hero-confirm-password" className="sr-only">
-              Confirm password
-            </label>
-            <input
-              id="hero-confirm-password"
-              name="confirmPassword"
-              type={showPassword ? "text" : "password"}
-              required
-              autoComplete="new-password"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={isSubmitting}
-              aria-invalid={passwordsDiffer ? true : undefined}
-              aria-describedby={
-                passwordsDiffer ? "hero-confirm-password-hint" : undefined
-              }
-              className={fieldClass}
-            />
-            {passwordsDiffer ? (
-              <p
-                id="hero-confirm-password-hint"
-                className="-mt-1 px-5 text-sm text-red-400"
-              >
-                Passwords do not match.
-              </p>
-            ) : null}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group relative transform rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
-            >
-              <span className="relative z-10">
-                {isSubmitting ? "Creating account…" : "Create account"}
-              </span>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-            </button>
-          </form>
-        )}
-
-        {error ? (
-          <div
-            id="hero-signup-error"
-            role="alert"
-            className="text-center text-sm text-red-400"
-          >
-            <p>
-              {error.message}
-              {error.status === 409 ? (
-                <>
-                  {" "}
-                  <a
-                    href="/login"
-                    className="underline underline-offset-4 hover:text-white"
+                <label htmlFor="hero-name" className="sr-only">
+                  Name
+                </label>
+                <input
+                  id="hero-name"
+                  name="name"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={isSubmitting}
+                  className={fieldClass}
+                />
+                <label htmlFor="hero-email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="hero-email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  aria-invalid={error?.status === 409 ? true : undefined}
+                  className={fieldClass}
+                />
+                <label htmlFor="hero-password" className="sr-only">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="hero-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
+                    aria-invalid={error?.details.length ? true : undefined}
+                    aria-describedby={error ? undefined : "hero-password-rules"}
+                    className={`${fieldClass} pr-20`}
+                  />
+                  <button
+                    type="button"
+                    aria-label="Show password"
+                    aria-pressed={showPassword}
+                    onClick={() => setShowPassword((current) => !current)}
+                    disabled={isSubmitting}
+                    className="absolute inset-y-0 right-0 flex items-center rounded-full px-4 text-sm font-medium text-gray-300 transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 disabled:opacity-60"
                   >
-                    Sign in instead
-                  </a>
-                </>
-              ) : null}
-            </p>
-            {error.details.length > 0 ? (
-              <ul className="mt-1 list-inside list-disc text-left">
-                {error.details.map((detail) => (
-                  <li key={detail}>{detail}</li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        ) : createdEmail ? null : (
-          <p
-            id="hero-password-rules"
-            className="text-center text-sm text-gray-400"
-          >
-            Free member account. Your password needs 8+ characters with an
-            uppercase letter, a lowercase letter, and a number.
-          </p>
-        )}
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+                <label htmlFor="hero-confirm-password" className="sr-only">
+                  Confirm password
+                </label>
+                <input
+                  id="hero-confirm-password"
+                  name="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="new-password"
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isSubmitting}
+                  aria-invalid={passwordsDiffer ? true : undefined}
+                  aria-describedby={
+                    passwordsDiffer ? "hero-confirm-password-hint" : undefined
+                  }
+                  className={fieldClass}
+                />
+                {passwordsDiffer ? (
+                  <p
+                    id="hero-confirm-password-hint"
+                    className="-mt-1 px-5 text-sm text-red-400"
+                  >
+                    Passwords do not match.
+                  </p>
+                ) : null}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="group relative transform rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                >
+                  <span className="relative z-10">
+                    {isSubmitting ? "Creating account…" : "Create account"}
+                  </span>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                </button>
+              </form>
+            )}
 
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-gray-400">
-          <a
-            href="/login"
-            className="underline-offset-4 transition-colors hover:text-white hover:underline"
-          >
-            Already have an account? Sign in
-          </a>
-          {createdEmail ? null : (
-            <a
-              href={SURVEY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline"
-            >
-              Already a member? Take our community survey
-            </a>
-          )}
-        </div>
+            {error ? (
+              <div
+                id="hero-signup-error"
+                role="alert"
+                className="text-center text-sm text-red-400"
+              >
+                <p>
+                  {error.message}
+                  {error.status === 409 ? (
+                    <>
+                      {" "}
+                      <a
+                        href="/login"
+                        className="underline underline-offset-4 hover:text-white"
+                      >
+                        Sign in instead
+                      </a>
+                    </>
+                  ) : null}
+                </p>
+                {error.details.length > 0 ? (
+                  <ul className="mt-1 list-inside list-disc text-left">
+                    {error.details.map((detail) => (
+                      <li key={detail}>{detail}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : createdEmail ? null : (
+              <p
+                id="hero-password-rules"
+                className="text-center text-sm text-gray-400"
+              >
+                Free member account. Your password needs 8+ characters with an
+                uppercase letter, a lowercase letter, and a number.
+              </p>
+            )}
+
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-gray-400">
+              <a
+                href="/login"
+                className="underline-offset-4 transition-colors hover:text-white hover:underline"
+              >
+                Already have an account? Sign in
+              </a>
+              {createdEmail ? null : (
+                <a
+                  href={SURVEY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline"
+                >
+                  Already a member? Take our community survey
+                </a>
+              )}
+            </div>
+          </>
+        )}
       </motion.div>
 
       {/* Social Links */}
