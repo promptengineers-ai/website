@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { render, screen } from "@testing-library/react";
 import { vi } from "vitest";
-import { CHAPTER_SLUGS } from "@/config/chapters";
+import { CHAPTERS, CHAPTER_SLUGS } from "@/config/chapters";
 
 vi.mock("@/components/nav/TopNavBar", () => ({
   default: () => <div data-testid="top-nav-bar" />,
@@ -114,6 +114,64 @@ describe("chapter page", () => {
     ).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/You don't need to code/);
     expect(container.textContent).not.toMatch(/No talk, no agenda/);
+  });
+
+  it("emphasis sentence renders byte-identical", async () => {
+    const { container } = await renderChapter("st-george");
+
+    const match = Array.from(container.querySelectorAll("*")).filter(
+      (node) => node.textContent === "You don't need to code.",
+    );
+
+    expect(match.length).toBeGreaterThan(0);
+  });
+
+  it("emphasis precedes the descriptive paragraphs in DOM order", async () => {
+    const { container } = await renderChapter("st-george");
+
+    const emphasis = screen.getByText("You don't need to code.");
+    const lead = screen.getByText(/Bring a laptop, or just bring questions\./);
+    const format = screen.getByText(/No talk, no agenda\./);
+    const audience = screen.getByText(
+      /Developers, founders, students, and the AI-curious\./,
+    );
+
+    for (const later of [lead, format, audience]) {
+      expect(
+        emphasis.compareDocumentPosition(later) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
+
+    expect(container.textContent).toContain("You don't need to code.");
+  });
+
+  it("emphasis appears exactly once", async () => {
+    const { container } = await renderChapter("st-george");
+
+    const occurrences =
+      (container.textContent ?? "").split("You don't need to code.").length - 1;
+
+    expect(occurrences).toBe(1);
+  });
+
+  it("a chapter page links to the other chapter and not to itself", async () => {
+    for (const chapter of CHAPTERS) {
+      const { container, unmount } = await renderChapter(chapter.slug);
+
+      const hrefs = Array.from(
+        container.querySelectorAll("a[href^='/chapters/']"),
+      ).map((node) => node.getAttribute("href"));
+
+      expect(hrefs).not.toContain(`/chapters/${chapter.slug}`);
+      for (const other of CHAPTERS.filter(
+        (entry) => entry.slug !== chapter.slug,
+      )) {
+        expect(hrefs).toContain(`/chapters/${other.slug}`);
+      }
+
+      unmount();
+    }
   });
 
   it("throws notFound for an unknown slug", async () => {

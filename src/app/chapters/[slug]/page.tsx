@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import TopNavBar from "@/components/nav/TopNavBar";
 import ChapterCard from "@/components/chapters/ChapterCard";
-import { CHAPTER_SLUGS, getChapter } from "@/config/chapters";
+import { CHAPTERS, CHAPTER_SLUGS, getChapter } from "@/config/chapters";
 import type { Chapter } from "@/config/chapters";
 import { getChapterSnapshot } from "@/lib/meetup";
 import type { ChapterSnapshot } from "@/types";
@@ -100,16 +100,40 @@ function LaunchingDetails({ chapter }: { chapter: Chapter }) {
 
   return (
     <div className="space-y-6 text-lg leading-relaxed text-gray-200">
+      <p className="text-3xl font-bold leading-tight text-white sm:text-4xl">
+        {LAUNCHING_COPY.emphasis}
+      </p>
       <p>{LAUNCHING_COPY.lead}</p>
       <p>{LAUNCHING_COPY.format}</p>
-      <p>
-        {LAUNCHING_COPY.audience}{" "}
-        <strong className="font-semibold text-white">
-          {LAUNCHING_COPY.emphasis}
-        </strong>
-      </p>
+      <p>{LAUNCHING_COPY.audience}</p>
       <p className="text-base text-gray-400">{segments.join(" · ")}</p>
     </div>
+  );
+}
+
+function OtherChapters({ chapter }: { chapter: Chapter }) {
+  const others = CHAPTERS.filter((entry) => entry.slug !== chapter.slug);
+
+  if (others.length === 0) return null;
+
+  return (
+    <nav aria-label="Other chapters" className="space-y-3">
+      <p className="text-sm font-medium uppercase tracking-widest text-gray-400">
+        Other chapters
+      </p>
+      <ul className="flex flex-wrap gap-3">
+        {others.map((other) => (
+          <li key={other.slug}>
+            <Link
+              href={`/chapters/${other.slug}`}
+              className="inline-block rounded-md border border-gray-700 px-4 py-2 text-base text-white transition-colors hover:border-white"
+            >
+              {other.city}, {other.state}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -196,6 +220,8 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             ) : (
               <EstablishedActions snapshot={snapshot} />
             )}
+
+            <OtherChapters chapter={chapter} />
           </section>
 
           <aside aria-label="Chapter details">
