@@ -1,3 +1,5 @@
+import type { Chapter } from "@/config/chapters";
+
 export type Blog = {
   id: number;
   title: {
@@ -187,6 +189,18 @@ export type MeetupStats = {
   averageRating: number;
   ratingCount: number;
   isFallback: boolean;
+};
+
+export type MeetupEvent = {
+  title: string;
+  dateTime: string;
+  url: string;
+};
+
+export type ChapterSnapshot = {
+  chapter: Chapter;
+  stats: MeetupStats | null;
+  nextEvent: MeetupEvent | null;
 };
 
 export type ResumeMetadata = {
