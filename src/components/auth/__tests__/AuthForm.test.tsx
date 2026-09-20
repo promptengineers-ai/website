@@ -5,6 +5,13 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
+vi.mock("next/image", () => ({
+  default: (props: Record<string, unknown>) => {
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img {...(props as React.ImgHTMLAttributes<HTMLImageElement>)} />;
+  },
+}));
+
 import AuthForm from "../AuthForm";
 
 describe("AuthForm reveal toggles", () => {
@@ -76,4 +83,24 @@ describe("AuthForm reveal toggles", () => {
       screen.queryByRole("button", { name: /confirm password/i }),
     ).not.toBeInTheDocument();
   });
+});
+
+describe("AuthForm logo image (#54)", () => {
+  const ROBOT = String.fromCodePoint(0x1f916);
+  const logo = () => document.querySelector('img[src="/pe-logo.png"]');
+
+  it.each(["login", "signup"] as const)(
+    "renders the logo image with an empty accessible name (%s)",
+    (type) => {
+      render(<AuthForm type={type} onSubmit={vi.fn()} />);
+
+      const image = logo();
+      expect(image).not.toBeNull();
+      expect(image).toHaveAttribute("width", "60");
+      expect(image).toHaveAttribute("height", "60");
+      expect(image).toHaveAttribute("alt", "");
+      expect(screen.queryByRole("img")).not.toBeInTheDocument();
+      expect(document.body.textContent).not.toContain(ROBOT);
+    },
+  );
 });
