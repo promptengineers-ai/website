@@ -136,11 +136,42 @@ const HeroSection = ({
         George, UT exploring ChatGPT, LLMs, and the future of AI
       </motion.p>
 
+      {/* Community Stats */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.7 }}
+        className="mb-8 flex max-w-xl flex-wrap justify-center gap-x-8 gap-y-4 px-4 text-center"
+      >
+        <div>
+          <div className="text-3xl font-bold text-blue-400">
+            {formatMemberCount(stats.memberCount)}
+          </div>
+          <div className="text-sm text-gray-400">Members</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-purple-400">
+            {formatEventCount(stats.pastEventCount)}
+          </div>
+          <div className="text-sm text-gray-400">Events Hosted</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold text-green-400">
+            {formatRating(stats.averageRating)}
+          </div>
+          <div className="text-sm text-gray-400">Rating</div>
+        </div>
+        <p className="basis-full text-sm text-gray-300">
+          An account creates a member profile you can choose to list in the
+          browsable members directory.
+        </p>
+      </motion.div>
+
       {/* Primary CTA - Signup form */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.7 }}
+        transition={{ duration: 0.8, delay: 0.9 }}
         className="mb-12 flex w-full max-w-xl flex-col items-center gap-4 px-4"
       >
         {createdEmail ? (
@@ -254,11 +285,12 @@ const HeroSection = ({
                 required
                 minLength={8}
                 autoComplete="new-password"
-                placeholder="Password (8+ characters, upper, lower, number)"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting}
                 aria-invalid={error?.details.length ? true : undefined}
+                aria-describedby={error ? undefined : "hero-password-rules"}
                 className={`${fieldClass} pr-20`}
               />
               <button
@@ -341,7 +373,10 @@ const HeroSection = ({
             ) : null}
           </div>
         ) : createdEmail ? null : (
-          <p className="text-center text-sm text-gray-400">
+          <p
+            id="hero-password-rules"
+            className="text-center text-sm text-gray-400"
+          >
             Free member account. Your password needs 8+ characters with an
             uppercase letter, a lowercase letter, and a number.
           </p>
@@ -364,33 +399,6 @@ const HeroSection = ({
               Already a member? Take our community survey
             </a>
           )}
-        </div>
-      </motion.div>
-
-      {/* Community Stats */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.9 }}
-        className="mb-12 flex flex-wrap justify-center gap-8 text-center"
-      >
-        <div>
-          <div className="text-3xl font-bold text-blue-400">
-            {formatMemberCount(stats.memberCount)}
-          </div>
-          <div className="text-sm text-gray-400">Members</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-purple-400">
-            {formatEventCount(stats.pastEventCount)}
-          </div>
-          <div className="text-sm text-gray-400">Events Hosted</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-green-400">
-            {formatRating(stats.averageRating)}
-          </div>
-          <div className="text-sm text-gray-400">Rating</div>
         </div>
       </motion.div>
 
