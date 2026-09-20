@@ -170,7 +170,10 @@ Additional `<meta>` tags set for:
 
 ## Deployment Notes
 
-- **Platform:** Vercel, connected through the GitHub integration. Every pull request gets a preview deployment, and `development` and `main` deploy automatically.
+- **Platform:** Vercel, connected through the GitHub integration.
+- **Deploying branch:** `master` only. `vercel.json` sets `git.deploymentEnabled` to `false` for every branch and re-enables `master`, so pull requests and feature branches do not consume build minutes on preview deployments.
+- **Production branch:** set in the Vercel project's Git settings, and must also be `master`.
+- **Preview deployments:** disabled. To preview a branch, deploy it by hand with `vercel deploy`.
 - **Serverless functions:** Each API route deploys as a separate serverless function
 - **MongoDB connection:** Must account for serverless cold starts (connection pooling configured with appropriate timeouts)
 - **Environment variables:** Must be set in Vercel project settings
