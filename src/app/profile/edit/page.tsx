@@ -67,6 +67,7 @@ export default function EditProfilePage() {
     };
     background: string;
     seeking: string[];
+    chapters: string[];
     isPublic: boolean;
     avatarFile: File | null;
   }) => {

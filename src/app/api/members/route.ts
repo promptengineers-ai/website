@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { PROFILES_COLLECTION } from "@/lib/models/Profile";
+import { isChapterSlug } from "@/config/chapters";
 
 export async function GET(request: Request) {
   try {
@@ -8,7 +9,7 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
     const seeking = searchParams.get("seeking");
-    const location = searchParams.get("location");
+    const chapter = searchParams.get("chapter");
     const name = searchParams.get("name");
     const random = searchParams.get("random") === "true";
 
@@ -21,9 +22,8 @@ export async function GET(request: Request) {
       query.seeking = seeking;
     }
 
-    if (location) {
-      const escapedLocation = location.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      query.background = { $regex: escapedLocation, $options: "i" };
+    if (chapter && isChapterSlug(chapter)) {
+      query.chapters = chapter;
     }
 
     const pipeline: Record<string, unknown>[] = [{ $match: query }];
@@ -48,6 +48,7 @@ export async function GET(request: Request) {
         name: "$user.name",
         avatarUrl: 1,
         seeking: 1,
+        chapters: 1,
         background: 1,
         links: 1,
         createdAt: 1,

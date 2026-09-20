@@ -14,6 +14,7 @@ import {
   signAuthToken,
 } from "@/lib/jwt";
 import { updateUserName } from "@/lib/models/User";
+import { isChapterSlug } from "@/config/chapters";
 
 export async function GET() {
   try {
@@ -65,7 +66,8 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, links, background, seeking, isPublic, avatarUrl } = body;
+    const { name, links, background, seeking, chapters, isPublic, avatarUrl } =
+      body;
 
     // Validate name if provided
     if (name !== undefined) {
@@ -126,6 +128,13 @@ export async function POST(request: Request) {
       }
     }
 
+    // Validate chapter slugs
+    if (chapters !== undefined) {
+      if (!Array.isArray(chapters) || !chapters.every(isChapterSlug)) {
+        return NextResponse.json({ error: "Invalid chapter" }, { status: 400 });
+      }
+    }
+
     // Check if profile exists
     const existingProfile = await getProfileByUserId(auth.user.id);
 
@@ -136,6 +145,7 @@ export async function POST(request: Request) {
         links,
         background,
         seeking,
+        chapters,
         isPublic,
         avatarUrl,
       });
@@ -146,6 +156,7 @@ export async function POST(request: Request) {
         links,
         background,
         seeking,
+        chapters,
         isPublic,
         avatarUrl,
       });

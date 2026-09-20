@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import type { UserProfile } from "@/types";
+import { CHAPTERS } from "@/config/chapters";
 import RichTextEditor from "./RichTextEditor";
 import AvatarUpload from "./AvatarUpload";
 
@@ -20,6 +21,7 @@ type ProfileFormProps = {
     };
     background: string;
     seeking: string[];
+    chapters: string[];
     isPublic: boolean;
     avatarFile: File | null;
   }) => Promise<void>;
@@ -45,10 +47,19 @@ export default function ProfileForm({
         ? [profile.seeking]
         : [],
   );
+  const [chapters, setChapters] = useState<string[]>(profile?.chapters || []);
   const [isPublic, setIsPublic] = useState(profile?.isPublic || false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleChapterChange = (slug: string) => {
+    setChapters((prev) =>
+      prev.includes(slug)
+        ? prev.filter((item) => item !== slug)
+        : [...prev, slug],
+    );
+  };
 
   const handleSeekingChange = (value: string) => {
     setSeeking((prev) =>
@@ -76,6 +87,7 @@ export default function ProfileForm({
         },
         background,
         seeking,
+        chapters,
         isPublic,
         avatarFile,
       });
@@ -408,6 +420,50 @@ export default function ProfileForm({
                   <p className="text-gray-400">Other reasons</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-white">
+              Chapters
+            </h3>
+            <p className="mt-1 text-sm text-gray-400">
+              Which local chapters do you attend? (Select all that apply)
+            </p>
+          </div>
+          <div className="mt-5 md:col-span-2 md:mt-0">
+            <div className="space-y-4">
+              {CHAPTERS.map((chapter) => (
+                <div key={chapter.slug} className="flex items-start">
+                  <div className="flex h-5 items-center">
+                    <input
+                      id={`chapter-${chapter.slug}`}
+                      name={`chapter-${chapter.slug}`}
+                      type="checkbox"
+                      checked={chapters.includes(chapter.slug)}
+                      onChange={() => handleChapterChange(chapter.slug)}
+                      className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label
+                      htmlFor={`chapter-${chapter.slug}`}
+                      className="font-medium text-gray-300"
+                    >
+                      {chapter.city}, {chapter.state}
+                    </label>
+                    <p className="text-gray-400">
+                      {chapter.status === "launching"
+                        ? "Launching soon"
+                        : "Monthly meetup"}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

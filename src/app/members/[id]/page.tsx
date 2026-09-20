@@ -14,10 +14,12 @@ import {
   FaUsers,
   FaMeetup,
   FaEnvelope,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import { getProfileByUserId } from "@/lib/models/Profile";
 import { getUserById } from "@/lib/models/User";
 import { getAuthFromCookies } from "@/lib/jwt";
+import { chapterLabel } from "@/config/chapters";
 
 export default async function MemberProfilePage({
   params,
@@ -133,6 +135,20 @@ export default async function MemberProfilePage({
                     <FaEnvelope className="h-3.5 w-3.5" />
                     {user.email}
                   </a>
+                )}
+
+                {profile.chapters && profile.chapters.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {profile.chapters.map((slug) => (
+                      <span
+                        key={slug}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm"
+                      >
+                        <FaMapMarkerAlt className="h-3.5 w-3.5" />
+                        {chapterLabel(slug)}
+                      </span>
+                    ))}
+                  </div>
                 )}
 
                 {/* Career Intentions Badges */}

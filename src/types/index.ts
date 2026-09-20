@@ -57,6 +57,7 @@ export type UserProfile = {
   background: string;
   seeking: string[] | string; // Array for multi-select, string for backward compatibility
   resumeId?: string;
+  chapters: string[];
   isPublic?: boolean;
   avatarUrl?: string;
   badges: string[];
@@ -178,6 +179,14 @@ export type HackathonRegistration = {
   involvement: HackathonInvolvement;
   rolePreference?: HackathonRole;
   registeredAt: Date;
+};
+
+export type MeetupStats = {
+  memberCount: number;
+  pastEventCount: number;
+  averageRating: number;
+  ratingCount: number;
+  isFallback: boolean;
 };
 
 export type ResumeMetadata = {

@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaHome, FaSearch, FaFilter, FaUsers } from "react-icons/fa";
+import {
+  FaHome,
+  FaSearch,
+  FaFilter,
+  FaUsers,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import { CHAPTERS } from "@/config/chapters";
 import MemberCard from "@/components/members/MemberCard";
 
 type Member = {
@@ -11,6 +18,7 @@ type Member = {
   name: string;
   avatarUrl?: string;
   seeking: string | string[];
+  chapters?: string[];
   background?: string;
 };
 
@@ -23,6 +31,7 @@ export default function MembersPage() {
   // Filters
   const [name, setName] = useState("");
   const [seeking, setSeeking] = useState("");
+  const [chapter, setChapter] = useState("");
 
   const fetchMembers = async (pageToFetch: number, reset: boolean) => {
     setLoading(true);
@@ -34,6 +43,7 @@ export default function MembersPage() {
 
       if (name) params.append("name", name);
       if (seeking) params.append("seeking", seeking);
+      if (chapter) params.append("chapter", chapter);
 
       const response = await fetch(`/api/members?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch members");
@@ -141,6 +151,33 @@ export default function MembersPage() {
                   <option value="hiring">Hiring</option>
                   <option value="networking">Networking</option>
                   <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="w-full md:w-64">
+              <label
+                htmlFor="chapter"
+                className="mb-1 block text-sm font-medium text-gray-300"
+              >
+                Chapter
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <FaMapMarkerAlt className="h-4 w-4 text-gray-500" />
+                </div>
+                <select
+                  id="chapter"
+                  value={chapter}
+                  onChange={(e) => setChapter(e.target.value)}
+                  className="block w-full rounded-md border border-gray-700 bg-gray-800 py-3 pl-10 text-white focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                >
+                  <option value="">All Chapters</option>
+                  {CHAPTERS.map((c) => (
+                    <option key={c.slug} value={c.slug}>
+                      {c.city}, {c.state}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

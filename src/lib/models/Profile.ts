@@ -9,6 +9,7 @@ export async function createProfileIndexes() {
   const collection = db.collection(PROFILES_COLLECTION);
 
   await collection.createIndex({ userId: 1 }, { unique: true });
+  await collection.createIndex({ isPublic: 1, chapters: 1 });
 }
 
 export async function createProfile(data: {
@@ -23,6 +24,7 @@ export async function createProfile(data: {
   };
   background?: string;
   seeking?: "work" | "hiring" | "networking" | "other";
+  chapters?: string[];
   isPublic?: boolean;
   avatarUrl?: string;
   badges?: string[];
@@ -38,6 +40,7 @@ export async function createProfile(data: {
     links: data.links || {},
     background: data.background || "",
     seeking: data.seeking || "networking",
+    chapters: data.chapters || [],
     isPublic: data.isPublic || false,
     avatarUrl: data.avatarUrl || "",
     badges: data.badges || [],
@@ -55,6 +58,7 @@ export async function createProfile(data: {
     links: profile.links,
     background: profile.background,
     seeking: profile.seeking,
+    chapters: profile.chapters,
     isPublic: profile.isPublic,
     avatarUrl: profile.avatarUrl,
     badges: profile.badges,
@@ -82,6 +86,7 @@ export async function getProfileByUserId(
     background: profile.background || "",
     seeking: profile.seeking || "networking",
     resumeId: profile.resumeId?.toString(),
+    chapters: profile.chapters || [],
     isPublic: profile.isPublic || false,
     avatarUrl: profile.avatarUrl || "",
     badges: profile.badges || [],
@@ -112,6 +117,7 @@ export async function getProfilesByUserIds(
       background: doc.background || "",
       seeking: doc.seeking || "networking",
       resumeId: doc.resumeId?.toString(),
+      chapters: doc.chapters || [],
       isPublic: doc.isPublic || false,
       avatarUrl: doc.avatarUrl || "",
       badges: doc.badges || [],
@@ -137,6 +143,7 @@ export async function updateProfile(
     };
     background?: string;
     seeking?: "work" | "hiring" | "networking" | "other";
+    chapters?: string[];
     resumeId?: string;
     isPublic?: boolean;
     avatarUrl?: string;
@@ -155,6 +162,7 @@ export async function updateProfile(
   if (data.links !== undefined) updateData.links = data.links;
   if (data.background !== undefined) updateData.background = data.background;
   if (data.seeking !== undefined) updateData.seeking = data.seeking;
+  if (data.chapters !== undefined) updateData.chapters = data.chapters;
   if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
   if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
   if (data.badges !== undefined) updateData.badges = data.badges;
@@ -181,6 +189,7 @@ export async function updateProfile(
     background: result.background || "",
     seeking: result.seeking || "networking",
     resumeId: result.resumeId?.toString(),
+    chapters: result.chapters || [],
     isPublic: result.isPublic || false,
     avatarUrl: result.avatarUrl || "",
     badges: result.badges || [],
