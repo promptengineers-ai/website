@@ -9,7 +9,6 @@ type Member = {
   _id: string;
   userId: string;
   name: string;
-  email?: string;
   avatarUrl?: string;
   seeking: string | string[];
   background?: string;

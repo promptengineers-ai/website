@@ -1,19 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  FaBriefcase,
-  FaUserFriends,
-  FaUsers,
-  FaLink,
-  FaEnvelope,
-} from "react-icons/fa";
+import { FaBriefcase, FaUserFriends, FaUsers, FaLink } from "react-icons/fa";
 
 type MemberCardProps = {
   member: {
     _id: string;
     userId: string;
     name: string;
-    email?: string;
     avatarUrl?: string;
     seeking: string | string[];
     background?: string;
@@ -80,12 +73,6 @@ export default function MemberCard({ member }: MemberCardProps) {
               <h3 className="text-lg font-semibold text-white group-hover:text-blue-400">
                 {member.name}
               </h3>
-              {member.email && (
-                <span className="flex items-center gap-1.5 text-xs text-gray-400">
-                  <FaEnvelope className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">{member.email}</span>
-                </span>
-              )}
             </div>
           </div>
 

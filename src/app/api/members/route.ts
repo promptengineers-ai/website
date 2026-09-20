@@ -46,7 +46,6 @@ export async function GET(request: Request) {
         _id: 1,
         userId: 1,
         name: "$user.name",
-        email: "$user.email",
         avatarUrl: 1,
         seeking: 1,
         background: 1,
