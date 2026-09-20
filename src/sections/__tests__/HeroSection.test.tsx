@@ -22,15 +22,23 @@ const account = {
   password: "Passw0rdOK",
 };
 
-const fillAndSubmit = (values = account) => {
+const SURVEY_URL = "https://forms.gle/DYBEgiiFGUUisw7V6";
+
+const fillAndSubmit = (
+  values = account,
+  confirmPassword: string = values.password,
+) => {
   fireEvent.change(screen.getByLabelText(/name/i), {
     target: { value: values.name },
   });
   fireEvent.change(screen.getByLabelText(/email/i), {
     target: { value: values.email },
   });
-  fireEvent.change(screen.getByLabelText(/password/i), {
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
     target: { value: values.password },
+  });
+  fireEvent.change(screen.getByLabelText(/confirm password/i), {
+    target: { value: confirmPassword },
   });
   fireEvent.click(screen.getByRole("button", { name: /create account/i }));
 };
@@ -45,7 +53,11 @@ describe("HeroSection", () => {
 
     expect(screen.getByLabelText(/name/i)).toHaveAttribute("type", "text");
     expect(screen.getByLabelText(/email/i)).toHaveAttribute("type", "email");
-    expect(screen.getByLabelText(/password/i)).toHaveAttribute(
+    expect(screen.getByLabelText(/^password$/i)).toHaveAttribute(
+      "type",
+      "password",
+    );
+    expect(screen.getByLabelText(/confirm password/i)).toHaveAttribute(
       "type",
       "password",
     );
@@ -74,7 +86,133 @@ describe("HeroSection", () => {
       screen.getByRole("button", { name: /resend verification/i }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
+  });
+
+  it("mismatched passwords show an error and never call register", async () => {
+    const register = vi.spyOn(apiClient, "register");
+
+    render(<HeroSection />);
+    fillAndSubmit(account, "Passw0rdNO");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /passwords do not match/i,
+    );
+    expect(register).not.toHaveBeenCalled();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toHaveValue(account.password);
+    expect(screen.getByLabelText(/confirm password/i)).toHaveValue(
+      "Passw0rdNO",
+    );
+  });
+
+  it("matching passwords submit normally", async () => {
+    const register = vi.spyOn(apiClient, "register").mockResolvedValue({
+      message: "Account created.",
+      requiresVerification: true,
+    });
+
+    render(<HeroSection />);
+    fillAndSubmit(account, account.password);
+
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(/account created/i);
+    });
+    expect(register).toHaveBeenCalledTimes(1);
+    expect(register).toHaveBeenCalledWith(account);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("toggle reveals and re-masks both fields, and is labelled", () => {
+    render(<HeroSection />);
+
+    const toggle = screen.getByRole("button", { name: /show password/i });
+    expect(toggle).toHaveAttribute("type", "button");
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByLabelText(/^password$/i)).toHaveAttribute(
+      "type",
+      "password",
+    );
+    expect(screen.getByLabelText(/confirm password/i)).toHaveAttribute(
+      "type",
+      "password",
+    );
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByLabelText(/^password$/i)).toHaveAttribute(
+      "type",
+      "text",
+    );
+    expect(screen.getByLabelText(/confirm password/i)).toHaveAttribute(
+      "type",
+      "text",
+    );
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByLabelText(/^password$/i)).toHaveAttribute(
+      "type",
+      "password",
+    );
+    expect(screen.getByLabelText(/confirm password/i)).toHaveAttribute(
+      "type",
+      "password",
+    );
+  });
+
+  it("success state offers the survey and a skip", async () => {
+    vi.spyOn(apiClient, "register").mockResolvedValue({
+      message: "Account created.",
+      requiresVerification: true,
+    });
+
+    render(<HeroSection />);
+    fillAndSubmit();
+
+    await screen.findByRole("status");
+    const surveyLink = screen.getByRole("link", { name: /survey/i });
+    expect(surveyLink).toHaveAttribute("href", SURVEY_URL);
+    expect(surveyLink).toHaveAttribute("target", "_blank");
+    expect(
+      screen.getByRole("button", { name: /skip for now/i }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/required/i)).not.toBeInTheDocument();
+  });
+
+  it("skipping leaves the created-account state intact", async () => {
+    vi.spyOn(apiClient, "register").mockResolvedValue({
+      message: "Account created.",
+      requiresVerification: true,
+    });
+    const resend = vi
+      .spyOn(apiClient, "resendVerification")
+      .mockResolvedValue({ message: "sent" });
+
+    render(<HeroSection />);
+    fillAndSubmit();
+
+    const skip = await screen.findByRole("button", { name: /skip for now/i });
+    fireEvent.click(skip);
+
+    expect(
+      screen.queryByRole("button", { name: /skip for now/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /take the community survey/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(/account created/i);
+    expect(screen.getByRole("status")).toHaveTextContent(account.email);
+    expect(screen.getByText(/profile page/i)).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /resend verification/i }),
+    );
+    await waitFor(() => {
+      expect(resend).toHaveBeenCalledWith(account.email);
+    });
   });
 
   it("resends the verification email from the success state", async () => {
