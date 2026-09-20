@@ -1,9 +1,13 @@
+import { existsSync } from "fs";
+import { join } from "path";
 import { render, screen } from "@testing-library/react";
 import { CHAPTERS, getChapter } from "@/config/chapters";
 import type { Chapter } from "@/config/chapters";
 import ChapterOrganizers from "../ChapterOrganizers";
 
 const plano = getChapter("plano") as Chapter;
+
+const ALL_ORGANIZERS = CHAPTERS.flatMap((chapter) => chapter.organizers);
 
 describe("ChapterOrganizers", () => {
   it("renders a heading and a card for every chapter with organizers", () => {
@@ -67,5 +71,38 @@ describe("ChapterOrganizers", () => {
     });
     expect(mailto).not.toHaveAttribute("target");
     expect(mailto).not.toHaveAttribute("rel");
+  });
+
+  it("renders a photo for every organizer", () => {
+    const { container } = render(<ChapterOrganizers />);
+
+    const sources = Array.from(container.querySelectorAll("img")).map(
+      (img) => img.getAttribute("src") ?? "",
+    );
+
+    expect(ALL_ORGANIZERS.length).toBeGreaterThan(0);
+
+    for (const organizer of ALL_ORGANIZERS) {
+      const matched = sources.some(
+        (src) =>
+          src.includes(organizer.photoUrl) ||
+          src.includes(encodeURIComponent(organizer.photoUrl)),
+      );
+      expect({ name: organizer.name, matched }).toEqual({
+        name: organizer.name,
+        matched: true,
+      });
+    }
+  });
+
+  it("every organizer photo exists on disk under public/", () => {
+    const missing = ALL_ORGANIZERS.filter(
+      (organizer) =>
+        !existsSync(
+          join(process.cwd(), "public", organizer.photoUrl.replace(/^\//, "")),
+        ),
+    ).map((organizer) => organizer.photoUrl);
+
+    expect(missing).toEqual([]);
   });
 });

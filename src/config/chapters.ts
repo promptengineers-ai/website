@@ -5,6 +5,7 @@ export type Organizer = {
   linkedinUrl: string;
   githubUrl: string;
   email: string;
+  photoUrl: string;
 };
 
 export type Chapter = {
@@ -32,6 +33,7 @@ export const CHAPTERS: Chapter[] = [
         linkedinUrl: "https://www.linkedin.com/in/debozkurt/",
         githubUrl: "https://github.com/debozkurt",
         email: "dbozkurt@promptengineers.ai",
+        photoUrl: "/images/organizers/derrick-bozkurt.jpg",
       },
     ],
   },
@@ -48,6 +50,7 @@ export const CHAPTERS: Chapter[] = [
         linkedinUrl: "https://www.linkedin.com/in/ryan-eggleston/",
         githubUrl: "https://github.com/ryaneggz",
         email: "reggleston@promptengineers.ai",
+        photoUrl: "/images/organizers/ryan-eggleston.jpg",
       },
     ],
     venue: "Atwood Innovation Plaza",
