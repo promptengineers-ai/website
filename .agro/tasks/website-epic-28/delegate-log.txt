@@ -1,0 +1,7 @@
+
+--- T21 organizers-on-landing ---
+branch: feat/organizers-landing (off development @939dfe3)
+worker: 1 (coupled implementation, single continuing worker; no parallelism -> no worktree)
+model requested: opus (low-complexity bounded implementation; typed-registry change + one new server component + auth branch)
+effort: no per-call control on Agent tool; observed effort: inherited session level, unobserved
+advisor retains: architecture below, all gates, PR.

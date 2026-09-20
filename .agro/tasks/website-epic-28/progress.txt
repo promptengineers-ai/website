@@ -1,0 +1,16 @@
+
+## T21 — organizers on landing for signed-out visitors (branch feat/organizers-landing)
+Chapter.organizers: string[] -> Organizer[] {name,linkedinUrl,githubUrl,email}; plano=Derrick Bozkurt, st-george=Ryan Eggleston.
+New server component ChapterOrganizers; page.tsx branches on getAuthFromCookies(): auth ? MemberStrip : ChapterOrganizers.
+Gates (advisor-run): lint 0 (2 pre-existing img warnings), test 35 files / 226 tests (was 221), build 0.
+Mutations: M35 invert auth branch -> 2 fail. M36 drop mailto: prefix -> 1 fail. M37 add target/rel to mailto -> 1 fail. M38 swap linkedin/github hrefs -> 1 fail. All caught.
+MEASURED: route "/" changes from O (static) to f (dynamic) because cookies() is read. Meetup fetch keeps its own next:{revalidate} cache.
+
+## T22 — organizer headshots + card layout (same branch/PR #58)
+Vendored LinkedIn photos locally (source URLs are signed, e=1791417600 ~3wk expiry): public/images/organizers/{ryan-eggleston,derrick-bozkurt}.jpg (200x200 6.8KB / 800x800 116KB). sharp unavailable, left at native res; next/image resizes on delivery (128px variants serve 2.0KB / 3.6KB).
+Organizer.photoUrl added as REQUIRED.
+Layout iterated twice on operator feedback: (a) photo left of name -> (b) operator: "upper right corner of card" -> flattened to one card per organizer (chapter name became the eyebrow h3) -> (c) operator: "links looked better as single row at bottom" -> header row (eyebrow+name left, 64px avatar right) + full-width link row beneath.
+INCIDENT: an interrupted mutation probe left the tree partially mutated - `git checkout src/config/chapters.ts` inside the probe reverted the worker's photoUrl additions, and the <Image> removal probe was not restored. Detected via grep before commit; both reconstructed by hand and re-verified. Lesson: never use `git checkout <path>` to restore a mutation when the path holds uncommitted work; copy to /tmp and restore from the copy.
+Gates (advisor-run): lint 0, test 35 files / 228 tests, build 0.
+Mutations: M39 point photoUrl at a missing file -> disk-existence test fails. M40 delete the <Image> element -> photo test fails. Both caught; both restored from /tmp copies and diff-verified.
+Verified on the local server behind the operator's tunnel: markup matches intent, /_next/image returns 200 image/jpeg for both.
