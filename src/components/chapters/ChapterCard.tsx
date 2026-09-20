@@ -11,16 +11,16 @@ export default function ChapterCard({ snapshot }: ChapterCardProps) {
   const launching = chapter.status === "launching";
 
   return (
-    <article className="flex h-full flex-col gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <article className="flex h-full flex-col gap-4 rounded-xl border border-white/15 bg-white/5 p-6 shadow-sm">
       <header className="flex items-start justify-between gap-3">
-        <h3 className="text-xl font-semibold text-gray-900">
+        <h3 className="text-xl font-semibold text-white">
           {chapter.city}, {chapter.state}
         </h3>
         <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
+          className={`rounded-full border px-3 py-1 text-xs font-medium ${
             launching
-              ? "bg-amber-100 text-amber-800"
-              : "bg-green-100 text-green-800"
+              ? "border-amber-400/40 bg-amber-500/20 text-amber-200"
+              : "border-green-400/40 bg-green-500/20 text-green-200"
           }`}
         >
           {launching ? "Launching" : "Established"}
@@ -28,27 +28,27 @@ export default function ChapterCard({ snapshot }: ChapterCardProps) {
       </header>
 
       {chapter.venue && (
-        <p className="flex items-center gap-2 text-sm text-gray-600">
+        <p className="flex items-center gap-2 text-sm text-gray-300">
           <FaMapMarkerAlt className="h-3 w-3 shrink-0" />
           <span>{chapter.venue}</span>
         </p>
       )}
 
       {chapter.organizers.length > 0 && (
-        <p className="flex items-center gap-2 text-sm text-gray-600">
+        <p className="flex items-center gap-2 text-sm text-gray-300">
           <FaUsers className="h-3 w-3 shrink-0" />
           <span>{chapter.organizers.join(", ")}</span>
         </p>
       )}
 
       {stats && (
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-300">
           {formatMemberCount(stats.memberCount)} members
         </p>
       )}
 
-      <div className="flex-1 rounded-lg bg-gray-50 p-4">
-        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+      <div className="flex-1 rounded-lg bg-white/10 p-4">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-gray-300">
           <FaCalendarAlt className="h-3 w-3 shrink-0" />
           Next event
         </p>
@@ -58,19 +58,19 @@ export default function ChapterCard({ snapshot }: ChapterCardProps) {
               href={nextEvent.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 block font-medium text-gray-900 hover:underline"
+              className="mt-2 block font-medium text-white hover:underline"
             >
               {nextEvent.title}
             </a>
             <time
               dateTime={nextEvent.dateTime}
-              className="mt-1 block text-sm text-gray-600"
+              className="mt-1 block text-sm text-gray-300"
             >
               {formatEventDateTime(nextEvent.dateTime) ?? nextEvent.dateTime}
             </time>
           </>
         ) : (
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-300">
             {launching ? "First event to be announced" : "No upcoming event"}
           </p>
         )}
@@ -81,7 +81,7 @@ export default function ChapterCard({ snapshot }: ChapterCardProps) {
           href={chapter.meetupUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-blue-600 hover:underline"
+          className="text-sm font-medium text-blue-400 hover:underline"
         >
           View on Meetup
         </a>
