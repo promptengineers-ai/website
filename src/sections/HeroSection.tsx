@@ -159,7 +159,7 @@ const HeroSection = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="mb-8 max-w-2xl text-center text-xl font-light text-gray-300"
+        className="mb-6 max-w-2xl px-4 text-center text-base font-light text-gray-300 sm:text-lg"
       >
         A community of developers and tech enthusiasts in Plano, TX and St.
         George, UT exploring ChatGPT, LLMs, and the future of AI
