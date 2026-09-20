@@ -23,8 +23,7 @@ import QRCode from "react-qr-code";
 import type { UserProfile } from "@/types";
 import { useAuth } from "@/components/auth/AuthProvider";
 import DeleteAccountCard from "@/components/profile/DeleteAccountCard";
-
-const SURVEY_URL = "https://forms.gle/DYBEgiiFGUUisw7V6";
+import { SURVEY_URL } from "@/config/survey";
 
 function CommunitySurveyCard() {
   return (

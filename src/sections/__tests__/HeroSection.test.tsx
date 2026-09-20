@@ -5,9 +5,10 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import HeroSection from "../HeroSection";
 import { ApiError, apiClient } from "@/utils/client";
+import { SURVEY_URL } from "@/config/survey";
 import {
   FALLBACK_MEETUP_STATS,
   formatEventCount,
@@ -15,6 +16,15 @@ import {
   formatRating,
 } from "@/lib/meetup";
 import type { MeetupStats } from "@/types";
+
+const auth = vi.hoisted(() => ({
+  status: "unauthenticated" as "loading" | "authenticated" | "unauthenticated",
+  user: null as { id: string; email: string; name?: string } | null,
+}));
+
+vi.mock("@/components/auth/AuthProvider", () => ({
+  useAuth: () => ({ status: auth.status, user: auth.user }),
+}));
 
 vi.mock("next/image", () => ({
   default: (props: Record<string, unknown>) => {
@@ -28,8 +38,6 @@ const account = {
   email: "ada@example.com",
   password: "Passw0rdOK",
 };
-
-const SURVEY_URL = "https://forms.gle/DYBEgiiFGUUisw7V6";
 
 const fillAndSubmit = (
   values = account,
@@ -51,6 +59,12 @@ const fillAndSubmit = (
 };
 
 describe("HeroSection", () => {
+  beforeEach(() => {
+    auth.status = "unauthenticated";
+    auth.user = null;
+    window.localStorage.clear();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -323,8 +337,150 @@ describe("HeroSection", () => {
 
     expect(screen.getByRole("link", { name: /survey/i })).toHaveAttribute(
       "href",
-      "https://forms.gle/DYBEgiiFGUUisw7V6",
+      SURVEY_URL,
     );
+  });
+
+  describe("signed-in members see the survey, not the signup form (#53)", () => {
+    const signIn = () => {
+      auth.status = "authenticated";
+      auth.user = { id: "u1", email: "ada@example.com", name: "Ada" };
+    };
+
+    const surveySlot = () => screen.queryByTestId("hero-survey-slot");
+    const signupForm = () =>
+      screen.queryByRole("button", { name: /create account/i });
+
+    it("unauthenticated renders the signup form and no survey block in its place", () => {
+      render(<HeroSection />);
+
+      expect(signupForm()).toBeInTheDocument();
+      expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
+      expect(surveySlot()).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /hide this/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("authenticated renders the survey and no signup form", () => {
+      signIn();
+      render(<HeroSection />);
+
+      expect(signupForm()).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/email/i)).not.toBeInTheDocument();
+      expect(document.querySelector("form")).toBeNull();
+
+      const slot = surveySlot();
+      expect(slot).toBeInTheDocument();
+      const surveyLinks = screen.getAllByRole("link", { name: /survey/i });
+      expect(surveyLinks).toHaveLength(1);
+      expect(surveyLinks[0]).toHaveAttribute("href", SURVEY_URL);
+      expect(surveyLinks[0]).toHaveAttribute("target", "_blank");
+      expect(surveyLinks[0]).toHaveAttribute(
+        "rel",
+        expect.stringContaining("noopener"),
+      );
+      expect(screen.queryByText(/required/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", { name: /sign in/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /hide this/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(formatMemberCount(FALLBACK_MEETUP_STATS.memberCount)),
+      ).toBeInTheDocument();
+    });
+
+    it("loading renders neither the signup form nor the survey", () => {
+      auth.status = "loading";
+      render(<HeroSection />);
+
+      expect(signupForm()).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
+      expect(document.querySelector("form")).toBeNull();
+      expect(surveySlot()).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", { name: /survey/i }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("hero-auth-placeholder")).toBeInTheDocument();
+    });
+
+    it("dismissing the survey slot hides it without affecting the account", () => {
+      signIn();
+      render(<HeroSection />);
+
+      fireEvent.click(screen.getByRole("button", { name: /hide this/i }));
+
+      expect(
+        screen.queryByRole("link", { name: /take the community survey/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /hide this/i }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /profile/i })).toHaveAttribute(
+        "href",
+        "/profile",
+      );
+      expect(signupForm()).not.toBeInTheDocument();
+      expect(document.querySelector("form")).toBeNull();
+      expect(auth.status).toBe("authenticated");
+      expect(window.localStorage.getItem("hero-survey-dismissed")).toBe("1");
+    });
+
+    it("a prior dismissal on this device keeps the slot hidden", () => {
+      window.localStorage.setItem("hero-survey-dismissed", "1");
+      signIn();
+      render(<HeroSection />);
+
+      expect(
+        screen.queryByRole("link", { name: /take the community survey/i }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /profile/i })).toHaveAttribute(
+        "href",
+        "/profile",
+      );
+      expect(signupForm()).not.toBeInTheDocument();
+    });
+
+    it("account-unlock line is hidden from a signed-in member", () => {
+      signIn();
+      render(<HeroSection />);
+
+      expect(
+        screen.queryByText(/creates a member profile you can choose to list/i),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText("Members")).toBeInTheDocument();
+      expect(screen.getByText("Events Hosted")).toBeInTheDocument();
+      expect(screen.getByText("Rating")).toBeInTheDocument();
+    });
+
+    it("account-unlock line does not render while auth is loading", () => {
+      auth.status = "loading";
+      render(<HeroSection />);
+
+      expect(
+        screen.queryByText(/creates a member profile you can choose to list/i),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText("Members")).toBeInTheDocument();
+    });
+
+    it("renders the survey when localStorage throws", () => {
+      const getItem = vi
+        .spyOn(Storage.prototype, "getItem")
+        .mockImplementation(() => {
+          throw new Error("SecurityError");
+        });
+      signIn();
+      render(<HeroSection />);
+
+      expect(getItem).toHaveBeenCalled();
+      expect(
+        screen.getByRole("link", { name: /take the community survey/i }),
+      ).toHaveAttribute("href", SURVEY_URL);
+      expect(signupForm()).not.toBeInTheDocument();
+    });
   });
 
   describe("live proof above the ask (#49)", () => {
