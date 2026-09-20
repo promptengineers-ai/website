@@ -614,4 +614,29 @@ describe("HeroSection", () => {
       expect(field).toHaveValue("Partial1");
     });
   });
+
+  describe("mobile spacing (#56)", () => {
+    it("hero reserves top space for the fixed nav", () => {
+      const { container } = render(<HeroSection />);
+
+      const hero = container.firstElementChild as HTMLElement;
+      expect(hero).toHaveClass("min-h-screen", "justify-center");
+      // Guard the defect (no top padding at all), not one exact value — the
+      // scale is tuned for space and differs per breakpoint.
+      expect(hero.className).toMatch(/(^|\s)pt-\S+/);
+      expect(hero.className).toMatch(/(^|\s)sm:pt-\S+/);
+    });
+
+    it("social links carry bottom spacing", () => {
+      render(<HeroSection />);
+
+      const socials = screen.getByRole("link", { name: /slack/i })
+        .parentElement as HTMLElement;
+      expect(socials).toHaveClass("flex", "justify-center");
+      // Guard the defect (flush against the chapters divider), not one exact
+      // value — the scale is tuned for space and differs per breakpoint.
+      expect(socials.className).toMatch(/(^|\s)mb-\S+/);
+      expect(socials.className).toMatch(/(^|\s)sm:mb-\S+/);
+    });
+  });
 });
