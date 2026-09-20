@@ -126,18 +126,24 @@ const HeroSection = ({
     confirmPassword.length > 0 && password !== confirmPassword;
 
   const fieldClass =
-    "w-full rounded-full border border-white/20 bg-white/10 px-5 py-3 text-base text-white placeholder-gray-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 disabled:opacity-60";
+    "w-full rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-base text-white placeholder-gray-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 disabled:opacity-60 sm:py-3";
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-black pt-24 text-white">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-black pt-20 text-white sm:pt-24">
       {/* Logo/Icon Area */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="mb-5 flex items-center justify-center"
+        className="mb-3 flex items-center justify-center sm:mb-5"
       >
-        <Image src="/pe-logo.png" alt="" width={72} height={72} />
+        <Image
+          src="/pe-logo.png"
+          alt=""
+          width={72}
+          height={72}
+          className="h-14 w-14 sm:h-[72px] sm:w-[72px]"
+        />
       </motion.div>
 
       {/* Headline */}
@@ -203,7 +209,7 @@ const HeroSection = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        className="mb-12 flex w-full max-w-xl flex-col items-center gap-4 px-4"
+        className="mb-8 flex w-full max-w-xl flex-col items-center gap-3 px-4 sm:mb-12 sm:gap-4"
       >
         {status === "loading" ? (
           <div
@@ -497,7 +503,7 @@ const HeroSection = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.1 }}
-        className="mb-16 flex justify-center gap-6"
+        className="mb-12 flex justify-center gap-6 sm:mb-16"
       >
         <a
           href="https://join.slack.com/t/promptengineersai/shared_invite/zt-3t4w1meid-10gQHbgoWO~UYPJprH~Cyw"

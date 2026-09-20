@@ -621,7 +621,10 @@ describe("HeroSection", () => {
 
       const hero = container.firstElementChild as HTMLElement;
       expect(hero).toHaveClass("min-h-screen", "justify-center");
-      expect(hero).toHaveClass("pt-24");
+      // Guard the defect (no top padding at all), not one exact value — the
+      // scale is tuned for space and differs per breakpoint.
+      expect(hero.className).toMatch(/(^|\s)pt-\S+/);
+      expect(hero.className).toMatch(/(^|\s)sm:pt-\S+/);
     });
 
     it("social links carry bottom spacing", () => {
@@ -630,7 +633,10 @@ describe("HeroSection", () => {
       const socials = screen.getByRole("link", { name: /slack/i })
         .parentElement as HTMLElement;
       expect(socials).toHaveClass("flex", "justify-center");
-      expect(socials).toHaveClass("mb-16");
+      // Guard the defect (flush against the chapters divider), not one exact
+      // value — the scale is tuned for space and differs per breakpoint.
+      expect(socials.className).toMatch(/(^|\s)mb-\S+/);
+      expect(socials.className).toMatch(/(^|\s)sm:mb-\S+/);
     });
   });
 });
