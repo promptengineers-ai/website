@@ -85,7 +85,9 @@ function ResetPasswordContent() {
         </div>
 
         <div className="flex justify-center">
-          <div className="text-6xl">🤖</div>
+          <div className="text-6xl" aria-hidden="true">
+            🧑‍💻
+          </div>
         </div>
 
         <div>

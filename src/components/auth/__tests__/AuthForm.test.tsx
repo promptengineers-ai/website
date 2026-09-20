@@ -77,3 +77,22 @@ describe("AuthForm reveal toggles", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("AuthForm technologist emoji (#54)", () => {
+  const TECHNOLOGIST = String.fromCodePoint(0x1f9d1, 0x200d, 0x1f4bb);
+  const ROBOT = String.fromCodePoint(0x1f916);
+
+  it.each(["login", "signup"] as const)(
+    "renders the technologist emoji, hidden from assistive tech (%s)",
+    (type) => {
+      render(<AuthForm type={type} onSubmit={vi.fn()} />);
+
+      const emoji = screen.getByText(TECHNOLOGIST);
+      expect(emoji).toBeInTheDocument();
+      expect(emoji).toHaveAttribute("aria-hidden", "true");
+      expect(emoji).toHaveClass("text-6xl");
+      expect(screen.queryByText(ROBOT)).not.toBeInTheDocument();
+      expect(document.body.textContent).not.toContain(ROBOT);
+    },
+  );
+});

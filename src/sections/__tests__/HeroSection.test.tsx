@@ -550,6 +550,30 @@ describe("HeroSection", () => {
     });
   });
 
+  describe("technologist emoji, not the robot (#54)", () => {
+    const TECHNOLOGIST = String.fromCodePoint(0x1f9d1, 0x200d, 0x1f4bb);
+    const ROBOT = String.fromCodePoint(0x1f916);
+
+    it.each(["unauthenticated", "authenticated", "loading"] as const)(
+      "renders the technologist emoji and no robot emoji (%s)",
+      (status) => {
+        auth.status = status;
+        auth.user =
+          status === "authenticated"
+            ? { id: "u1", email: "ada@example.com", name: "Ada" }
+            : null;
+        render(<HeroSection />);
+
+        const emoji = screen.getByText(TECHNOLOGIST);
+        expect(emoji).toBeInTheDocument();
+        expect(emoji).toHaveAttribute("aria-hidden", "true");
+        expect(emoji).toHaveClass("text-7xl");
+        expect(screen.queryByText(ROBOT)).not.toBeInTheDocument();
+        expect(document.body.textContent).not.toContain(ROBOT);
+      },
+    );
+  });
+
   describe("password rules stated once (#51)", () => {
     const RULES = /8\+ characters/i;
 

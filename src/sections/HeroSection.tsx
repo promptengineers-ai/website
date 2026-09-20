@@ -136,7 +136,9 @@ const HeroSection = ({
         transition={{ duration: 0.8 }}
         className="mb-5 flex items-center justify-center"
       >
-        <div className="text-7xl">🤖</div>
+        <div className="text-7xl" aria-hidden="true">
+          🧑‍💻
+        </div>
       </motion.div>
 
       {/* Headline */}
