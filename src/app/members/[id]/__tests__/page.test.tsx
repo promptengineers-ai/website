@@ -207,4 +207,17 @@ describe("MemberProfilePage — resume link gating (#37)", () => {
 
     expect(container.querySelector(resumeHref)).toBeInTheDocument();
   });
+
+  it("shows no resume link to the owner once the resume is deleted", async () => {
+    signInAsOwner();
+    const { container } = await renderPage({
+      resumeId: undefined,
+      resumeVisibleToMembers: true,
+    });
+
+    expect(
+      container.querySelector('a[href^="/api/resumes/"]'),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("View Resume")).not.toBeInTheDocument();
+  });
 });

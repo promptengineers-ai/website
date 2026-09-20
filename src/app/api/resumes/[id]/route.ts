@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getGridFSBucket } from "@/lib/mongodb";
 import {
+  clearResume,
   getProfileByResumeId,
   getProfileByUserId,
-  updateProfile,
 } from "@/lib/models/Profile";
 import {
   clearAuthCookie,
@@ -116,10 +116,7 @@ export async function DELETE(
     // Delete file from GridFS
     await bucket.delete(new ObjectId(id));
 
-    // Remove resume reference from profile
-    await updateProfile(auth.user.id, {
-      resumeId: undefined,
-    });
+    await clearResume(auth.user.id);
 
     const response = NextResponse.json(
       { message: "Resume deleted successfully" },

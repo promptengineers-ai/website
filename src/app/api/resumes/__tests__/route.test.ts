@@ -59,7 +59,8 @@ function makeDb(docs: ProfileDoc[]) {
     );
   });
   const findOneAndUpdate = vi.fn(async () => docs[0] ?? null);
-  const profiles = { findOne, findOneAndUpdate };
+  const updateOne = vi.fn(async () => ({ matchedCount: 1, modifiedCount: 1 }));
+  const profiles = { findOne, findOneAndUpdate, updateOne };
   mockGetDb.mockResolvedValue({
     collection: (name: string) =>
       name === PROFILES_COLLECTION ? profiles : undefined,
@@ -222,21 +223,59 @@ describe("DELETE /api/resumes/[id] — remains owner-only", () => {
     expect(res.status).toBe(403);
     expect(bucket.delete).not.toHaveBeenCalled();
     expect(profiles.findOneAndUpdate).not.toHaveBeenCalled();
+    expect(profiles.updateOne).not.toHaveBeenCalled();
   });
 
   it("owner can delete", async () => {
     signInAs(OWNER_ID);
-    const profiles = makeDb([makeOwnerDoc({ resumeVisibleToMembers: false })]);
+    makeDb([makeOwnerDoc({ resumeVisibleToMembers: false })]);
     const bucket = makeBucket();
 
     const res = await del();
 
     expect(res.status).toBe(200);
     expect(bucket.delete).toHaveBeenCalledWith(new ObjectId(RESUME_ID));
-    expect(profiles.findOneAndUpdate).toHaveBeenCalledWith(
-      { userId: new ObjectId(OWNER_ID) },
-      expect.anything(),
-      expect.anything(),
-    );
+  });
+
+  function ownerWrites(profiles: ReturnType<typeof makeDb>) {
+    const calls = [
+      ...profiles.updateOne.mock.calls,
+      ...profiles.findOneAndUpdate.mock.calls,
+    ] as unknown as [Record<string, unknown>, Record<string, unknown>][];
+    return calls
+      .filter(([filter]) =>
+        (filter.userId as ObjectId).equals(new ObjectId(OWNER_ID)),
+      )
+      .map(([, update]) => update);
+  }
+
+  it("DELETE clears resumeId from the owner's profile", async () => {
+    signInAs(OWNER_ID);
+    const profiles = makeDb([makeOwnerDoc({ resumeVisibleToMembers: true })]);
+    makeBucket();
+
+    const res = await del();
+
+    expect(res.status).toBe(200);
+    const clearing = ownerWrites(profiles).find((update) => {
+      const unset = update.$unset as Record<string, unknown> | undefined;
+      const set = update.$set as Record<string, unknown> | undefined;
+      return unset?.resumeId !== undefined || set?.resumeId === null;
+    });
+    expect(clearing).toBeDefined();
+  });
+
+  it("DELETE resets resumeVisibleToMembers to false", async () => {
+    signInAs(OWNER_ID);
+    const profiles = makeDb([makeOwnerDoc({ resumeVisibleToMembers: true })]);
+    makeBucket();
+
+    await del();
+
+    const reset = ownerWrites(profiles).find((update) => {
+      const set = update.$set as Record<string, unknown> | undefined;
+      return set?.resumeVisibleToMembers === false;
+    });
+    expect(reset).toBeDefined();
   });
 });

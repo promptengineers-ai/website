@@ -229,6 +229,19 @@ export async function updateProfile(
   };
 }
 
+export async function clearResume(userId: string): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(PROFILES_COLLECTION);
+
+  await collection.updateOne(
+    { userId: new ObjectId(userId) },
+    {
+      $unset: { resumeId: "" },
+      $set: { resumeVisibleToMembers: false, updatedAt: new Date() },
+    },
+  );
+}
+
 export async function deleteProfile(userId: string): Promise<boolean> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
