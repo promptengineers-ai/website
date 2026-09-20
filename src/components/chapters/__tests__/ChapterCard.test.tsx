@@ -73,4 +73,49 @@ describe("ChapterCard", () => {
       plano.meetupUrl,
     );
   });
+
+  it("card surface does not use light-theme classes", () => {
+    const snapshot: ChapterSnapshot = {
+      chapter: plano,
+      stats: {
+        memberCount: 3983,
+        pastEventCount: 27,
+        averageRating: 4.67,
+        ratingCount: 271,
+        isFallback: false,
+      },
+      nextEvent: {
+        title: "\u{1F3D7}\uFE0F Building Your First Engineering Harness",
+        dateTime: "2026-09-23T18:00:00-05:00",
+        url: "https://www.meetup.com/plano-prompt-engineers/events/316446877/",
+      },
+    };
+
+    const { container } = render(<ChapterCard snapshot={snapshot} />);
+
+    const lightClasses = [
+      "bg-white",
+      "bg-gray-50",
+      "text-gray-900",
+      "border-gray-200",
+    ];
+
+    const card = container.querySelector("article");
+    expect(card).not.toBeNull();
+
+    const eventBlock = screen
+      .getByText(/next event/i)
+      .closest("div") as HTMLElement;
+    expect(eventBlock).not.toBeNull();
+
+    for (const element of [
+      card as HTMLElement,
+      eventBlock,
+      ...Array.from(container.querySelectorAll<HTMLElement>("*")),
+    ]) {
+      for (const lightClass of lightClasses) {
+        expect(Array.from(element.classList)).not.toContain(lightClass);
+      }
+    }
+  });
 });
