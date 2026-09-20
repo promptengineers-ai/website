@@ -7,6 +7,12 @@ vi.mock("@/components/auth/AuthProvider", () => ({
   useAuth: () => ({ user: null, status: "unauthenticated" }),
 }));
 
+const getAuthFromCookies = vi.hoisted(() => vi.fn(() => null as unknown));
+
+vi.mock("@/lib/jwt", () => ({
+  getAuthFromCookies,
+}));
+
 vi.mock("@/components/nav/TopNavBar", () => ({
   default: () => <div data-testid="top-nav-bar" />,
 }));
@@ -47,6 +53,10 @@ function classTokens(element: Element | null): string[] {
 }
 
 describe("home page", () => {
+  beforeEach(() => {
+    getAuthFromCookies.mockReturnValue(null);
+  });
+
   it("uses the meetup fallback stats without a network call", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
@@ -72,6 +82,32 @@ describe("home page", () => {
     expect(
       screen.getByRole("heading", { level: 2, name: "Our chapters" }),
     ).toBeInTheDocument();
+  });
+
+  it("shows chapter organizers instead of the member strip when signed out", async () => {
+    getAuthFromCookies.mockReturnValue(null);
+
+    await renderHome();
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Chapter organizers" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("member-strip")).not.toBeInTheDocument();
+  });
+
+  it("shows the member strip instead of chapter organizers when signed in", async () => {
+    getAuthFromCookies.mockReturnValue({
+      token: "token",
+      payload: { userId: "1" },
+      user: { id: "1" },
+    });
+
+    await renderHome();
+
+    expect(screen.getByTestId("member-strip")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { level: 2, name: "Chapter organizers" }),
+    ).not.toBeInTheDocument();
   });
 
   it("chapters section does not use light-theme classes", async () => {

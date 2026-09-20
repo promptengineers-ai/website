@@ -3,10 +3,13 @@ import TopNavBar from "@/components/nav/TopNavBar";
 import HeroSection from "@/sections/HeroSection";
 import ChapterCard from "@/components/chapters/ChapterCard";
 import MemberStrip from "@/components/members/MemberStrip";
+import ChapterOrganizers from "@/components/chapters/ChapterOrganizers";
 import { getChapterSnapshot, getMeetupStats } from "@/lib/meetup";
 import { CHAPTERS } from "@/config/chapters";
+import { getAuthFromCookies } from "@/lib/jwt";
 
 export default async function Home() {
+  const auth = getAuthFromCookies();
   const [stats, snapshots] = await Promise.all([
     getMeetupStats(),
     Promise.all(CHAPTERS.map(getChapterSnapshot)),
@@ -49,7 +52,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <MemberStrip />
+        {auth ? <MemberStrip /> : <ChapterOrganizers />}
       </main>
     </>
   );
