@@ -8,7 +8,7 @@ const projects = [
     image:
       "https://secure.meetupstatic.com/photos/event/1/2/3/5/clean_513484661.webp",
     description:
-      "A meetup group (3.9k+ members) for engineers, developers, and tech enthusiasts in Plano, TX. Join us for tech talks, networking, and more!",
+      "A meetup group for engineers, developers, and tech enthusiasts in Plano, TX. Join us for tech talks, networking, and more!",
     link: "https://www.meetup.com/plano-prompt-engineers",
   },
   {

@@ -80,8 +80,8 @@ const HeroSection = ({
         transition={{ duration: 0.8, delay: 0.5 }}
         className="mb-8 max-w-2xl text-center text-xl font-light text-gray-300"
       >
-        Join 2,450+ developers and tech enthusiasts in Plano, TX exploring
-        ChatGPT, LLMs, and the future of AI
+        Join developers and tech enthusiasts in Plano, TX exploring ChatGPT,
+        LLMs, and the future of AI
       </motion.p>
 
       {/* Primary CTA - Survey Button */}
