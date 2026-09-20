@@ -1,7 +1,7 @@
 /**
  * Seeds a test hackathon with teams.
  *
- * Usage: npx tsx scripts/seed-hackathon.ts
+ * Usage: pnpm dlx tsx scripts/seed-hackathon.ts
  */
 
 import { MongoClient, ObjectId } from "mongodb";

@@ -122,9 +122,9 @@ The `emailVerified` field and `updateUserEmailVerified()` helper already exist i
 ## Acceptance Criteria
 
 - [ ] Implementation plan is thoroughly documented
-- [ ] `npm run lint` passes
-- [ ] `npm run test` passes (new tests added if applicable)
-- [ ] `npm run build` succeeds
+- [ ] `pnpm lint` passes
+- [ ] `pnpm test` passes (new tests added if applicable)
+- [ ] `pnpm build` succeeds
 - [ ] New code follows existing repo patterns (`src/lib/models/` for data, `src/app/api/` for routes, Tailwind for styles)
 - [ ] No new dependencies added beyond what's already in the project (or justified in PR description)
 - [ ] Draft PR opened: `FROM feat/15-resend-email-validation TO development`

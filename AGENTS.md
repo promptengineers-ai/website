@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents when working with code in this repository.
 
 ## Project Overview
 
@@ -9,15 +9,16 @@ Community website for Prompt Engineers AI (~1,700+ member AI developer group in 
 ## Commands
 
 ```bash
-npm run dev      # Start dev server at localhost:3000
-npm run build    # Production build
-npm run start    # Start production server
-npm run lint     # ESLint with next/core-web-vitals + exhaustive-deps
-npm run test     # Vitest (unit + component tests)
-npm run test:watch  # Vitest in watch mode
+pnpm dev      # Start dev server at localhost:3000
+pnpm build    # Production build
+pnpm start    # Start production server
+pnpm lint     # ESLint with next/core-web-vitals + exhaustive-deps
+pnpm test     # Vitest (unit + component tests)
+pnpm test:watch  # Vitest in watch mode
 ```
 
-Utility scripts (run with `npx ts-node --compiler-options '{"module":"commonjs"}' scripts/<file>`):
+Utility scripts (run with `pnpm dlx ts-node --compiler-options '{"module":"commonjs"}' scripts/<file>`):
+
 - `scripts/create-admin.ts` — Create admin user
 - `scripts/seed-hackathon.ts` — Seed hackathon data
 
@@ -27,7 +28,7 @@ Utility scripts (run with `npx ts-node --compiler-options '{"module":"commonjs"}
 **Styling**: Tailwind CSS only (no CSS modules). Framer Motion for animations.
 **Database**: MongoDB 7 native driver (no ORM). Direct collection operations in `src/lib/models/`.
 **File Storage**: MongoDB GridFS (avatars bucket: 5MB max, resumes bucket: 10MB max)
-**Deployment**: Netlify via `@netlify/plugin-nextjs`
+**Deployment**: Vercel (GitHub integration; `master` only — preview deployments are disabled in `vercel.json`)
 
 ### Path alias
 
@@ -85,10 +86,12 @@ React Context only — `AuthProvider` at `src/components/auth/AuthProvider.tsx` 
 ## Environment Variables
 
 Required:
+
 - `MONGO_DB_URI` — MongoDB connection string
 - `NEXTAUTH_SECRET` — JWT signing secret (generate with `openssl rand -base64 32`)
 
 Optional:
+
 - `AIRTABLE_API_KEY` — Airtable API key for contact form
 - `BREVO_API_KEY` — Brevo email service key
 - `NEXT_PUBLIC_GA_ID` — Google Analytics 4 measurement ID
@@ -96,14 +99,16 @@ Optional:
 ## Testing
 
 **Framework**: Vitest + @testing-library/react + jsdom. Config in `vitest.config.ts`, setup in `src/test/setup.ts`.
+
 - Tests live next to source in `__tests__/` directories (e.g., `src/lib/__tests__/validation.test.ts`)
-- `npm run test` runs all tests; `npm run test:watch` for dev
+- `pnpm test` runs all tests; `pnpm test:watch` for dev
 - Globals enabled (`describe`, `it`, `expect` without imports)
 
 ## CI/CD
 
 **GitHub Actions** (`.github/workflows/ci.yml`): runs on every push to any branch.
-- Steps: `npm ci` → `npm run lint` → `npm run test` → `npm run build`
+
+- Steps: `pnpm install --frozen-lockfile` → `pnpm lint` → `pnpm test` → `pnpm build`
 - Build step requires `MONGO_DB_URI` and `NEXTAUTH_SECRET` env vars (dummy values in CI) because Next.js pre-renders API routes that import the MongoDB client
 
 **Pre-commit hooks**: Husky + lint-staged runs ESLint --fix and Prettier on staged `.ts`/`.tsx` files.

@@ -2,8 +2,8 @@
  * Seeds 200 test participants with varied attributes for testing auto-assign.
  * Also creates 10 teams with standard role slots.
  *
- * Usage: npx tsx scripts/seed-participants.ts
- * Clean:  npx tsx scripts/seed-participants.ts --clean
+ * Usage: pnpm dlx tsx scripts/seed-participants.ts
+ * Clean:  pnpm dlx tsx scripts/seed-participants.ts --clean
  */
 
 import { MongoClient, ObjectId } from "mongodb";
