@@ -80,8 +80,8 @@ const HeroSection = ({
         transition={{ duration: 0.8, delay: 0.5 }}
         className="mb-8 max-w-2xl text-center text-xl font-light text-gray-300"
       >
-        Join developers and tech enthusiasts in Plano, TX exploring ChatGPT,
-        LLMs, and the future of AI
+        A community of developers and tech enthusiasts in Plano, TX and St.
+        George, UT exploring ChatGPT, LLMs, and the future of AI
       </motion.p>
 
       {/* Primary CTA - Signup form */}
@@ -134,7 +134,7 @@ const HeroSection = ({
           </p>
         ) : isSubmitted ? (
           <p role="status" className="text-center text-sm text-green-400">
-            You&apos;re in! Check your inbox for next steps.
+            You&apos;re in! We&apos;ll be in touch.
           </p>
         ) : (
           <p className="text-center text-sm text-gray-400">
