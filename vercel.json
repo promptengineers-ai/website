@@ -6,7 +6,8 @@
       "master": true,
       "development": true,
       "feat/*": true,
-      "fix/*": true
+      "fix/*": true,
+      "epic/*": true
     }
   }
 }
