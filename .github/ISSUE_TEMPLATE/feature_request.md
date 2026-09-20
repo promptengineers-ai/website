@@ -116,10 +116,10 @@ worktree_path: "$WORKSPACE/.worktrees/feat-[issue#]"
 <!-- Every criterion must be binary — testable by an agent with a pass/fail outcome. Avoid subjective language. -->
 
 - [ ] Implementation plan is thoroughly documented
-- [ ] `npm run lint` passes
+- [ ] `pnpm lint` passes
 - [ ] Tests written **before** implementation (TDD)
-- [ ] `npm run test` passes (new tests required for all new logic)
-- [ ] `npm run build` succeeds
+- [ ] `pnpm test` passes (new tests required for all new logic)
+- [ ] `pnpm build` succeeds
 - [ ] New code follows existing repo patterns (`src/lib/models/` for data, `src/app/api/` for routes, Tailwind for styles)
 - [ ] No new dependencies added beyond what's already in the project (or justified in PR description)
 - [ ] Draft PR opened: `FROM feat/[issue#]-[shortdesc] TO development`

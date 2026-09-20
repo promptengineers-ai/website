@@ -2,7 +2,7 @@
  * Creates an admin user or promotes an existing user to admin.
  *
  * Usage:
- *   npx tsx scripts/create-admin.ts <email> [password] [name]
+ *   pnpm dlx tsx scripts/create-admin.ts <email> [password] [name]
  *
  * If user exists: promotes to admin
  * If user doesn't exist: creates with given password and name, then promotes
@@ -11,15 +11,20 @@
 import { MongoClient, ObjectId } from "mongodb";
 import * as bcrypt from "bcryptjs";
 
-const MONGO_URI = process.env.MONGO_DB_URI || "mongodb://localhost:27017/promptengineers";
+const MONGO_URI =
+  process.env.MONGO_DB_URI || "mongodb://localhost:27017/promptengineers";
 
 async function main() {
   const [email, password, name] = process.argv.slice(2);
 
   if (!email) {
-    console.error("Usage: npx tsx scripts/create-admin.ts <email> [password] [name]");
+    console.error(
+      "Usage: pnpm dlx tsx scripts/create-admin.ts <email> [password] [name]",
+    );
     console.error("  If user exists, promotes to admin.");
-    console.error("  If user doesn't exist, provide password and name to create.");
+    console.error(
+      "  If user doesn't exist, provide password and name to create.",
+    );
     process.exit(1);
   }
 
@@ -35,11 +40,15 @@ async function main() {
 
     if (existing) {
       await users.updateOne({ _id: existing._id }, { $set: { isAdmin: true } });
-      console.log(`✓ Promoted existing user "${existing.name}" (${email}) to admin.`);
+      console.log(
+        `✓ Promoted existing user "${existing.name}" (${email}) to admin.`,
+      );
     } else {
       if (!password || !name) {
         console.error("User not found. Provide password and name to create:");
-        console.error(`  npx tsx scripts/create-admin.ts ${email} <password> <name>`);
+        console.error(
+          `  pnpm dlx tsx scripts/create-admin.ts ${email} <password> <name>`,
+        );
         process.exit(1);
       }
 
