@@ -1,0 +1,7 @@
+
+## T21 — organizers on landing for signed-out visitors (branch feat/organizers-landing)
+Chapter.organizers: string[] -> Organizer[] {name,linkedinUrl,githubUrl,email}; plano=Derrick Bozkurt, st-george=Ryan Eggleston.
+New server component ChapterOrganizers; page.tsx branches on getAuthFromCookies(): auth ? MemberStrip : ChapterOrganizers.
+Gates (advisor-run): lint 0 (2 pre-existing img warnings), test 35 files / 226 tests (was 221), build 0.
+Mutations: M35 invert auth branch -> 2 fail. M36 drop mailto: prefix -> 1 fail. M37 add target/rel to mailto -> 1 fail. M38 swap linkedin/github hrefs -> 1 fail. All caught.
+MEASURED: route "/" changes from O (static) to f (dynamic) because cookies() is read. Meetup fetch keeps its own next:{revalidate} cache.

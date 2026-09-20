@@ -37,7 +37,9 @@ export default function ChapterCard({ snapshot }: ChapterCardProps) {
       {chapter.organizers.length > 0 && (
         <p className="flex items-center gap-2 text-sm text-gray-300">
           <FaUsers className="h-3 w-3 shrink-0" />
-          <span>{chapter.organizers.join(", ")}</span>
+          <span>
+            {chapter.organizers.map((organizer) => organizer.name).join(", ")}
+          </span>
         </p>
       )}
 

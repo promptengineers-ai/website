@@ -1,5 +1,12 @@
 export type ChapterStatus = "established" | "launching";
 
+export type Organizer = {
+  name: string;
+  linkedinUrl: string;
+  githubUrl: string;
+  email: string;
+};
+
 export type Chapter = {
   slug: string;
   name: string;
@@ -7,7 +14,7 @@ export type Chapter = {
   state: string;
   status: ChapterStatus;
   meetupUrl: string;
-  organizers: string[];
+  organizers: Organizer[];
   venue?: string;
 };
 
@@ -19,7 +26,14 @@ export const CHAPTERS: Chapter[] = [
     state: "TX",
     status: "established",
     meetupUrl: "https://www.meetup.com/plano-prompt-engineers/",
-    organizers: [],
+    organizers: [
+      {
+        name: "Derrick Bozkurt",
+        linkedinUrl: "https://www.linkedin.com/in/debozkurt/",
+        githubUrl: "https://github.com/debozkurt",
+        email: "dbozkurt@promptengineers.ai",
+      },
+    ],
   },
   {
     slug: "st-george",
@@ -28,7 +42,14 @@ export const CHAPTERS: Chapter[] = [
     state: "UT",
     status: "launching",
     meetupUrl: "",
-    organizers: ["Ryan Eggleston"],
+    organizers: [
+      {
+        name: "Ryan Eggleston",
+        linkedinUrl: "https://www.linkedin.com/in/ryan-eggleston/",
+        githubUrl: "https://github.com/ryaneggz",
+        email: "reggleston@promptengineers.ai",
+      },
+    ],
     venue: "Atwood Innovation Plaza",
   },
 ];
