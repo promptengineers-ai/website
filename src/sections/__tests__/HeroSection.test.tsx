@@ -8,6 +8,13 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import HeroSection from "../HeroSection";
 import { ApiError, apiClient } from "@/utils/client";
+import {
+  FALLBACK_MEETUP_STATS,
+  formatEventCount,
+  formatMemberCount,
+  formatRating,
+} from "@/lib/meetup";
+import type { MeetupStats } from "@/types";
 
 vi.mock("next/image", () => ({
   default: (props: Record<string, unknown>) => {
@@ -318,5 +325,112 @@ describe("HeroSection", () => {
       "href",
       "https://forms.gle/DYBEgiiFGUUisw7V6",
     );
+  });
+
+  describe("live proof above the ask (#49)", () => {
+    const signupForm = () =>
+      screen.getByRole("button", { name: /create account/i }).closest("form");
+
+    it("live stats render above the signup form in DOM order", () => {
+      render(<HeroSection />);
+
+      const form = signupForm();
+      expect(form).not.toBeNull();
+      for (const label of ["Members", "Events Hosted", "Rating"]) {
+        const stat = screen.getByText(label);
+        expect(
+          stat.compareDocumentPosition(form as Node) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
+      }
+    });
+
+    it("stat values come from the stats prop, not literals", () => {
+      const fake: MeetupStats = {
+        memberCount: 5432,
+        pastEventCount: 91,
+        averageRating: 3.3,
+        ratingCount: 7,
+        isFallback: false,
+      };
+      render(<HeroSection stats={fake} />);
+
+      expect(
+        screen.getByText(formatMemberCount(fake.memberCount)),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(formatEventCount(fake.pastEventCount)),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(formatRating(fake.averageRating)),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText(
+          formatMemberCount(FALLBACK_MEETUP_STATS.memberCount),
+        ),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(
+          formatEventCount(FALLBACK_MEETUP_STATS.pastEventCount),
+        ),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(formatRating(FALLBACK_MEETUP_STATS.averageRating)),
+      ).not.toBeInTheDocument();
+    });
+
+    it("states what an account unlocks", () => {
+      render(<HeroSection />);
+
+      const line = screen.getByText(
+        /creates a member profile you can choose to list in the browsable members directory/i,
+      );
+      expect(line).toBeInTheDocument();
+      expect(
+        line.compareDocumentPosition(signupForm() as Node) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      expect(line).not.toHaveTextContent(/slack|meetup|invite|newsletter/i);
+    });
+  });
+
+  describe("password rules stated once (#51)", () => {
+    const RULES = /8\+ characters/i;
+
+    const ruleStatements = () => {
+      const inText = screen.queryAllByText(RULES).length;
+      const inPlaceholders = Array.from(
+        document.querySelectorAll("[placeholder]"),
+      ).filter((el) => RULES.test(el.getAttribute("placeholder") ?? "")).length;
+      return inText + inPlaceholders;
+    };
+
+    it("password rules are stated exactly once", () => {
+      render(<HeroSection />);
+
+      expect(ruleStatements()).toBe(1);
+      expect(
+        screen.getByLabelText(/^password$/i).getAttribute("placeholder") ?? "",
+      ).not.toMatch(/8\+|upper|lower|number/i);
+    });
+
+    it("rules remain associated with the password field", () => {
+      render(<HeroSection />);
+
+      const field = screen.getByLabelText(/^password$/i);
+      fireEvent.change(field, { target: { value: "Partial1" } });
+      field.focus();
+
+      const describedBy = field.getAttribute("aria-describedby");
+      expect(describedBy).toBeTruthy();
+      const rules = document.getElementById(describedBy as string);
+      expect(rules).not.toBeNull();
+      expect(rules).toHaveTextContent(RULES);
+      expect(rules).toHaveTextContent(/uppercase letter/i);
+      expect(rules).toHaveTextContent(/lowercase letter/i);
+      expect(rules).toHaveTextContent(/number/i);
+      expect(rules).toHaveTextContent(/free/i);
+      expect(field).toHaveValue("Partial1");
+    });
   });
 });
