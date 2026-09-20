@@ -28,7 +28,7 @@ Utility scripts (run with `pnpm dlx ts-node --compiler-options '{"module":"commo
 **Styling**: Tailwind CSS only (no CSS modules). Framer Motion for animations.
 **Database**: MongoDB 7 native driver (no ORM). Direct collection operations in `src/lib/models/`.
 **File Storage**: MongoDB GridFS (avatars bucket: 5MB max, resumes bucket: 10MB max)
-**Deployment**: Netlify via `@netlify/plugin-nextjs`
+**Deployment**: Vercel (GitHub integration; preview deployment per pull request)
 
 ### Path alias
 

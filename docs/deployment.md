@@ -170,7 +170,7 @@ Additional `<meta>` tags set for:
 
 ## Deployment Notes
 
-- **Inferred platform:** Vercel (Next.js default, `.vercel` patterns in `.gitignore`)
+- **Platform:** Vercel, connected through the GitHub integration. Every pull request gets a preview deployment, and `development` and `main` deploy automatically.
 - **Serverless functions:** Each API route deploys as a separate serverless function
 - **MongoDB connection:** Must account for serverless cold starts (connection pooling configured with appropriate timeouts)
 - **Environment variables:** Must be set in Vercel project settings

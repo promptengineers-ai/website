@@ -18,7 +18,7 @@ New to the project? Start with [Getting started](getting-started.md), then read
 | Components, sections, design system, registry         | [Frontend](frontend.md)               |
 | Pages, route protection, navigation                   | [Routing](routing.md)                 |
 | Airtable, Brevo, Resend, Google Analytics, Medium RSS | [Integrations](integrations.md)       |
-| PWA, service worker, Netlify deployment               | [Deployment](deployment.md)           |
+| PWA, service worker, Vercel deployment                | [Deployment](deployment.md)           |
 
 ## Reference
 

@@ -30,7 +30,7 @@
 | PWA              | @ducanh2912/next-pwa with Workbox                |
 | Fonts            | Google Fonts (Montserrat, Space Grotesk)         |
 | Icons            | React Icons                                      |
-| Deployment       | Vercel (inferred from config)                    |
+| Deployment       | Vercel                                           |
 
 ## Quick Start
 
