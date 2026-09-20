@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, type Document, type WithId } from "mongodb";
 import { getDb, getGridFSBucket } from "../mongodb";
 import type { UserProfile } from "@/types";
 
@@ -25,6 +25,7 @@ export async function createProfile(data: {
   background?: string;
   seeking?: "work" | "hiring" | "networking" | "other";
   chapters?: string[];
+  resumeVisibleToMembers?: boolean;
   isPublic?: boolean;
   avatarUrl?: string;
   badges?: string[];
@@ -41,6 +42,7 @@ export async function createProfile(data: {
     background: data.background || "",
     seeking: data.seeking || "networking",
     chapters: data.chapters || [],
+    resumeVisibleToMembers: data.resumeVisibleToMembers || false,
     isPublic: data.isPublic || false,
     avatarUrl: data.avatarUrl || "",
     badges: data.badges || [],
@@ -59,6 +61,7 @@ export async function createProfile(data: {
     background: profile.background,
     seeking: profile.seeking,
     chapters: profile.chapters,
+    resumeVisibleToMembers: profile.resumeVisibleToMembers,
     isPublic: profile.isPublic,
     avatarUrl: profile.avatarUrl,
     badges: profile.badges,
@@ -79,6 +82,26 @@ export async function getProfileByUserId(
 
   if (!profile) return null;
 
+  return toUserProfile(profile);
+}
+
+export async function getProfileByResumeId(
+  resumeId: string,
+): Promise<UserProfile | null> {
+  if (!ObjectId.isValid(resumeId)) return null;
+  const db = await getDb();
+  const collection = db.collection(PROFILES_COLLECTION);
+
+  const profile = await collection.findOne({
+    resumeId: new ObjectId(resumeId),
+  });
+
+  if (!profile) return null;
+
+  return toUserProfile(profile);
+}
+
+function toUserProfile(profile: WithId<Document>): UserProfile {
   return {
     _id: profile._id.toString(),
     userId: profile.userId.toString(),
@@ -86,6 +109,7 @@ export async function getProfileByUserId(
     background: profile.background || "",
     seeking: profile.seeking || "networking",
     resumeId: profile.resumeId?.toString(),
+    resumeVisibleToMembers: profile.resumeVisibleToMembers === true,
     chapters: profile.chapters || [],
     isPublic: profile.isPublic || false,
     avatarUrl: profile.avatarUrl || "",
@@ -117,6 +141,7 @@ export async function getProfilesByUserIds(
       background: doc.background || "",
       seeking: doc.seeking || "networking",
       resumeId: doc.resumeId?.toString(),
+      resumeVisibleToMembers: doc.resumeVisibleToMembers === true,
       chapters: doc.chapters || [],
       isPublic: doc.isPublic || false,
       avatarUrl: doc.avatarUrl || "",
@@ -145,6 +170,7 @@ export async function updateProfile(
     seeking?: "work" | "hiring" | "networking" | "other";
     chapters?: string[];
     resumeId?: string;
+    resumeVisibleToMembers?: boolean;
     isPublic?: boolean;
     avatarUrl?: string;
     badges?: string[];
@@ -163,6 +189,8 @@ export async function updateProfile(
   if (data.background !== undefined) updateData.background = data.background;
   if (data.seeking !== undefined) updateData.seeking = data.seeking;
   if (data.chapters !== undefined) updateData.chapters = data.chapters;
+  if (data.resumeVisibleToMembers !== undefined)
+    updateData.resumeVisibleToMembers = data.resumeVisibleToMembers;
   if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
   if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
   if (data.badges !== undefined) updateData.badges = data.badges;
@@ -189,6 +217,7 @@ export async function updateProfile(
     background: result.background || "",
     seeking: result.seeking || "networking",
     resumeId: result.resumeId?.toString(),
+    resumeVisibleToMembers: result.resumeVisibleToMembers === true,
     chapters: result.chapters || [],
     isPublic: result.isPublic || false,
     avatarUrl: result.avatarUrl || "",

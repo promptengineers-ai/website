@@ -59,6 +59,7 @@ export type UserProfile = {
   background: string;
   seeking: string[] | string; // Array for multi-select, string for backward compatibility
   resumeId?: string;
+  resumeVisibleToMembers: boolean;
   chapters: string[];
   isPublic?: boolean;
   avatarUrl?: string;

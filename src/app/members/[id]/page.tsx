@@ -45,7 +45,12 @@ export default async function MemberProfilePage({
     notFound();
   }
 
-  const canSeeEmail = Boolean(getAuthFromCookies()?.user?.id);
+  const viewerId = getAuthFromCookies()?.user?.id;
+  const canSeeEmail = Boolean(viewerId);
+  const canDownloadResume =
+    Boolean(profile.resumeId) &&
+    Boolean(viewerId) &&
+    (viewerId === profile.userId || profile.resumeVisibleToMembers === true);
 
   const getSocialIcon = (platform: string) => {
     switch (platform) {
@@ -306,10 +311,7 @@ export default async function MemberProfilePage({
           </div>
         )}
 
-        {/* Resume Card - Should we show resume public? Spec says "tells about themselves and their interests". 
-            Usually resumes are public on professional profiles.
-        */}
-        {profile.resumeId && (
+        {canDownloadResume && (
           <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
             <h2 className="mb-4 text-xl font-semibold text-white">Resume</h2>
             <a
