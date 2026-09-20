@@ -82,7 +82,7 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
               <>
                 Or{" "}
                 <Link
-                  href={`/signup${fromQuery}`}
+                  href="/"
                   className="font-medium text-blue-400 hover:text-blue-300"
                 >
                   create a new account

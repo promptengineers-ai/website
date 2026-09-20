@@ -104,3 +104,22 @@ describe("AuthForm logo image (#54)", () => {
     },
   );
 });
+
+describe("AuthForm registration route (#55)", () => {
+  it("points the login page's create-a-new-account link at the canonical form", () => {
+    render(<AuthForm type="login" onSubmit={vi.fn()} />);
+
+    const link = screen.getByRole("link", { name: /^create a new account$/i });
+    expect(link).toHaveAttribute("href", "/");
+    expect(link).toHaveTextContent(/^create a new account$/);
+  });
+
+  it("leaves the signup page's sign-in link unchanged", () => {
+    render(<AuthForm type="signup" onSubmit={vi.fn()} />);
+
+    expect(screen.getByRole("link", { name: /^sign in$/i })).toHaveAttribute(
+      "href",
+      "/login",
+    );
+  });
+});

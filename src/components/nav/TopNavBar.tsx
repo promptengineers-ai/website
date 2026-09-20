@@ -184,7 +184,7 @@ const TopNavbar = () => {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : status === "unauthenticated" ? (
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/login?from=${encodeURIComponent(pathname)}`}
@@ -192,14 +192,16 @@ const TopNavbar = () => {
                   >
                     Login
                   </Link>
-                  <Link
-                    href={`/signup?from=${encodeURIComponent(pathname)}`}
-                    className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
-                  >
-                    Register
-                  </Link>
+                  {pathname !== "/" && (
+                    <Link
+                      href="/"
+                      className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
+                    >
+                      Register
+                    </Link>
+                  )}
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Mobile menu button */}
@@ -275,7 +277,7 @@ const TopNavbar = () => {
                     Sign Out
                   </button>
                 </>
-              ) : (
+              ) : status === "unauthenticated" ? (
                 <div className="mt-1 flex items-center gap-2 px-2 pb-1">
                   <Link
                     href={`/login?from=${encodeURIComponent(pathname)}`}
@@ -284,15 +286,17 @@ const TopNavbar = () => {
                   >
                     Login
                   </Link>
-                  <Link
-                    href={`/signup?from=${encodeURIComponent(pathname)}`}
-                    onClick={closeDrawer}
-                    className="flex-1 rounded-full bg-white px-4 py-2 text-center text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
-                  >
-                    Register
-                  </Link>
+                  {pathname !== "/" && (
+                    <Link
+                      href="/"
+                      onClick={closeDrawer}
+                      className="flex-1 rounded-full bg-white px-4 py-2 text-center text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
+                    >
+                      Register
+                    </Link>
+                  )}
                 </div>
-              )}
+              ) : null}
             </div>
           )}
         </div>
