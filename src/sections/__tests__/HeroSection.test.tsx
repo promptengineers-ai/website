@@ -170,8 +170,12 @@ describe("HeroSection", () => {
     render(<HeroSection />);
     fillAndSubmit();
 
-    await screen.findByRole("status");
+    const status = await screen.findByRole("status");
     const surveyLink = screen.getByRole("link", { name: /survey/i });
+    expect(within(status).queryByRole("link", { name: /survey/i })).toBeNull();
+    expect(
+      within(status).queryByRole("button", { name: /skip for now/i }),
+    ).toBeNull();
     expect(surveyLink).toHaveAttribute("href", SURVEY_URL);
     expect(surveyLink).toHaveAttribute("target", "_blank");
     expect(

@@ -144,33 +144,35 @@ const HeroSection = ({
         className="mb-12 flex w-full max-w-xl flex-col items-center gap-4 px-4"
       >
         {createdEmail ? (
-          <div
-            role="status"
-            className="flex w-full flex-col items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 px-6 py-5 text-center text-sm text-green-200"
-          >
-            <p className="text-base font-semibold text-green-300">
-              Account created.
-            </p>
-            <p>
-              Check <span className="font-medium">{createdEmail}</span> for a
-              verification link. If it does not arrive, you can resend it.
-            </p>
-            {resendState === "sent" ? (
-              <p>Verification email sent again.</p>
-            ) : (
-              <button
-                type="button"
-                onClick={handleResend}
-                disabled={resendState === "sending"}
-                className="font-medium text-green-300 underline underline-offset-4 hover:text-white disabled:opacity-60"
-              >
-                {resendState === "sending"
-                  ? "Sending…"
-                  : resendState === "failed"
-                    ? "Resend failed — try again"
-                    : "Resend verification email"}
-              </button>
-            )}
+          <div className="flex w-full flex-col items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 px-6 py-5 text-center text-sm text-green-200">
+            <div
+              role="status"
+              className="flex w-full flex-col items-center gap-3"
+            >
+              <p className="text-base font-semibold text-green-300">
+                Account created.
+              </p>
+              <p>
+                Check <span className="font-medium">{createdEmail}</span> for a
+                verification link. If it does not arrive, you can resend it.
+              </p>
+              {resendState === "sent" ? (
+                <p>Verification email sent again.</p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendState === "sending"}
+                  className="font-medium text-green-300 underline underline-offset-4 hover:text-white disabled:opacity-60"
+                >
+                  {resendState === "sending"
+                    ? "Sending…"
+                    : resendState === "failed"
+                      ? "Resend failed — try again"
+                      : "Resend verification email"}
+                </button>
+              )}
+            </div>
             <div className="mt-2 w-full border-t border-green-500/20 pt-3 text-gray-300">
               {surveySkipped ? (
                 <p>
