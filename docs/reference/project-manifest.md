@@ -1,15 +1,17 @@
 # Project Manifest
 
 ## Identity
+
 - **Name:** Prompt Engineers AI Community Website
 - **Type:** Next.js 14.2.4 full-stack web application
 - **Router:** App Router (not Pages Router)
 - **Language:** TypeScript 5
-- **Package Manager:** Yarn
+- **Package Manager:** pnpm
 - **Node Runtime:** Required for API routes (not edge-only)
 - **Path Alias:** `@/*` → `./src/*`
 
 ## Constraints
+
 - No ORM (native MongoDB driver)
 - No state management library (Context API only)
 - No data fetching library (plain fetch + useEffect)
@@ -20,6 +22,7 @@
 - `seeking` field accepts both `string` and `string[]` (backward compat)
 
 ## Critical Paths
+
 - Auth cookie name: `auth-token`
 - JWT secret env var: `NEXTAUTH_SECRET`
 - DB connection env var: `MONGO_DB_URI`
@@ -30,6 +33,7 @@
 - Medium RSS: `https://medium.com/feed/@ryaneggz`
 
 ## Runtime Behavior
+
 - JWT expiry: 30 days
 - JWT refresh threshold: 7 days remaining
 - bcrypt salt rounds: 12
@@ -41,9 +45,10 @@
 - Password: min 8 chars, 1 upper, 1 lower, 1 digit
 
 ## Build
+
 ```
-yarn dev    # development server
-yarn build  # production build
-yarn start  # production server
-yarn lint   # eslint
+pnpm dev    # development server
+pnpm build  # production build
+pnpm start  # production server
+pnpm lint   # eslint
 ```

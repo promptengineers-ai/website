@@ -12,25 +12,25 @@
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 14.2.4 (App Router) |
-| Language | TypeScript 5 |
-| UI | React 18, Tailwind CSS 3.4.1 |
-| Animation | Framer Motion 12.4.7 |
-| Database | MongoDB (via native driver, not Mongoose) |
-| File Storage | MongoDB GridFS (avatars, resumes) |
-| Auth | JWT (jsonwebtoken + jose) with HTTP-only cookies |
-| Password Hashing | bcryptjs (12 salt rounds) |
-| Rich Text | React Quill |
-| Email Marketing | Brevo (Sendinblue) |
-| Contact Storage | Airtable |
-| Analytics | Google Analytics 4 |
-| Content Feed | Medium RSS via rss-parser |
-| PWA | @ducanh2912/next-pwa with Workbox |
-| Fonts | Google Fonts (Montserrat, Space Grotesk) |
-| Icons | React Icons |
-| Deployment | Vercel (inferred from config) |
+| Layer            | Technology                                       |
+| ---------------- | ------------------------------------------------ |
+| Framework        | Next.js 14.2.4 (App Router)                      |
+| Language         | TypeScript 5                                     |
+| UI               | React 18, Tailwind CSS 3.4.1                     |
+| Animation        | Framer Motion 12.4.7                             |
+| Database         | MongoDB (via native driver, not Mongoose)        |
+| File Storage     | MongoDB GridFS (avatars, resumes)                |
+| Auth             | JWT (jsonwebtoken + jose) with HTTP-only cookies |
+| Password Hashing | bcryptjs (12 salt rounds)                        |
+| Rich Text        | React Quill                                      |
+| Email Marketing  | Brevo (Sendinblue)                               |
+| Contact Storage  | Airtable                                         |
+| Analytics        | Google Analytics 4                               |
+| Content Feed     | Medium RSS via rss-parser                        |
+| PWA              | @ducanh2912/next-pwa with Workbox                |
+| Fonts            | Google Fonts (Montserrat, Space Grotesk)         |
+| Icons            | React Icons                                      |
+| Deployment       | Vercel (inferred from config)                    |
 
 ## Quick Start
 
@@ -38,7 +38,7 @@
 # Install dependencies
 yarn install
 
-# Set environment variables (see arch-docs/ai-ref/env-config.md)
+# Set environment variables (see docs/reference/environment.md)
 cp .env.example .env.local
 
 # Run development server

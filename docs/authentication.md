@@ -26,32 +26,40 @@ The app uses a custom JWT-based authentication system (no NextAuth/Auth.js). Tok
 ## Token Lifecycle
 
 ### Creation
+
 When a user logs in or registers, the API:
+
 1. Validates credentials against MongoDB
 2. Signs a JWT with `{ userId, email, name }` payload
 3. Sets an `auth-token` cookie (HTTP-only, SameSite=Lax, Secure in prod)
 4. Token expiry: **30 days**
 
 ### Verification
+
 Two JWT libraries are used because Next.js middleware runs on Edge Runtime:
+
 - **Middleware** (`src/middleware.ts`): Uses `jose` library (Edge-compatible)
 - **API routes** (`src/lib/jwt.ts`): Uses `jsonwebtoken` (Node.js runtime)
 
 Both use the same secret (`NEXTAUTH_SECRET`) and algorithm (HS256).
 
 ### Auto-Refresh
+
 When a token has less than **7 days** remaining:
+
 - Middleware refreshes it by setting a new cookie with fresh 30-day expiry
 - The `/api/auth/session` endpoint also refreshes tokens
 - This is transparent to the user
 
 ### Logout
+
 - API clears the `auth-token` cookie by setting `maxAge: 0`
 - AuthProvider resets context state to `unauthenticated`
 
 ## Password Requirements
 
 Enforced in `src/lib/auth.ts`:
+
 - Minimum 8 characters
 - At least one uppercase letter (`/[A-Z]/`)
 - At least one lowercase letter (`/[a-z]/`)
@@ -64,11 +72,12 @@ Defined in `src/middleware.ts` via path matching:
 
 ```typescript
 export const config = {
-  matcher: ['/profile/:path*']
+  matcher: ["/profile/:path*"],
 };
 ```
 
 When an unauthenticated user hits a protected route:
+
 1. Middleware reads `auth-token` cookie
 2. If missing or invalid, redirects to `/login?from={originalPath}`
 3. Login page can then redirect back after successful auth
@@ -78,10 +87,11 @@ When an unauthenticated user hits a protected route:
 `AuthProvider` (`src/components/auth/AuthProvider.tsx`) wraps the entire app in the root layout.
 
 ### Context Shape
+
 ```typescript
 interface AuthContextType {
-  user: AuthUser | null;       // { id, email, name }
-  status: AuthStatus;          // 'loading' | 'authenticated' | 'unauthenticated'
+  user: AuthUser | null; // { id, email, name }
+  status: AuthStatus; // 'loading' | 'authenticated' | 'unauthenticated'
   login: (email, password) => Promise<void>;
   register: (email, password, name) => Promise<void>;
   logout: () => Promise<void>;
@@ -90,9 +100,11 @@ interface AuthContextType {
 ```
 
 ### Initialization
+
 On mount, `AuthProvider` calls `GET /api/auth/session` to check for an existing valid token. This determines the initial auth state.
 
 ### Usage in Components
+
 ```typescript
 const { user, status, login, logout } = useAuth();
 
@@ -108,7 +120,7 @@ Every protected API route follows this pattern:
 export async function GET(request: NextRequest) {
   const auth = await getAuthFromRequest(request);
   if (!auth) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   // auth.userId is now available
 }
