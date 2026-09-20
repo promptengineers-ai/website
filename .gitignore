@@ -48,6 +48,5 @@ public/workbox-*.js
 
 # openpsec
 **/openspec/
-**/AGENTS.md
 **/CLAUDE.md
 .claude/
