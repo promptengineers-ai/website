@@ -4,8 +4,19 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { apiClient } from "@/utils/client";
 import { FaGithub, FaSlack, FaMeetup, FaLinkedin } from "react-icons/fa";
+import {
+  FALLBACK_MEETUP_STATS,
+  formatEventCount,
+  formatMemberCount,
+  formatRating,
+} from "@/lib/meetup";
+import type { MeetupStats } from "@/types";
 
-const HeroSection = () => {
+const HeroSection = ({
+  stats = FALLBACK_MEETUP_STATS,
+}: {
+  stats?: MeetupStats;
+}) => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -102,15 +113,21 @@ const HeroSection = () => {
         className="mb-12 flex flex-wrap justify-center gap-8 text-center"
       >
         <div>
-          <div className="text-3xl font-bold text-blue-400">2,450+</div>
+          <div className="text-3xl font-bold text-blue-400">
+            {formatMemberCount(stats.memberCount)}
+          </div>
           <div className="text-sm text-gray-400">Members</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-purple-400">19+</div>
+          <div className="text-3xl font-bold text-purple-400">
+            {formatEventCount(stats.pastEventCount)}
+          </div>
           <div className="text-sm text-gray-400">Events Hosted</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-green-400">4.7/5</div>
+          <div className="text-3xl font-bold text-green-400">
+            {formatRating(stats.averageRating)}
+          </div>
           <div className="text-sm text-gray-400">Rating</div>
         </div>
       </motion.div>
