@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { getDb } from "../mongodb";
+import { getDb, getGridFSBucket } from "../mongodb";
 import type { UserProfile } from "@/types";
 
 export const PROFILES_COLLECTION = "profiles";
@@ -207,4 +207,29 @@ export async function deleteProfile(userId: string): Promise<boolean> {
   const result = await collection.deleteOne({ userId: new ObjectId(userId) });
 
   return result.deletedCount > 0;
+}
+
+const AVATAR_URL_PATTERN = /\/api\/avatars\/([a-f0-9]{24})/;
+
+async function deleteGridFSFileIfPresent(
+  bucketName: "avatars" | "resumes",
+  id: string,
+): Promise<void> {
+  const bucket = await getGridFSBucket(bucketName);
+  try {
+    await bucket.delete(new ObjectId(id));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/not found/i.test(message)) throw error;
+  }
+}
+
+export async function deleteProfileFiles(userId: string): Promise<void> {
+  const profile = await getProfileByUserId(userId);
+  if (!profile) return;
+
+  const avatarId = profile.avatarUrl?.match(AVATAR_URL_PATTERN)?.[1];
+  if (avatarId) await deleteGridFSFileIfPresent("avatars", avatarId);
+  if (profile.resumeId)
+    await deleteGridFSFileIfPresent("resumes", profile.resumeId);
 }
