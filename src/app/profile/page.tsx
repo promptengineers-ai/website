@@ -24,6 +24,30 @@ import type { UserProfile } from "@/types";
 import { useAuth } from "@/components/auth/AuthProvider";
 import DeleteAccountCard from "@/components/profile/DeleteAccountCard";
 
+const SURVEY_URL = "https://forms.gle/DYBEgiiFGUUisw7V6";
+
+function CommunitySurveyCard() {
+  return (
+    <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
+      <h2 className="mb-2 text-xl font-semibold text-white">
+        Community Survey
+      </h2>
+      <p className="mb-4 text-sm text-gray-400">
+        The community survey is optional. It stays open here whenever you want
+        to fill it out.
+      </p>
+      <a
+        href={SURVEY_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-black"
+      >
+        Take the community survey
+      </a>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const { user, status } = useAuth();
   const router = useRouter();
@@ -198,6 +222,8 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          <CommunitySurveyCard />
 
           {user?.email && <DeleteAccountCard email={user.email} />}
         </div>
@@ -468,6 +494,8 @@ export default function ProfilePage() {
             </a>
           </div>
         )}
+
+        <CommunitySurveyCard />
 
         {user?.email && <DeleteAccountCard email={user.email} />}
       </div>

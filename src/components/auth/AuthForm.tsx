@@ -154,13 +154,15 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
               />
               <button
                 type="button"
+                aria-label="Show password"
+                aria-pressed={showPassword}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-300"
               >
                 {showPassword ? (
-                  <FiEyeOff className="h-5 w-5" />
+                  <FiEyeOff className="h-5 w-5" aria-hidden="true" />
                 ) : (
-                  <FiEye className="h-5 w-5" />
+                  <FiEye className="h-5 w-5" aria-hidden="true" />
                 )}
               </button>
             </div>
@@ -182,13 +184,15 @@ export default function AuthForm({ type, onSubmit }: AuthFormProps) {
                 />
                 <button
                   type="button"
+                  aria-label="Show confirm password"
+                  aria-pressed={showConfirmPassword}
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-300"
                 >
                   {showConfirmPassword ? (
-                    <FiEyeOff className="h-5 w-5" />
+                    <FiEyeOff className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <FiEye className="h-5 w-5" />
+                    <FiEye className="h-5 w-5" aria-hidden="true" />
                   )}
                 </button>
               </div>
