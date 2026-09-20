@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { apiClient } from "@/utils/client";
-import { FaGithub, FaSlack, FaMeetup, FaLinkedin } from "react-icons/fa";
+import { FaSlack, FaMeetup, FaLinkedin } from "react-icons/fa";
 import {
   FALLBACK_MEETUP_STATS,
   formatEventCount,
@@ -20,29 +19,30 @@ const HeroSection = ({
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage(null);
+    setIsSubmitted(false);
 
     try {
-      const response = await apiClient.contactFormSubmit({
+      await apiClient.contactFormSubmit({
         Email: email,
-        // Name: "Newsletter Subscriber",
-        Referrer: "Enso Contact Form",
-        Message: "Beta invite request",
+        Referrer: "Homepage Hero",
+        Message: "Community signup",
       });
-
-      setIsSubmitting(false);
       setIsSubmitted(true);
       setEmail("");
-
-      // Reset success message after delay
-      setTimeout(() => {
-        setIsSubmitted(false);
-      }, 3000);
     } catch (error) {
       console.error("Error submitting form:", error);
+      setErrorMessage(
+        error instanceof Error && error.message
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -84,25 +84,72 @@ const HeroSection = ({
         LLMs, and the future of AI
       </motion.p>
 
-      {/* Primary CTA - Survey Button */}
+      {/* Primary CTA - Signup form */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.7 }}
-        className="mb-12 flex flex-col items-center gap-4"
+        className="mb-12 flex w-full max-w-xl flex-col items-center gap-4 px-4"
       >
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full flex-col gap-3 sm:flex-row"
+        >
+          <label htmlFor="hero-email" className="sr-only">
+            Email address
+          </label>
+          <input
+            id="hero-email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isSubmitting}
+            aria-invalid={errorMessage ? true : undefined}
+            aria-describedby={errorMessage ? "hero-email-error" : undefined}
+            className="w-full flex-1 rounded-full border border-white/20 bg-white/10 px-5 py-4 text-base text-white placeholder-gray-400 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="group relative transform rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+          >
+            <span className="relative z-10">
+              {isSubmitting ? "Joining…" : "Join the community"}
+            </span>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+          </button>
+        </form>
+
+        {errorMessage ? (
+          <p
+            id="hero-email-error"
+            role="alert"
+            className="text-center text-sm text-red-400"
+          >
+            {errorMessage}
+          </p>
+        ) : isSubmitted ? (
+          <p role="status" className="text-center text-sm text-green-400">
+            You&apos;re in! Check your inbox for next steps.
+          </p>
+        ) : (
+          <p className="text-center text-sm text-gray-400">
+            Get invited to the next meetup and the Slack. No spam.
+          </p>
+        )}
+
         <a
           href="https://forms.gle/DYBEgiiFGUUisw7V6"
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative transform rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+          className="text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline"
         >
-          <span className="relative z-10">Take Our Community Survey</span>
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-purple-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+          Already a member? Take our community survey
         </a>
-        <p className="text-sm text-gray-400">
-          Help shape the future of our AI community
-        </p>
       </motion.div>
 
       {/* Community Stats */}

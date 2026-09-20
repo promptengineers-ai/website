@@ -86,15 +86,21 @@ const TopNavbar = () => {
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <a href="/" className="ml-2 flex items-center gap-3">
-                <span className="text-lg font-bold tracking-tight text-white transition-colors duration-200 hover:text-gray-300">
+              <a href="/" className="flex items-center gap-3 sm:ml-2">
+                <span className="whitespace-nowrap text-sm font-bold tracking-tight text-white transition-colors duration-200 hover:text-gray-300 sm:text-lg">
                   Prompt Engineers <span className="text-blue-400">AI</span>
                 </span>
               </a>
             </motion.div>
 
-            {/* Right side - GitHub link and Auth */}
-            <div className="flex items-center gap-4">
+            {/* Right side - public links and Auth */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link
+                href="/members"
+                className="text-xs font-medium text-gray-300 transition-colors duration-200 hover:text-white sm:text-sm"
+              >
+                Members
+              </Link>
               {/* <a
                 href="https://github.com/promptengineers-ai"
                 target="_blank"
@@ -162,16 +168,16 @@ const TopNavbar = () => {
                   )}
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   <Link
                     href={`/login?from=${encodeURIComponent(pathname)}`}
-                    className="rounded-full border border-white/30 bg-transparent px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10"
+                    className="rounded-full border border-white/30 bg-transparent px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:bg-white/10 sm:px-4 sm:py-2 sm:text-sm"
                   >
                     Login
                   </Link>
                   <Link
                     href={`/signup?from=${encodeURIComponent(pathname)}`}
-                    className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-200 hover:bg-gray-200"
+                    className="rounded-full bg-white px-2.5 py-1.5 text-xs font-medium text-black transition-all duration-200 hover:bg-gray-200 sm:px-4 sm:py-2 sm:text-sm"
                   >
                     Register
                   </Link>
