@@ -14,9 +14,12 @@ import {
   FaUsers,
   FaMeetup,
   FaEnvelope,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import { getProfileByUserId } from "@/lib/models/Profile";
 import { getUserById } from "@/lib/models/User";
+import { getAuthFromCookies } from "@/lib/jwt";
+import { chapterLabel } from "@/config/chapters";
 
 export default async function MemberProfilePage({
   params,
@@ -41,6 +44,13 @@ export default async function MemberProfilePage({
   if (!user) {
     notFound();
   }
+
+  const viewerId = getAuthFromCookies()?.user?.id;
+  const canSeeEmail = Boolean(viewerId);
+  const canDownloadResume =
+    Boolean(profile.resumeId) &&
+    Boolean(viewerId) &&
+    (viewerId === profile.userId || profile.resumeVisibleToMembers === true);
 
   const getSocialIcon = (platform: string) => {
     switch (platform) {
@@ -122,13 +132,29 @@ export default async function MemberProfilePage({
               )}
               <div>
                 <h1 className="text-3xl font-bold text-white">{user.name}</h1>
-                <a
-                  href={`mailto:${user.email}`}
-                  className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-white underline decoration-white/40 transition-colors hover:decoration-white"
-                >
-                  <FaEnvelope className="h-3.5 w-3.5" />
-                  {user.email}
-                </a>
+                {canSeeEmail && (
+                  <a
+                    href={`mailto:${user.email}`}
+                    className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-white underline decoration-white/40 transition-colors hover:decoration-white"
+                  >
+                    <FaEnvelope className="h-3.5 w-3.5" />
+                    {user.email}
+                  </a>
+                )}
+
+                {profile.chapters && profile.chapters.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {profile.chapters.map((slug) => (
+                      <span
+                        key={slug}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm"
+                      >
+                        <FaMapMarkerAlt className="h-3.5 w-3.5" />
+                        {chapterLabel(slug)}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* Career Intentions Badges */}
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -156,17 +182,31 @@ export default async function MemberProfilePage({
             Connect With Me
           </h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <a
-              href={`mailto:${user.email}`}
-              className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
-            >
-              <div className="text-blue-400 group-hover:text-blue-300">
-                <FaEnvelope className="h-5 w-5" />
-              </div>
-              <span className="text-gray-300 group-hover:text-white">
-                {user.email}
-              </span>
-            </a>
+            {canSeeEmail ? (
+              <a
+                href={`mailto:${user.email}`}
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  <FaEnvelope className="h-5 w-5" />
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  {user.email}
+                </span>
+              </a>
+            ) : (
+              <Link
+                href={`/login?from=/members/${userId}`}
+                className="group flex items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 transition-all hover:border-blue-500 hover:bg-gray-700"
+              >
+                <div className="text-blue-400 group-hover:text-blue-300">
+                  <FaEnvelope className="h-5 w-5" />
+                </div>
+                <span className="text-gray-300 group-hover:text-white">
+                  Sign in to view email
+                </span>
+              </Link>
+            )}
             {profile.links.linkedin && (
               <a
                 href={profile.links.linkedin}
@@ -271,10 +311,7 @@ export default async function MemberProfilePage({
           </div>
         )}
 
-        {/* Resume Card - Should we show resume public? Spec says "tells about themselves and their interests". 
-            Usually resumes are public on professional profiles.
-        */}
-        {profile.resumeId && (
+        {canDownloadResume && (
           <div className="rounded-lg border border-gray-800 bg-gray-900 p-6 shadow-lg">
             <h2 className="mb-4 text-xl font-semibold text-white">Resume</h2>
             <a

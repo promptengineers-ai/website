@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import type { UserProfile } from "@/types";
+import { CHAPTERS } from "@/config/chapters";
 import RichTextEditor from "./RichTextEditor";
 import AvatarUpload from "./AvatarUpload";
 
@@ -20,7 +21,9 @@ type ProfileFormProps = {
     };
     background: string;
     seeking: string[];
+    chapters: string[];
     isPublic: boolean;
+    resumeVisibleToMembers: boolean;
     avatarFile: File | null;
   }) => Promise<void>;
 };
@@ -45,10 +48,22 @@ export default function ProfileForm({
         ? [profile.seeking]
         : [],
   );
+  const [chapters, setChapters] = useState<string[]>(profile?.chapters || []);
   const [isPublic, setIsPublic] = useState(profile?.isPublic || false);
+  const [resumeVisibleToMembers, setResumeVisibleToMembers] = useState(
+    profile?.resumeVisibleToMembers === true,
+  );
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleChapterChange = (slug: string) => {
+    setChapters((prev) =>
+      prev.includes(slug)
+        ? prev.filter((item) => item !== slug)
+        : [...prev, slug],
+    );
+  };
 
   const handleSeekingChange = (value: string) => {
     setSeeking((prev) =>
@@ -76,7 +91,9 @@ export default function ProfileForm({
         },
         background,
         seeking,
+        chapters,
         isPublic,
+        resumeVisibleToMembers,
         avatarFile,
       });
     } catch (err) {
@@ -118,31 +135,89 @@ export default function ProfileForm({
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
             <h3 className="text-lg font-medium leading-6 text-white">
-              Public Profile
+              Visibility
             </h3>
             <p className="mt-1 text-sm text-gray-400">
-              Manage your profile visibility and avatar
+              Both choices below are off until you turn them on. Each one is
+              separate.
             </p>
           </div>
           <div className="mt-5 space-y-6 md:col-span-2 md:mt-0">
-            <div className="flex items-start">
-              <div className="flex h-5 items-center">
-                <input
-                  id="isPublic"
-                  name="isPublic"
-                  type="checkbox"
-                  checked={isPublic}
-                  onChange={(e) => setIsPublic(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
-                />
+            <div className="rounded-md border border-gray-700 bg-gray-800/40 p-4">
+              <div className="flex items-start">
+                <div className="flex h-5 items-center">
+                  <input
+                    id="isPublic"
+                    name="isPublic"
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                    aria-describedby="isPublic-description"
+                    className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label
+                    htmlFor="isPublic"
+                    className="font-medium text-gray-300"
+                  >
+                    List me in the member directory
+                  </label>
+                  <div
+                    id="isPublic-description"
+                    className="mt-1 space-y-2 text-gray-400"
+                  >
+                    <p>
+                      Turn this on to be findable by other members and potential
+                      collaborators.
+                    </p>
+                    <p>
+                      Anyone who visits the directory, signed in or not, can see
+                      your display name, avatar, chapters, career intentions,
+                      background, and social links.
+                    </p>
+                    <p>
+                      Your email is shown only to signed-in members. Your resume
+                      is not included; sharing it is a separate choice below.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="isPublic" className="font-medium text-gray-300">
-                  Make Profile Public
-                </label>
-                <p className="text-gray-400">
-                  Allow other members to see your profile in the directory.
-                </p>
+            </div>
+
+            <div className="rounded-md border border-gray-700 bg-gray-800/40 p-4">
+              <div className="flex items-start">
+                <div className="flex h-5 items-center">
+                  <input
+                    id="resumeVisibleToMembers"
+                    name="resumeVisibleToMembers"
+                    type="checkbox"
+                    checked={resumeVisibleToMembers}
+                    onChange={(e) =>
+                      setResumeVisibleToMembers(e.target.checked)
+                    }
+                    aria-describedby="resumeVisibleToMembers-description"
+                    className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label
+                    htmlFor="resumeVisibleToMembers"
+                    className="font-medium text-gray-300"
+                  >
+                    Share my resume with signed-in members
+                  </label>
+                  <p
+                    id="resumeVisibleToMembers-description"
+                    className="mt-1 text-gray-400"
+                  >
+                    Let members who are signed in download your resume from your
+                    profile. Leave this off and only you can download it.
+                    Uploading a resume does not share it. This is separate from
+                    the directory listing and never applies to visitors who are
+                    not signed in.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -408,6 +483,50 @@ export default function ProfileForm({
                   <p className="text-gray-400">Other reasons</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border border-gray-800 bg-gray-900 px-4 py-5 shadow sm:rounded-lg sm:p-6">
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-white">
+              Chapters
+            </h3>
+            <p className="mt-1 text-sm text-gray-400">
+              Which local chapters do you attend? (Select all that apply)
+            </p>
+          </div>
+          <div className="mt-5 md:col-span-2 md:mt-0">
+            <div className="space-y-4">
+              {CHAPTERS.map((chapter) => (
+                <div key={chapter.slug} className="flex items-start">
+                  <div className="flex h-5 items-center">
+                    <input
+                      id={`chapter-${chapter.slug}`}
+                      name={`chapter-${chapter.slug}`}
+                      type="checkbox"
+                      checked={chapters.includes(chapter.slug)}
+                      onChange={() => handleChapterChange(chapter.slug)}
+                      className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label
+                      htmlFor={`chapter-${chapter.slug}`}
+                      className="font-medium text-gray-300"
+                    >
+                      {chapter.city}, {chapter.state}
+                    </label>
+                    <p className="text-gray-400">
+                      {chapter.status === "launching"
+                        ? "Launching soon"
+                        : "Monthly meetup"}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

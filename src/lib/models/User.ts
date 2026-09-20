@@ -1,6 +1,9 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../mongodb";
 import type { User } from "@/types";
+import { deleteProfile, deleteProfileFiles } from "./Profile";
+import { HACKATHON_TEAMS_COLLECTION } from "./HackathonTeam";
+import { HACKATHON_REGISTRATIONS_COLLECTION } from "./HackathonRegistration";
 
 export const USERS_COLLECTION = "users";
 
@@ -258,4 +261,31 @@ export async function updateUserName(id: string, name: string): Promise<void> {
     { _id: new ObjectId(id) },
     { $set: { name, updatedAt: new Date() } },
   );
+}
+
+export async function deleteUser(id: string): Promise<boolean> {
+  const db = await getDb();
+  const collection = db.collection(USERS_COLLECTION);
+
+  const result = await collection.deleteOne({ _id: new ObjectId(id) });
+  return result.deletedCount > 0;
+}
+
+export async function deleteUserAccount(userId: string): Promise<boolean> {
+  const db = await getDb();
+  const id = new ObjectId(userId);
+
+  await db
+    .collection(HACKATHON_TEAMS_COLLECTION)
+    .updateMany(
+      { "slots.userId": id },
+      { $set: { "slots.$[slot].userId": null, updatedAt: new Date() } },
+      { arrayFilters: [{ "slot.userId": id }] },
+    );
+  await db
+    .collection(HACKATHON_REGISTRATIONS_COLLECTION)
+    .deleteMany({ userId: id });
+  await deleteProfileFiles(userId);
+  await deleteProfile(userId);
+  return deleteUser(userId);
 }

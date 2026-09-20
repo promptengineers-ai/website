@@ -1,5 +1,5 @@
-import { ObjectId } from "mongodb";
-import { getDb } from "../mongodb";
+import { ObjectId, type Document, type WithId } from "mongodb";
+import { getDb, getGridFSBucket } from "../mongodb";
 import type { UserProfile } from "@/types";
 
 export const PROFILES_COLLECTION = "profiles";
@@ -9,6 +9,7 @@ export async function createProfileIndexes() {
   const collection = db.collection(PROFILES_COLLECTION);
 
   await collection.createIndex({ userId: 1 }, { unique: true });
+  await collection.createIndex({ isPublic: 1, chapters: 1 });
 }
 
 export async function createProfile(data: {
@@ -23,6 +24,8 @@ export async function createProfile(data: {
   };
   background?: string;
   seeking?: "work" | "hiring" | "networking" | "other";
+  chapters?: string[];
+  resumeVisibleToMembers?: boolean;
   isPublic?: boolean;
   avatarUrl?: string;
   badges?: string[];
@@ -38,6 +41,8 @@ export async function createProfile(data: {
     links: data.links || {},
     background: data.background || "",
     seeking: data.seeking || "networking",
+    chapters: data.chapters || [],
+    resumeVisibleToMembers: data.resumeVisibleToMembers || false,
     isPublic: data.isPublic || false,
     avatarUrl: data.avatarUrl || "",
     badges: data.badges || [],
@@ -55,6 +60,8 @@ export async function createProfile(data: {
     links: profile.links,
     background: profile.background,
     seeking: profile.seeking,
+    chapters: profile.chapters,
+    resumeVisibleToMembers: profile.resumeVisibleToMembers,
     isPublic: profile.isPublic,
     avatarUrl: profile.avatarUrl,
     badges: profile.badges,
@@ -75,6 +82,26 @@ export async function getProfileByUserId(
 
   if (!profile) return null;
 
+  return toUserProfile(profile);
+}
+
+export async function getProfileByResumeId(
+  resumeId: string,
+): Promise<UserProfile | null> {
+  if (!ObjectId.isValid(resumeId)) return null;
+  const db = await getDb();
+  const collection = db.collection(PROFILES_COLLECTION);
+
+  const profile = await collection.findOne({
+    resumeId: new ObjectId(resumeId),
+  });
+
+  if (!profile) return null;
+
+  return toUserProfile(profile);
+}
+
+function toUserProfile(profile: WithId<Document>): UserProfile {
   return {
     _id: profile._id.toString(),
     userId: profile.userId.toString(),
@@ -82,6 +109,8 @@ export async function getProfileByUserId(
     background: profile.background || "",
     seeking: profile.seeking || "networking",
     resumeId: profile.resumeId?.toString(),
+    resumeVisibleToMembers: profile.resumeVisibleToMembers === true,
+    chapters: profile.chapters || [],
     isPublic: profile.isPublic || false,
     avatarUrl: profile.avatarUrl || "",
     badges: profile.badges || [],
@@ -112,6 +141,8 @@ export async function getProfilesByUserIds(
       background: doc.background || "",
       seeking: doc.seeking || "networking",
       resumeId: doc.resumeId?.toString(),
+      resumeVisibleToMembers: doc.resumeVisibleToMembers === true,
+      chapters: doc.chapters || [],
       isPublic: doc.isPublic || false,
       avatarUrl: doc.avatarUrl || "",
       badges: doc.badges || [],
@@ -137,7 +168,9 @@ export async function updateProfile(
     };
     background?: string;
     seeking?: "work" | "hiring" | "networking" | "other";
+    chapters?: string[];
     resumeId?: string;
+    resumeVisibleToMembers?: boolean;
     isPublic?: boolean;
     avatarUrl?: string;
     badges?: string[];
@@ -155,6 +188,9 @@ export async function updateProfile(
   if (data.links !== undefined) updateData.links = data.links;
   if (data.background !== undefined) updateData.background = data.background;
   if (data.seeking !== undefined) updateData.seeking = data.seeking;
+  if (data.chapters !== undefined) updateData.chapters = data.chapters;
+  if (data.resumeVisibleToMembers !== undefined)
+    updateData.resumeVisibleToMembers = data.resumeVisibleToMembers;
   if (data.isPublic !== undefined) updateData.isPublic = data.isPublic;
   if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl;
   if (data.badges !== undefined) updateData.badges = data.badges;
@@ -181,6 +217,8 @@ export async function updateProfile(
     background: result.background || "",
     seeking: result.seeking || "networking",
     resumeId: result.resumeId?.toString(),
+    resumeVisibleToMembers: result.resumeVisibleToMembers === true,
+    chapters: result.chapters || [],
     isPublic: result.isPublic || false,
     avatarUrl: result.avatarUrl || "",
     badges: result.badges || [],
@@ -191,6 +229,19 @@ export async function updateProfile(
   };
 }
 
+export async function clearResume(userId: string): Promise<void> {
+  const db = await getDb();
+  const collection = db.collection(PROFILES_COLLECTION);
+
+  await collection.updateOne(
+    { userId: new ObjectId(userId) },
+    {
+      $unset: { resumeId: "" },
+      $set: { resumeVisibleToMembers: false, updatedAt: new Date() },
+    },
+  );
+}
+
 export async function deleteProfile(userId: string): Promise<boolean> {
   const db = await getDb();
   const collection = db.collection(PROFILES_COLLECTION);
@@ -198,4 +249,29 @@ export async function deleteProfile(userId: string): Promise<boolean> {
   const result = await collection.deleteOne({ userId: new ObjectId(userId) });
 
   return result.deletedCount > 0;
+}
+
+const AVATAR_URL_PATTERN = /\/api\/avatars\/([a-f0-9]{24})/;
+
+async function deleteGridFSFileIfPresent(
+  bucketName: "avatars" | "resumes",
+  id: string,
+): Promise<void> {
+  const bucket = await getGridFSBucket(bucketName);
+  try {
+    await bucket.delete(new ObjectId(id));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/not found/i.test(message)) throw error;
+  }
+}
+
+export async function deleteProfileFiles(userId: string): Promise<void> {
+  const profile = await getProfileByUserId(userId);
+  if (!profile) return;
+
+  const avatarId = profile.avatarUrl?.match(AVATAR_URL_PATTERN)?.[1];
+  if (avatarId) await deleteGridFSFileIfPresent("avatars", avatarId);
+  if (profile.resumeId)
+    await deleteGridFSFileIfPresent("resumes", profile.resumeId);
 }

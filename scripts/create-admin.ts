@@ -2,7 +2,9 @@
  * Creates an admin user or promotes an existing user to admin.
  *
  * Usage:
- *   pnpm dlx tsx scripts/create-admin.ts <email> [password] [name]
+ *   pnpm dlx tsx scripts/create-admin.ts [email] [password] [name]
+ *
+ * Email defaults to admin@promptengineers.ai.
  *
  * If user exists: promotes to admin
  * If user doesn't exist: creates with given password and name, then promotes
@@ -13,20 +15,11 @@ import * as bcrypt from "bcryptjs";
 
 const MONGO_URI =
   process.env.MONGO_DB_URI || "mongodb://localhost:27017/promptengineers";
+const DEFAULT_ADMIN_EMAIL = "admin@promptengineers.ai";
 
 async function main() {
-  const [email, password, name] = process.argv.slice(2);
-
-  if (!email) {
-    console.error(
-      "Usage: pnpm dlx tsx scripts/create-admin.ts <email> [password] [name]",
-    );
-    console.error("  If user exists, promotes to admin.");
-    console.error(
-      "  If user doesn't exist, provide password and name to create.",
-    );
-    process.exit(1);
-  }
+  const [emailArg, password, name] = process.argv.slice(2);
+  const email = emailArg || DEFAULT_ADMIN_EMAIL;
 
   const client = new MongoClient(MONGO_URI);
 

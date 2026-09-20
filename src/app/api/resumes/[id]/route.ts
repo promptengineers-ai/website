@@ -1,34 +1,45 @@
-import { NextResponse } from 'next/server';
-import { ObjectId } from 'mongodb';
-import { getGridFSBucket } from '@/lib/mongodb';
-import { getProfileByUserId, updateProfile } from '@/lib/models/Profile';
+import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
+import { getGridFSBucket } from "@/lib/mongodb";
+import {
+  clearResume,
+  getProfileByResumeId,
+  getProfileByUserId,
+} from "@/lib/models/Profile";
 import {
   clearAuthCookie,
   getAuthFromCookies,
   refreshAuthToken,
   setAuthCookie,
   shouldRefreshToken,
-} from '@/lib/jwt';
+} from "@/lib/jwt";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const auth = getAuthFromCookies();
 
     if (!auth?.user?.id) {
-      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const response = NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
       clearAuthCookie(response);
       return response;
     }
 
     const { id } = params;
 
-    // Verify the resume belongs to the user
-    const profile = await getProfileByUserId(auth.user.id);
-    if (!profile || profile.resumeId !== id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const owner = await getProfileByResumeId(id);
+    if (!owner) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const isOwner = owner.userId === auth.user.id;
+    if (!isOwner && owner.resumeVisibleToMembers !== true) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const bucket = await getGridFSBucket();
@@ -36,7 +47,7 @@ export async function GET(
     // Get file metadata
     const files = await bucket.find({ _id: new ObjectId(id) }).toArray();
     if (files.length === 0) {
-      return NextResponse.json({ error: 'Resume not found' }, { status: 404 });
+      return NextResponse.json({ error: "Resume not found" }, { status: 404 });
     }
 
     const file = files[0];
@@ -54,9 +65,10 @@ export async function GET(
     // Return file as response
     const response = new NextResponse(buffer, {
       headers: {
-        'Content-Type': (file.metadata as any)?.contentType || 'application/octet-stream',
-        'Content-Disposition': `inline; filename="${file.filename}"`,
-        'Content-Length': file.length.toString(),
+        "Content-Type":
+          (file.metadata as any)?.contentType || "application/octet-stream",
+        "Content-Disposition": `inline; filename="${file.filename}"`,
+        "Content-Length": file.length.toString(),
       },
     });
 
@@ -67,20 +79,26 @@ export async function GET(
 
     return response;
   } catch (error) {
-    console.error('Download error:', error);
-    return NextResponse.json({ error: 'Failed to download resume' }, { status: 500 });
+    console.error("Download error:", error);
+    return NextResponse.json(
+      { error: "Failed to download resume" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const auth = getAuthFromCookies();
 
     if (!auth?.user?.id) {
-      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const response = NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
       clearAuthCookie(response);
       return response;
     }
@@ -90,7 +108,7 @@ export async function DELETE(
     // Verify the resume belongs to the user
     const profile = await getProfileByUserId(auth.user.id);
     if (!profile || profile.resumeId !== id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const bucket = await getGridFSBucket();
@@ -98,14 +116,11 @@ export async function DELETE(
     // Delete file from GridFS
     await bucket.delete(new ObjectId(id));
 
-    // Remove resume reference from profile
-    await updateProfile(auth.user.id, {
-      resumeId: undefined,
-    });
+    await clearResume(auth.user.id);
 
     const response = NextResponse.json(
-      { message: 'Resume deleted successfully' },
-      { status: 200 }
+      { message: "Resume deleted successfully" },
+      { status: 200 },
     );
 
     if (shouldRefreshToken(auth.payload)) {
@@ -115,7 +130,10 @@ export async function DELETE(
 
     return response;
   } catch (error) {
-    console.error('Delete error:', error);
-    return NextResponse.json({ error: 'Failed to delete resume' }, { status: 500 });
+    console.error("Delete error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete resume" },
+      { status: 500 },
+    );
   }
 }

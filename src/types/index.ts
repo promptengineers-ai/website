@@ -1,3 +1,5 @@
+import type { Chapter } from "@/config/chapters";
+
 export type Blog = {
   id: number;
   title: {
@@ -57,6 +59,8 @@ export type UserProfile = {
   background: string;
   seeking: string[] | string; // Array for multi-select, string for backward compatibility
   resumeId?: string;
+  resumeVisibleToMembers: boolean;
+  chapters: string[];
   isPublic?: boolean;
   avatarUrl?: string;
   badges: string[];
@@ -178,6 +182,26 @@ export type HackathonRegistration = {
   involvement: HackathonInvolvement;
   rolePreference?: HackathonRole;
   registeredAt: Date;
+};
+
+export type MeetupStats = {
+  memberCount: number;
+  pastEventCount: number;
+  averageRating: number;
+  ratingCount: number;
+  isFallback: boolean;
+};
+
+export type MeetupEvent = {
+  title: string;
+  dateTime: string;
+  url: string;
+};
+
+export type ChapterSnapshot = {
+  chapter: Chapter;
+  stats: MeetupStats | null;
+  nextEvent: MeetupEvent | null;
 };
 
 export type ResumeMetadata = {

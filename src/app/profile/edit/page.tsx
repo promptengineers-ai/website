@@ -67,7 +67,9 @@ export default function EditProfilePage() {
     };
     background: string;
     seeking: string[];
+    chapters: string[];
     isPublic: boolean;
+    resumeVisibleToMembers: boolean;
     avatarFile: File | null;
   }) => {
     // Extract avatarFile to handle separately

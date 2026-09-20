@@ -26,9 +26,12 @@ const APP_NAME = "Prompt Engineers AI";
 const APP_DEFAULT_TITLE = "Prompt Engineers AI - Dallas Plano AI Community";
 const APP_TITLE_TEMPLATE = "%s | Prompt Engineers AI";
 const APP_DESCRIPTION =
-  "Join 2,450+ developers and tech enthusiasts in Plano, TX exploring ChatGPT, LLMs, and the future of AI. Monthly meetups focused on prompt engineering, machine learning, and AI development.";
+  "A community of developers and tech enthusiasts in Plano, TX and St. George, UT exploring ChatGPT, LLMs, and the future of AI. Monthly meetups focused on prompt engineering, machine learning, and AI development.";
+const PRODUCTION_URL = "https://promptengineers.ai/";
+const METADATA_BASE = new URL(process.env.NEXT_PUBLIC_APP_URL || PRODUCTION_URL);
 
 export const metadata: Metadata = {
+  metadataBase: METADATA_BASE,
   applicationName: APP_NAME,
   title: {
     default: APP_DEFAULT_TITLE,
@@ -54,7 +57,7 @@ export const metadata: Metadata = {
     },
     description: APP_DESCRIPTION,
     locale: "en_US",
-    url: "https://promptengineers-ai.github.io/website/",
+    url: PRODUCTION_URL,
     images: [
       {
         url: "/images/og-image.png",
