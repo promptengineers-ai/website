@@ -145,3 +145,79 @@ describe("MemberProfilePage — chapter badges (#30)", () => {
     expect(screen.queryByText("Plano, TX")).not.toBeInTheDocument();
   });
 });
+
+describe("MemberProfilePage — resume link gating (#37)", () => {
+  const RESUME_ID = "dddddddddddddddddddddddd";
+  const resumeHref = `a[href="/api/resumes/${RESUME_ID}"]`;
+
+  function signInAsOwner() {
+    mockGetAuth.mockReturnValue({
+      user: { id: MEMBER_ID, email: MEMBER_EMAIL, name: "Alice" },
+      payload: {},
+    } as never);
+  }
+
+  it("hides the resume link from an anonymous viewer even when opted in", async () => {
+    signOut();
+    const { container } = await renderPage({
+      resumeId: RESUME_ID,
+      resumeVisibleToMembers: true,
+    });
+
+    expect(container.querySelector(resumeHref)).not.toBeInTheDocument();
+    expect(screen.queryByText("View Resume")).not.toBeInTheDocument();
+    expect(container.innerHTML).not.toContain(RESUME_ID);
+  });
+
+  it("hides the resume link from a signed-in non-owner when the owner has not opted in", async () => {
+    signIn();
+    const { container } = await renderPage({
+      resumeId: RESUME_ID,
+      resumeVisibleToMembers: false,
+    });
+
+    expect(container.querySelector(resumeHref)).not.toBeInTheDocument();
+    expect(container.innerHTML).not.toContain(RESUME_ID);
+  });
+
+  it("hides the resume link from a signed-in non-owner for a legacy profile without the flag", async () => {
+    signIn();
+    const { container } = await renderPage({ resumeId: RESUME_ID });
+
+    expect(container.querySelector(resumeHref)).not.toBeInTheDocument();
+  });
+
+  it("shows the resume link to a signed-in non-owner when the owner has opted in", async () => {
+    signIn();
+    const { container } = await renderPage({
+      resumeId: RESUME_ID,
+      resumeVisibleToMembers: true,
+    });
+
+    expect(container.querySelector(resumeHref)).toBeInTheDocument();
+    expect(screen.getByText("View Resume")).toBeInTheDocument();
+  });
+
+  it("shows the resume link to the owner regardless of the flag", async () => {
+    signInAsOwner();
+    const { container } = await renderPage({
+      resumeId: RESUME_ID,
+      resumeVisibleToMembers: false,
+    });
+
+    expect(container.querySelector(resumeHref)).toBeInTheDocument();
+  });
+
+  it("shows no resume link to the owner once the resume is deleted", async () => {
+    signInAsOwner();
+    const { container } = await renderPage({
+      resumeId: undefined,
+      resumeVisibleToMembers: true,
+    });
+
+    expect(
+      container.querySelector('a[href^="/api/resumes/"]'),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("View Resume")).not.toBeInTheDocument();
+  });
+});

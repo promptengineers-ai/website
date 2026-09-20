@@ -66,8 +66,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, links, background, seeking, chapters, isPublic, avatarUrl } =
-      body;
+    const {
+      name,
+      links,
+      background,
+      seeking,
+      chapters,
+      resumeVisibleToMembers,
+      isPublic,
+      avatarUrl,
+    } = body;
 
     // Validate name if provided
     if (name !== undefined) {
@@ -135,6 +143,16 @@ export async function POST(request: Request) {
       }
     }
 
+    if (
+      resumeVisibleToMembers !== undefined &&
+      typeof resumeVisibleToMembers !== "boolean"
+    ) {
+      return NextResponse.json(
+        { error: "resumeVisibleToMembers must be a boolean" },
+        { status: 400 },
+      );
+    }
+
     // Check if profile exists
     const existingProfile = await getProfileByUserId(auth.user.id);
 
@@ -146,6 +164,7 @@ export async function POST(request: Request) {
         background,
         seeking,
         chapters,
+        resumeVisibleToMembers,
         isPublic,
         avatarUrl,
       });
@@ -157,6 +176,7 @@ export async function POST(request: Request) {
         background,
         seeking,
         chapters,
+        resumeVisibleToMembers,
         isPublic,
         avatarUrl,
       });

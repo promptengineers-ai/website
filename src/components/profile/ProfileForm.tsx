@@ -23,6 +23,7 @@ type ProfileFormProps = {
     seeking: string[];
     chapters: string[];
     isPublic: boolean;
+    resumeVisibleToMembers: boolean;
     avatarFile: File | null;
   }) => Promise<void>;
 };
@@ -49,6 +50,9 @@ export default function ProfileForm({
   );
   const [chapters, setChapters] = useState<string[]>(profile?.chapters || []);
   const [isPublic, setIsPublic] = useState(profile?.isPublic || false);
+  const [resumeVisibleToMembers, setResumeVisibleToMembers] = useState(
+    profile?.resumeVisibleToMembers === true,
+  );
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -89,6 +93,7 @@ export default function ProfileForm({
         seeking,
         chapters,
         isPublic,
+        resumeVisibleToMembers,
         avatarFile,
       });
     } catch (err) {
@@ -154,6 +159,32 @@ export default function ProfileForm({
                 </label>
                 <p className="text-gray-400">
                   Allow other members to see your profile in the directory.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex h-5 items-center">
+                <input
+                  id="resumeVisibleToMembers"
+                  name="resumeVisibleToMembers"
+                  type="checkbox"
+                  checked={resumeVisibleToMembers}
+                  onChange={(e) => setResumeVisibleToMembers(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label
+                  htmlFor="resumeVisibleToMembers"
+                  className="font-medium text-gray-300"
+                >
+                  Share Resume With Signed-In Members
+                </label>
+                <p className="text-gray-400">
+                  Let members who are signed in download your resume from your
+                  profile. Leave this off and only you can download it.
+                  Uploading a resume does not share it.
                 </p>
               </div>
             </div>
