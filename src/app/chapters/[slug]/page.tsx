@@ -5,7 +5,7 @@ import TopNavBar from "@/components/nav/TopNavBar";
 import ChapterCard from "@/components/chapters/ChapterCard";
 import { CHAPTERS, CHAPTER_SLUGS, getChapter } from "@/config/chapters";
 import type { Chapter } from "@/config/chapters";
-import { getChapterSnapshot } from "@/lib/meetup";
+import { formatEventDay, getChapterSnapshot } from "@/lib/meetup";
 import type { ChapterSnapshot } from "@/types";
 
 const PRODUCTION_URL = "https://promptengineers.ai/";
@@ -91,11 +91,18 @@ export async function generateMetadata({
   };
 }
 
-function LaunchingDetails({ chapter }: { chapter: Chapter }) {
+function rsvpUrl({ chapter, nextEvent }: ChapterSnapshot): string | null {
+  return nextEvent?.url ?? (chapter.meetupUrl || null);
+}
+
+function LaunchingDetails({ snapshot }: { snapshot: ChapterSnapshot }) {
+  const { chapter, nextEvent } = snapshot;
   const segments = [
-    LAUNCHING_COPY.firstEvent,
-    chapter.venue ? `Planned venue: ${chapter.venue}` : null,
+    nextEvent
+      ? formatEventDay(nextEvent.dateTime) ?? nextEvent.dateTime
+      : LAUNCHING_COPY.firstEvent,
     MEETUP_TIME_WINDOW[chapter.slug] ?? null,
+    chapter.venue ?? null,
   ].filter((segment): segment is string => segment !== null);
 
   return (
@@ -106,7 +113,13 @@ function LaunchingDetails({ chapter }: { chapter: Chapter }) {
       <p>{LAUNCHING_COPY.lead}</p>
       <p>{LAUNCHING_COPY.format}</p>
       <p>{LAUNCHING_COPY.audience}</p>
-      <p className="text-base text-gray-400">{segments.join(" · ")}</p>
+      <p className="text-base text-gray-400">
+        {nextEvent ? (
+          <time dateTime={nextEvent.dateTime}>{segments.join(" · ")}</time>
+        ) : (
+          segments.join(" · ")
+        )}
+      </p>
     </div>
   );
 }
@@ -137,12 +150,28 @@ function OtherChapters({ chapter }: { chapter: Chapter }) {
   );
 }
 
-function LaunchingActions() {
+function LaunchingActions({ snapshot }: { snapshot: ChapterSnapshot }) {
+  const rsvp = rsvpUrl(snapshot);
+
   return (
     <div className="flex flex-wrap gap-3">
+      {rsvp && (
+        <a
+          href={rsvp}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-md bg-white px-6 py-3 text-base font-medium text-black transition-colors hover:bg-gray-200"
+        >
+          RSVP on Meetup
+        </a>
+      )}
       <Link
         href="/signup"
-        className="rounded-md bg-white px-6 py-3 text-base font-medium text-black transition-colors hover:bg-gray-200"
+        className={
+          rsvp
+            ? "rounded-md border border-gray-600 px-6 py-3 text-base font-medium text-white transition-colors hover:border-white"
+            : "rounded-md bg-white px-6 py-3 text-base font-medium text-black transition-colors hover:bg-gray-200"
+        }
       >
         Create a free account
       </Link>
@@ -159,12 +188,10 @@ function LaunchingActions() {
 }
 
 function EstablishedActions({ snapshot }: { snapshot: ChapterSnapshot }) {
-  const rsvpUrl = snapshot.nextEvent?.url ?? snapshot.chapter.meetupUrl;
-
   return (
     <div className="flex flex-wrap gap-3">
       <a
-        href={rsvpUrl}
+        href={rsvpUrl(snapshot) ?? undefined}
         target="_blank"
         rel="noopener noreferrer"
         className="rounded-md bg-white px-6 py-3 text-base font-medium text-black transition-colors hover:bg-gray-200"
@@ -208,7 +235,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             </div>
 
             {launching ? (
-              <LaunchingDetails chapter={chapter} />
+              <LaunchingDetails snapshot={snapshot} />
             ) : (
               <p className="text-lg leading-relaxed text-gray-200">
                 Event details, the group description, and RSVPs live on Meetup.
@@ -216,7 +243,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             )}
 
             {launching ? (
-              <LaunchingActions />
+              <LaunchingActions snapshot={snapshot} />
             ) : (
               <EstablishedActions snapshot={snapshot} />
             )}
