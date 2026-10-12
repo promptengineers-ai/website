@@ -43,7 +43,8 @@ export const CHAPTERS: Chapter[] = [
     city: "St. George",
     state: "UT",
     status: "launching",
-    meetupUrl: "",
+    meetupUrl:
+      "https://www.meetup.com/prompt-engineers-ai-community-st-george/",
     organizers: [
       {
         name: "Ryan Eggleston",
@@ -53,7 +54,7 @@ export const CHAPTERS: Chapter[] = [
         photoUrl: "/images/organizers/ryan-eggleston.jpg",
       },
     ],
-    venue: "Atwood Innovation Plaza",
+    venue: "Atwood Innovation Plaza at UT",
   },
 ];
 

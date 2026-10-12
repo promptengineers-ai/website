@@ -6,6 +6,7 @@ import {
   FALLBACK_MEETUP_STATS,
   formatEventCount,
   formatEventDateTime,
+  formatEventDay,
   formatMemberCount,
   formatRating,
   getChapterSnapshot,
@@ -118,12 +119,11 @@ describe("getChapterSnapshot", () => {
 
     const snapshot = await getChapterSnapshot(stGeorge);
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(snapshot).toEqual({
-      chapter: stGeorge,
-      stats: null,
-      nextEvent: null,
-    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      stGeorge.meetupUrl,
+      expect.anything(),
+    );
+    expect(snapshot.stats).toBeNull();
   });
 
   it("launching chapter with a Meetup URL keeps its own next event and no stats", async () => {
@@ -227,5 +227,10 @@ describe("formatters", () => {
       "Wed, Oct 14 · 12:05 AM",
     );
     expect(formatEventDateTime("not a date")).toBeNull();
+  });
+
+  it("formats an event day without the time", () => {
+    expect(formatEventDay("2026-10-20T18:00:00-06:00")).toBe("Tue, Oct 20");
+    expect(formatEventDay("not a date")).toBeNull();
   });
 });

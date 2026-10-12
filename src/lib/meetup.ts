@@ -145,16 +145,28 @@ const MONTHS = [
   "Dec",
 ];
 
-export function formatEventDateTime(dateTime: string): string | null {
-  const parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(dateTime);
+const EVENT_DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/;
+
+export function formatEventDay(dateTime: string): string | null {
+  const parts = EVENT_DATE_TIME.exec(dateTime);
   if (!parts) return null;
 
-  const [year, month, day, hour, minute] = parts.slice(1).map(Number);
+  const [year, month, day] = parts.slice(1, 4).map(Number);
   const weekday =
     WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+
+  return `${weekday}, ${MONTHS[month - 1]} ${day}`;
+}
+
+export function formatEventDateTime(dateTime: string): string | null {
+  const parts = EVENT_DATE_TIME.exec(dateTime);
+  const eventDay = formatEventDay(dateTime);
+  if (!parts || !eventDay) return null;
+
+  const [hour, minute] = parts.slice(4, 6).map(Number);
   const hour12 = hour % 12 === 0 ? 12 : hour % 12;
   const meridiem = hour < 12 ? "AM" : "PM";
   const paddedMinute = String(minute).padStart(2, "0");
 
-  return `${weekday}, ${MONTHS[month - 1]} ${day} · ${hour12}:${paddedMinute} ${meridiem}`;
+  return `${eventDay} · ${hour12}:${paddedMinute} ${meridiem}`;
 }
