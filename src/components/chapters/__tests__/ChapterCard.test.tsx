@@ -19,10 +19,19 @@ describe("ChapterCard", () => {
 
     expect(screen.getByText("St. George, UT")).toBeInTheDocument();
     expect(screen.getByText("Launching")).toBeInTheDocument();
-    expect(screen.getByText("Atwood Innovation Plaza")).toBeInTheDocument();
+    expect(
+      screen.getByText("Atwood Innovation Plaza at UT"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Ryan Eggleston")).toBeInTheDocument();
-    expect(screen.getByText(/first event to be announced/i)).toBeInTheDocument();
-    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/first event to be announced/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /view on meetup/i }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.meetup.com/prompt-engineers-ai-community-st-george/",
+    );
     expect(screen.queryByText(/members/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/3,900/)).not.toBeInTheDocument();
   });
@@ -55,23 +64,23 @@ describe("ChapterCard", () => {
       }),
     ).toHaveAttribute("href", snapshot.nextEvent?.url);
     expect(screen.getByText("Wed, Sep 23 · 6:00 PM")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /view on meetup/i })).toHaveAttribute(
-      "href",
-      plano.meetupUrl,
-    );
+    expect(
+      screen.getByRole("link", { name: /view on meetup/i }),
+    ).toHaveAttribute("href", plano.meetupUrl);
   });
 
   it("renders no event when the scrape returned none", () => {
     render(
-      <ChapterCard snapshot={{ chapter: plano, stats: null, nextEvent: null }} />,
+      <ChapterCard
+        snapshot={{ chapter: plano, stats: null, nextEvent: null }}
+      />,
     );
 
     expect(screen.getByText(/no upcoming event/i)).toBeInTheDocument();
     expect(screen.queryByText(/members/i)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /view on meetup/i })).toHaveAttribute(
-      "href",
-      plano.meetupUrl,
-    );
+    expect(
+      screen.getByRole("link", { name: /view on meetup/i }),
+    ).toHaveAttribute("href", plano.meetupUrl);
   });
 
   it("card surface does not use light-theme classes", () => {

@@ -15,6 +15,31 @@ const planoFixture = readFileSync(
   "utf-8",
 );
 
+const newGroupFixture = readFileSync(
+  join(process.cwd(), "src/lib/__tests__/fixtures/meetup-group-new.html"),
+  "utf-8",
+);
+
+const noUpcomingFixture = readFileSync(
+  join(
+    process.cwd(),
+    "src/lib/__tests__/fixtures/meetup-group-no-upcoming.html",
+  ),
+  "utf-8",
+);
+
+const ST_GEORGE_MEETUP_URL =
+  "https://www.meetup.com/prompt-engineers-ai-community-st-george/";
+
+function serveMeetup(stGeorgeHtml: string) {
+  return async (url: string) =>
+    ({
+      ok: true,
+      text: async () =>
+        url === ST_GEORGE_MEETUP_URL ? stGeorgeHtml : planoFixture,
+    }) as Response;
+}
+
 const DATE_PATTERN =
   /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}\b|\b\d{1,2}\/\d{1,2}\/\d{2,4}\b|\b20\d{2}\b|\b(mon|tues|wednes|thurs|fri|satur|sun)day\b/i;
 
@@ -28,10 +53,7 @@ describe("chapter page", () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
-    fetchMock.mockResolvedValue({
-      ok: true,
-      text: async () => planoFixture,
-    } as Response);
+    fetchMock.mockImplementation(serveMeetup(newGroupFixture));
     vi.stubGlobal("fetch", fetchMock);
   });
 
@@ -68,7 +90,26 @@ describe("chapter page", () => {
     expect(screen.getByText(/6–9 PM/)).toBeInTheDocument();
   });
 
-  it("renders no date for a launching chapter", async () => {
+  it("renders the kickoff date, time window, venue, and RSVP link", async () => {
+    const { container } = await renderChapter("st-george");
+
+    expect(
+      screen.getByText("Wed, Oct 14 · 6–9 PM · Atwood Innovation Plaza at UT"),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector("time[datetime='2026-10-14T18:30:00-06:00']"),
+    ).not.toBeNull();
+    expect(
+      screen.getByRole("link", { name: /rsvp on meetup/i }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.meetup.com/synthetic-prompt-engineers/events/900000101/",
+    );
+    expect(container.textContent).not.toMatch(/first event to be announced/i);
+  });
+
+  it("renders no date when the Meetup group has no upcoming event", async () => {
+    fetchMock.mockImplementation(serveMeetup(noUpcomingFixture));
     const { container } = await renderChapter("st-george");
 
     expect(
@@ -77,20 +118,24 @@ describe("chapter page", () => {
     expect(container.textContent).not.toMatch(DATE_PATTERN);
     expect(container.querySelector("time")).toBeNull();
     expect(container.textContent).not.toMatch(/booked|confirmed|reserved/i);
+    expect(
+      screen.getByRole("link", { name: /rsvp on meetup/i }),
+    ).toHaveAttribute("href", ST_GEORGE_MEETUP_URL);
   });
 
   it("the St. George page never renders Plano's stats", async () => {
     const { container } = await renderChapter("st-george");
 
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      ST_GEORGE_MEETUP_URL,
+      expect.anything(),
+    );
     expect(screen.queryByText(/members/i)).not.toBeInTheDocument();
     expect(container.textContent).not.toMatch(/3,9\d\d|3,900|3983/);
     expect(container.textContent).not.toMatch(
       /Building Your First Engineering Harness/,
     );
-    expect(
-      screen.queryByRole("link", { name: /meetup/i }),
-    ).not.toBeInTheDocument();
   });
 
   it("renders live Meetup data and no editorial copy for Plano", async () => {
