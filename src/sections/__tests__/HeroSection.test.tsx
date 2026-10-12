@@ -639,7 +639,7 @@ describe("HeroSection", () => {
       expect(socials.className).toMatch(/(^|\s)sm:mb-\S+/);
     });
 
-    it("social links point to Slack, the GitHub organization, and LinkedIn", () => {
+    it("social links point to Slack, GitHub, LinkedIn, and Instagram", () => {
       render(<HeroSection />);
 
       const socials = screen.getByRole("link", { name: /slack/i })
@@ -648,10 +648,14 @@ describe("HeroSection", () => {
         (link) => link.textContent,
       );
 
-      expect(labels).toEqual(["Slack", "GitHub", "LinkedIn"]);
+      expect(labels).toEqual(["Slack", "GitHub", "LinkedIn", "Instagram"]);
       expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
         "href",
         "https://github.com/promptengineers-ai",
+      );
+      expect(screen.getByRole("link", { name: "Instagram" })).toHaveAttribute(
+        "href",
+        "https://www.instagram.com/promptengineers.ai",
       );
       expect(
         screen.queryByRole("link", { name: "Meetup" }),
