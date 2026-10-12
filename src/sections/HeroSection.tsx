@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ApiError, apiClient } from "@/utils/client";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { SURVEY_URL } from "@/config/survey";
-import { FaSlack, FaMeetup, FaLinkedin } from "react-icons/fa";
+import { FaSlack, FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 import {
   FALLBACK_MEETUP_STATS,
   formatEventCount,
@@ -503,7 +503,7 @@ const HeroSection = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.1 }}
-        className="mb-12 flex justify-center gap-6 sm:mb-16"
+        className="mb-12 flex flex-wrap justify-center gap-x-6 gap-y-3 sm:mb-16"
       >
         <a
           href="https://join.slack.com/t/promptengineersai/shared_invite/zt-3t4w1meid-10gQHbgoWO~UYPJprH~Cyw"
@@ -515,13 +515,13 @@ const HeroSection = ({
           <span>Slack</span>
         </a>
         <a
-          href="https://www.meetup.com/plano-prompt-engineers/"
+          href="https://github.com/promptengineers-ai"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
         >
-          <FaMeetup className="text-2xl transition-transform group-hover:scale-110" />
-          <span>Meetup</span>
+          <FaGithub className="text-2xl transition-transform group-hover:scale-110" />
+          <span>GitHub</span>
         </a>
         <a
           href="https://www.linkedin.com/company/prompt-engineers-ai"
@@ -531,6 +531,15 @@ const HeroSection = ({
         >
           <FaLinkedin className="text-2xl transition-transform group-hover:scale-110" />
           <span>LinkedIn</span>
+        </a>
+        <a
+          href="https://www.instagram.com/promptengineers.ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
+        >
+          <FaInstagram className="text-2xl transition-transform group-hover:scale-110" />
+          <span>Instagram</span>
         </a>
       </motion.div>
     </div>

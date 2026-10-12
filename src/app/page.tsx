@@ -2,14 +2,14 @@ import Link from "next/link";
 import TopNavBar from "@/components/nav/TopNavBar";
 import HeroSection from "@/sections/HeroSection";
 import ChapterCard from "@/components/chapters/ChapterCard";
-import MemberStrip from "@/components/members/MemberStrip";
+import HomeCommunityStrip from "@/components/members/HomeCommunityStrip";
 import ChapterOrganizers from "@/components/chapters/ChapterOrganizers";
 import { getChapterSnapshot, getMeetupStats } from "@/lib/meetup";
 import { CHAPTERS } from "@/config/chapters";
-import { getAuthFromCookies } from "@/lib/jwt";
+
+export const revalidate = 3600;
 
 export default async function Home() {
-  const auth = getAuthFromCookies();
   const [stats, snapshots] = await Promise.all([
     getMeetupStats(),
     Promise.all(CHAPTERS.map(getChapterSnapshot)),
@@ -52,7 +52,9 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        {auth ? <MemberStrip /> : <ChapterOrganizers />}
+        <HomeCommunityStrip>
+          <ChapterOrganizers />
+        </HomeCommunityStrip>
       </main>
     </>
   );
