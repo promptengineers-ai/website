@@ -3,14 +3,10 @@ import { vi } from "vitest";
 import { CHAPTERS } from "@/config/chapters";
 import { FALLBACK_MEETUP_STATS } from "@/lib/meetup";
 
+const authStatus = vi.hoisted(() => ({ current: "unauthenticated" }));
+
 vi.mock("@/components/auth/AuthProvider", () => ({
-  useAuth: () => ({ user: null, status: "unauthenticated" }),
-}));
-
-const getAuthFromCookies = vi.hoisted(() => vi.fn(() => null as unknown));
-
-vi.mock("@/lib/jwt", () => ({
-  getAuthFromCookies,
+  useAuth: () => ({ user: null, status: authStatus.current }),
 }));
 
 vi.mock("@/components/nav/TopNavBar", () => ({
@@ -34,7 +30,7 @@ vi.mock("@/lib/meetup", async (importOriginal) => {
   };
 });
 
-import Home from "../page";
+import Home, { revalidate } from "../page";
 
 async function renderHome() {
   const ui = await Home();
@@ -54,7 +50,11 @@ function classTokens(element: Element | null): string[] {
 
 describe("home page", () => {
   beforeEach(() => {
-    getAuthFromCookies.mockReturnValue(null);
+    authStatus.current = "unauthenticated";
+  });
+
+  it("revalidates hourly instead of rendering per request", () => {
+    expect(revalidate).toBe(3600);
   });
 
   it("uses the meetup fallback stats without a network call", async () => {
@@ -85,8 +85,6 @@ describe("home page", () => {
   });
 
   it("shows chapter organizers instead of the member strip when signed out", async () => {
-    getAuthFromCookies.mockReturnValue(null);
-
     await renderHome();
 
     expect(
@@ -96,11 +94,7 @@ describe("home page", () => {
   });
 
   it("shows the member strip instead of chapter organizers when signed in", async () => {
-    getAuthFromCookies.mockReturnValue({
-      token: "token",
-      payload: { userId: "1" },
-      user: { id: "1" },
-    });
+    authStatus.current = "authenticated";
 
     await renderHome();
 
