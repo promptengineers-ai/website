@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ApiError, apiClient } from "@/utils/client";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { SURVEY_URL } from "@/config/survey";
-import { FaSlack, FaMeetup, FaLinkedin } from "react-icons/fa";
+import { FaSlack, FaGithub, FaLinkedin } from "react-icons/fa";
 import {
   FALLBACK_MEETUP_STATS,
   formatEventCount,
@@ -515,13 +515,13 @@ const HeroSection = ({
           <span>Slack</span>
         </a>
         <a
-          href="https://www.meetup.com/plano-prompt-engineers/"
+          href="https://github.com/promptengineers-ai"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2 text-gray-400 transition-colors duration-200 hover:text-white"
         >
-          <FaMeetup className="text-2xl transition-transform group-hover:scale-110" />
-          <span>Meetup</span>
+          <FaGithub className="text-2xl transition-transform group-hover:scale-110" />
+          <span>GitHub</span>
         </a>
         <a
           href="https://www.linkedin.com/company/prompt-engineers-ai"

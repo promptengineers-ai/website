@@ -638,5 +638,24 @@ describe("HeroSection", () => {
       expect(socials.className).toMatch(/(^|\s)mb-\S+/);
       expect(socials.className).toMatch(/(^|\s)sm:mb-\S+/);
     });
+
+    it("social links point to Slack, the GitHub organization, and LinkedIn", () => {
+      render(<HeroSection />);
+
+      const socials = screen.getByRole("link", { name: /slack/i })
+        .parentElement as HTMLElement;
+      const labels = Array.from(socials.querySelectorAll("a")).map(
+        (link) => link.textContent,
+      );
+
+      expect(labels).toEqual(["Slack", "GitHub", "LinkedIn"]);
+      expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
+        "href",
+        "https://github.com/promptengineers-ai",
+      );
+      expect(
+        screen.queryByRole("link", { name: "Meetup" }),
+      ).not.toBeInTheDocument();
+    });
   });
 });
