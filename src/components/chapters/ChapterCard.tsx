@@ -73,7 +73,7 @@ export default function ChapterCard({ snapshot }: ChapterCardProps) {
           </>
         ) : (
           <p className="mt-2 text-sm text-gray-300">
-            {launching ? "First event to be announced" : "No upcoming event"}
+            {launching ? "Next event to be announced" : "No upcoming event"}
           </p>
         )}
       </div>

@@ -19,10 +19,10 @@ const MEETUP_TIME_WINDOW: Record<string, string> = {
 const LAUNCHING_COPY = {
   lead: "A casual monthly meetup for people making things with AI. Bring a laptop, or just bring questions.",
   format:
-    "No talk, no agenda. Some people work on a project in the corner, some people come to figure out what any of this even is. Both are the point.",
+    "Demos and Q&A first, then networking for the rest of the night. Anyone is welcome to show what they're working on and get feedback.",
   audience: "Developers, founders, students, and the AI-curious.",
   emphasis: "You don't need to code.",
-  firstEvent: "First event to be announced",
+  nextEventPending: "Next event to be announced",
 };
 
 type ChapterPageProps = {
@@ -100,7 +100,7 @@ function LaunchingDetails({ snapshot }: { snapshot: ChapterSnapshot }) {
   const segments = [
     nextEvent
       ? formatEventDay(nextEvent.dateTime) ?? nextEvent.dateTime
-      : LAUNCHING_COPY.firstEvent,
+      : LAUNCHING_COPY.nextEventPending,
     MEETUP_TIME_WINDOW[chapter.slug] ?? null,
     chapter.venue ?? null,
   ].filter((segment): segment is string => segment !== null);
