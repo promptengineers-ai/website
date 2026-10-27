@@ -82,8 +82,12 @@ describe("chapter page", () => {
     expect(
       screen.getByText(/Bring a laptop, or just bring questions\./),
     ).toBeInTheDocument();
-    expect(screen.getByText(/No talk, no agenda\./)).toBeInTheDocument();
-    expect(screen.getByText(/Both are the point\./)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Demos and Q&A first, then networking/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Anyone is welcome to show what they're working on/),
+    ).toBeInTheDocument();
     expect(
       screen.getAllByText(/Atwood Innovation Plaza/).length,
     ).toBeGreaterThan(0);
@@ -105,7 +109,7 @@ describe("chapter page", () => {
       "href",
       "https://www.meetup.com/synthetic-prompt-engineers/events/900000101/",
     );
-    expect(container.textContent).not.toMatch(/first event to be announced/i);
+    expect(container.textContent).not.toMatch(/next event to be announced/i);
   });
 
   it("renders no date when the Meetup group has no upcoming event", async () => {
@@ -113,7 +117,7 @@ describe("chapter page", () => {
     const { container } = await renderChapter("st-george");
 
     expect(
-      screen.getAllByText(/first event to be announced/i).length,
+      screen.getAllByText(/next event to be announced/i).length,
     ).toBeGreaterThan(0);
     expect(container.textContent).not.toMatch(DATE_PATTERN);
     expect(container.querySelector("time")).toBeNull();
@@ -158,7 +162,7 @@ describe("chapter page", () => {
       screen.getByRole("link", { name: /rsvp on meetup/i }),
     ).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/You don't need to code/);
-    expect(container.textContent).not.toMatch(/No talk, no agenda/);
+    expect(container.textContent).not.toMatch(/Demos and Q&A first/);
   });
 
   it("emphasis sentence renders byte-identical", async () => {
@@ -176,7 +180,7 @@ describe("chapter page", () => {
 
     const emphasis = screen.getByText("You don't need to code.");
     const lead = screen.getByText(/Bring a laptop, or just bring questions\./);
-    const format = screen.getByText(/No talk, no agenda\./);
+    const format = screen.getByText(/Demos and Q&A first/);
     const audience = screen.getByText(
       /Developers, founders, students, and the AI-curious\./,
     );

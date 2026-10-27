@@ -23,9 +23,7 @@ describe("ChapterCard", () => {
       screen.getByText("Atwood Innovation Plaza at UT"),
     ).toBeInTheDocument();
     expect(screen.getByText("Ryan Eggleston")).toBeInTheDocument();
-    expect(
-      screen.getByText(/first event to be announced/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/next event to be announced/i)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /view on meetup/i }),
     ).toHaveAttribute(
