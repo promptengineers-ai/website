@@ -81,7 +81,7 @@ describe("chapter metadata", () => {
     }
   });
 
-  it("launching chapter metadata carries no date and no member count", async () => {
+  it("St. George Build Night metadata carries no date or member count", async () => {
     const entries = await chapterMetadata();
 
     for (const { chapter, metadata } of entries) {
@@ -92,7 +92,7 @@ describe("chapter metadata", () => {
         ...imageUrls(metadata.openGraph?.images),
       ].join(" ");
       expect(text).not.toMatch(HARDCODED_MEMBER_COUNT);
-      if (chapter.status === "launching") {
+      if (chapter.slug === "st-george") {
         expect(text).not.toMatch(/\b20\d{2}\b|\b\d{1,2}\/\d{1,2}\b/);
         expect(text).toContain("You don't need to code");
       }

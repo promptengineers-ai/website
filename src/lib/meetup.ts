@@ -118,6 +118,7 @@ export async function getChapterSnapshot(
 }
 
 export function formatMemberCount(count: number): string {
+  if (count < 100) return String(count);
   return `${(Math.floor(count / 100) * 100).toLocaleString("en-US")}+`;
 }
 
