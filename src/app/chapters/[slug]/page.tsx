@@ -8,6 +8,8 @@ import type { Chapter } from "@/config/chapters";
 import { formatEventDay, getChapterSnapshot } from "@/lib/meetup";
 import type { ChapterSnapshot } from "@/types";
 
+export const revalidate = 3600;
+
 const PRODUCTION_URL = "https://promptengineers.ai/";
 const SLACK_INVITE_URL =
   "https://join.slack.com/t/promptengineersai/shared_invite/zt-3t4w1meid-10gQHbgoWO~UYPJprH~Cyw";

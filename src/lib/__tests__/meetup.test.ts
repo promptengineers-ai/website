@@ -104,7 +104,7 @@ describe("getChapterSnapshot", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       plano.meetupUrl,
-      expect.objectContaining({ next: { revalidate: 86400 } }),
+      expect.objectContaining({ next: { revalidate: 3600 } }),
     );
     expect(snapshot.chapter).toBe(plano);
     expect(snapshot.stats?.memberCount).toBe(3983);
@@ -121,7 +121,7 @@ describe("getChapterSnapshot", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       stGeorge.meetupUrl,
-      expect.anything(),
+      expect.objectContaining({ next: { revalidate: 3600 } }),
     );
     expect(snapshot.stats).toBeNull();
   });
@@ -186,7 +186,10 @@ describe("getMeetupStats", () => {
   it("defaults to the Plano group and keeps the fallback contract", async () => {
     fetchMock.mockResolvedValue(htmlResponse(fixture));
     expect((await getMeetupStats()).memberCount).toBe(3983);
-    expect(fetchMock).toHaveBeenCalledWith(plano.meetupUrl, expect.anything());
+    expect(fetchMock).toHaveBeenCalledWith(
+      plano.meetupUrl,
+      expect.objectContaining({ next: { revalidate: 3600 } }),
+    );
 
     fetchMock.mockRejectedValue(new Error("network down"));
     expect(await getMeetupStats()).toBe(FALLBACK_MEETUP_STATS);
