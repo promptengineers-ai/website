@@ -18,7 +18,7 @@ const MEETUP_TIME_WINDOW: Record<string, string> = {
   "st-george": "6–9 PM",
 };
 
-const LAUNCHING_COPY = {
+const BUILD_NIGHT_COPY = {
   lead: "A casual monthly meetup for people making things with AI. Bring a laptop, or just bring questions.",
   format:
     "Demos and Q&A first, then networking for the rest of the night. Anyone is welcome to show what they're working on and get feedback.",
@@ -40,11 +40,11 @@ type ChapterCopy = {
 function chapterCopy(chapter: Chapter): ChapterCopy {
   const place = `${chapter.city}, ${chapter.state}`;
 
-  if (chapter.status === "launching") {
+  if (chapter.slug === "st-george") {
     return {
       title: `AI Build Night — ${place}`,
       heading: `AI Build Night — ${chapter.name}`,
-      description: `A casual monthly meetup in ${place} for people making things with AI. Bring a laptop, or just bring questions. ${LAUNCHING_COPY.emphasis}`,
+      description: `A casual monthly meetup in ${place} for people making things with AI. Bring a laptop, or just bring questions. ${BUILD_NIGHT_COPY.emphasis}`,
     };
   }
 
@@ -97,12 +97,12 @@ function rsvpUrl({ chapter, nextEvent }: ChapterSnapshot): string | null {
   return nextEvent?.url ?? (chapter.meetupUrl || null);
 }
 
-function LaunchingDetails({ snapshot }: { snapshot: ChapterSnapshot }) {
+function BuildNightDetails({ snapshot }: { snapshot: ChapterSnapshot }) {
   const { chapter, nextEvent } = snapshot;
   const segments = [
     nextEvent
       ? formatEventDay(nextEvent.dateTime) ?? nextEvent.dateTime
-      : LAUNCHING_COPY.nextEventPending,
+      : BUILD_NIGHT_COPY.nextEventPending,
     MEETUP_TIME_WINDOW[chapter.slug] ?? null,
     chapter.venue ?? null,
   ].filter((segment): segment is string => segment !== null);
@@ -110,11 +110,11 @@ function LaunchingDetails({ snapshot }: { snapshot: ChapterSnapshot }) {
   return (
     <div className="space-y-6 text-lg leading-relaxed text-gray-200">
       <p className="text-3xl font-bold leading-tight text-white sm:text-4xl">
-        {LAUNCHING_COPY.emphasis}
+        {BUILD_NIGHT_COPY.emphasis}
       </p>
-      <p>{LAUNCHING_COPY.lead}</p>
-      <p>{LAUNCHING_COPY.format}</p>
-      <p>{LAUNCHING_COPY.audience}</p>
+      <p>{BUILD_NIGHT_COPY.lead}</p>
+      <p>{BUILD_NIGHT_COPY.format}</p>
+      <p>{BUILD_NIGHT_COPY.audience}</p>
       <p className="text-base text-gray-400">
         {nextEvent ? (
           <time dateTime={nextEvent.dateTime}>{segments.join(" · ")}</time>
@@ -152,7 +152,7 @@ function OtherChapters({ chapter }: { chapter: Chapter }) {
   );
 }
 
-function LaunchingActions({ snapshot }: { snapshot: ChapterSnapshot }) {
+function BuildNightActions({ snapshot }: { snapshot: ChapterSnapshot }) {
   const rsvp = rsvpUrl(snapshot);
 
   return (
@@ -214,7 +214,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const chapter = requireChapter(params.slug);
   const snapshot = await getChapterSnapshot(chapter);
   const copy = chapterCopy(chapter);
-  const launching = chapter.status === "launching";
+  const buildNight = chapter.slug === "st-george";
 
   return (
     <>
@@ -236,16 +236,16 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
               </h1>
             </div>
 
-            {launching ? (
-              <LaunchingDetails snapshot={snapshot} />
+            {buildNight ? (
+              <BuildNightDetails snapshot={snapshot} />
             ) : (
               <p className="text-lg leading-relaxed text-gray-200">
                 Event details, the group description, and RSVPs live on Meetup.
               </p>
             )}
 
-            {launching ? (
-              <LaunchingActions snapshot={snapshot} />
+            {buildNight ? (
+              <BuildNightActions snapshot={snapshot} />
             ) : (
               <EstablishedActions snapshot={snapshot} />
             )}

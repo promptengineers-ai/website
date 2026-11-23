@@ -56,6 +56,11 @@ export default function ChapterCard({ snapshot }: ChapterCardProps) {
         </p>
         {nextEvent ? (
           <>
+            {stats && (
+              <p className="mt-2 text-sm text-gray-300">
+                Event #{stats.pastEventCount + 1}
+              </p>
+            )}
             <a
               href={nextEvent.url}
               target="_blank"

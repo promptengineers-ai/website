@@ -30,6 +30,11 @@ const noUpcomingFixture = readFileSync(
   "utf-8",
 );
 
+const stGeorgeFixture = readFileSync(
+  join(__dirname, "fixtures", "meetup-group-st-george.html"),
+  "utf-8",
+);
+
 const plano = getChapter("plano") as Chapter;
 const stGeorge = getChapter("st-george") as Chapter;
 
@@ -114,10 +119,31 @@ describe("getChapterSnapshot", () => {
     );
   });
 
+  it("returns established St. George stats and its upcoming event", async () => {
+    fetchMock.mockResolvedValue(htmlResponse(stGeorgeFixture));
+    const snapshot = await getChapterSnapshot(stGeorge);
+    expect(snapshot.chapter.status).toBe("established");
+    expect(snapshot.stats).toEqual({
+      memberCount: 47,
+      pastEventCount: 2,
+      averageRating: 5,
+      ratingCount: 2,
+      isFallback: false,
+    });
+    expect(snapshot.nextEvent?.dateTime).toBe("2026-12-15T18:30:00-06:00");
+    expect(fetchMock).toHaveBeenCalledWith(
+      stGeorge.meetupUrl,
+      expect.anything(),
+    );
+  });
+
   it("launching chapter never returns another chapter's stats", async () => {
     fetchMock.mockResolvedValue(htmlResponse(fixture));
 
-    const snapshot = await getChapterSnapshot(stGeorge);
+    const snapshot = await getChapterSnapshot({
+      ...stGeorge,
+      status: "launching",
+    });
 
     expect(fetchMock).toHaveBeenCalledWith(
       stGeorge.meetupUrl,
@@ -129,6 +155,7 @@ describe("getChapterSnapshot", () => {
   it("launching chapter with a Meetup URL keeps its own next event and no stats", async () => {
     const launched: Chapter = {
       ...stGeorge,
+      status: "launching",
       meetupUrl: "https://www.meetup.com/synthetic-prompt-engineers/",
     };
     fetchMock.mockResolvedValue(htmlResponse(newGroupFixture));
@@ -208,6 +235,13 @@ describe("getMeetupStats", () => {
 });
 
 describe("formatters", () => {
+  it("keeps exact counts below one hundred", () => {
+    expect(formatMemberCount(0)).toBe("0");
+    expect(formatMemberCount(47)).toBe("47");
+    expect(formatMemberCount(99)).toBe("99");
+    expect(formatMemberCount(100)).toBe("100+");
+  });
+
   it("rounds members down to the nearest hundred", () => {
     expect(formatMemberCount(3983)).toBe("3,900+");
     expect(formatMemberCount(2450)).toBe("2,400+");

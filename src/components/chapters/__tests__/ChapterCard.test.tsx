@@ -10,7 +10,7 @@ const stGeorge = getChapter("st-george") as Chapter;
 describe("ChapterCard", () => {
   it("renders founding state for launching chapter", () => {
     const snapshot: ChapterSnapshot = {
-      chapter: stGeorge,
+      chapter: { ...stGeorge, status: "launching" },
       stats: null,
       nextEvent: null,
     };
@@ -67,6 +67,33 @@ describe("ChapterCard", () => {
     ).toHaveAttribute("href", plano.meetupUrl);
   });
 
+  it("shows the third upcoming event for established St. George", () => {
+    render(
+      <ChapterCard
+        snapshot={{
+          chapter: stGeorge,
+          stats: {
+            memberCount: 47,
+            pastEventCount: 2,
+            averageRating: 5,
+            ratingCount: 2,
+            isFallback: false,
+          },
+          nextEvent: {
+            title: "Synthetic Build Night",
+            dateTime: "2026-12-15T18:00:00-07:00",
+            url: "https://www.meetup.com/synthetic-prompt-engineers/events/900000101/",
+          },
+        }}
+      />,
+    );
+    expect(screen.getByText("Established")).toBeInTheDocument();
+    expect(screen.getByText("47 members")).toBeInTheDocument();
+    expect(screen.getByText("Next event")).toBeInTheDocument();
+    expect(screen.getByText("Event #3")).toBeInTheDocument();
+    expect(screen.queryByText(/3 events/)).not.toBeInTheDocument();
+  });
+
   it("renders no event when the scrape returned none", () => {
     render(
       <ChapterCard
@@ -76,6 +103,7 @@ describe("ChapterCard", () => {
 
     expect(screen.getByText(/no upcoming event/i)).toBeInTheDocument();
     expect(screen.queryByText(/members/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Event #/)).not.toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /view on meetup/i }),
     ).toHaveAttribute("href", plano.meetupUrl);

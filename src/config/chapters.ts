@@ -42,7 +42,7 @@ export const CHAPTERS: Chapter[] = [
     name: "St. George",
     city: "St. George",
     state: "UT",
-    status: "launching",
+    status: "established",
     meetupUrl:
       "https://www.meetup.com/prompt-engineers-ai-community-st-george/",
     organizers: [
