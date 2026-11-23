@@ -11,6 +11,7 @@ describe("chapter registry", () => {
   it("contains the plano and st-george chapters", () => {
     expect(CHAPTER_SLUGS).toContain("plano");
     expect(CHAPTER_SLUGS).toContain("st-george");
+    expect(getChapter("st-george")?.status).toBe("established");
     expect(CHAPTERS).toHaveLength(CHAPTER_SLUGS.length);
   });
 });

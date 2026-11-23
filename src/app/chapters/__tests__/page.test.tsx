@@ -15,8 +15,8 @@ const planoFixture = readFileSync(
   "utf-8",
 );
 
-const newGroupFixture = readFileSync(
-  join(process.cwd(), "src/lib/__tests__/fixtures/meetup-group-new.html"),
+const stGeorgeFixture = readFileSync(
+  join(process.cwd(), "src/lib/__tests__/fixtures/meetup-group-st-george.html"),
   "utf-8",
 );
 
@@ -53,7 +53,7 @@ describe("chapter page", () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
-    fetchMock.mockImplementation(serveMeetup(newGroupFixture));
+    fetchMock.mockImplementation(serveMeetup(stGeorgeFixture));
     vi.stubGlobal("fetch", fetchMock);
   });
 
@@ -73,7 +73,7 @@ describe("chapter page", () => {
     );
   });
 
-  it("renders founding copy for launching chapter", async () => {
+  it("retains Build Night copy for established St. George", async () => {
     await renderChapter("st-george");
 
     expect(
@@ -96,16 +96,25 @@ describe("chapter page", () => {
       screen.getAllByText(/Atwood Innovation Plaza/).length,
     ).toBeGreaterThan(0);
     expect(screen.getByText(/6–9 PM/)).toBeInTheDocument();
+    expect(screen.getByText("Established")).toBeInTheDocument();
+    expect(screen.getByText("47 members")).toBeInTheDocument();
+    expect(screen.getByText("Event #3")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /say hi on slack/i }),
+    ).toHaveAttribute(
+      "href",
+      expect.stringContaining("https://join.slack.com/"),
+    );
   });
 
-  it("renders the kickoff date, time window, venue, and RSVP link", async () => {
+  it("renders the upcoming event date, time window, venue, and RSVP link", async () => {
     const { container } = await renderChapter("st-george");
 
     expect(
-      screen.getByText("Wed, Oct 14 · 6–9 PM · Atwood Innovation Plaza at UT"),
+      screen.getByText("Tue, Dec 15 · 6–9 PM · Atwood Innovation Plaza at UT"),
     ).toBeInTheDocument();
     expect(
-      container.querySelector("time[datetime='2026-10-14T18:30:00-06:00']"),
+      container.querySelector("time[datetime='2026-12-15T18:30:00-06:00']"),
     ).not.toBeNull();
     expect(
       screen.getByRole("link", { name: /rsvp on meetup/i }),
@@ -139,7 +148,7 @@ describe("chapter page", () => {
       ST_GEORGE_MEETUP_URL,
       expect.anything(),
     );
-    expect(screen.queryByText(/members/i)).not.toBeInTheDocument();
+    expect(screen.getByText("47 members")).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/3,9\d\d|3,900|3983/);
     expect(container.textContent).not.toMatch(
       /Building Your First Engineering Harness/,
