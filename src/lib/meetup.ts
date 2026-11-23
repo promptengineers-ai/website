@@ -4,7 +4,7 @@ import type { ChapterSnapshot, MeetupEvent, MeetupStats } from "@/types";
 
 const DEFAULT_CHAPTER: Chapter = getChapter("plano") ?? CHAPTERS[0];
 
-const REVALIDATE_SECONDS = 86400;
+const REVALIDATE_SECONDS = 3600;
 
 const BROWSER_USER_AGENT =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";

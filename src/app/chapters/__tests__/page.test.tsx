@@ -8,7 +8,7 @@ vi.mock("@/components/nav/TopNavBar", () => ({
   default: () => <div data-testid="top-nav-bar" />,
 }));
 
-import ChapterPage, { generateStaticParams } from "../[slug]/page";
+import ChapterPage, { generateStaticParams, revalidate } from "../[slug]/page";
 
 const planoFixture = readFileSync(
   join(process.cwd(), "src/lib/__tests__/fixtures/meetup-group.html"),
@@ -59,6 +59,10 @@ describe("chapter page", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("revalidates chapter pages hourly", () => {
+    expect(revalidate).toBe(3600);
   });
 
   it("generateStaticParams returns all registry slugs", async () => {
